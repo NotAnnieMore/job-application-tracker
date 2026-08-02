@@ -1,0 +1,380 @@
+export type ApplicationStatusValue =
+  | "interested"
+  | "applied"
+  | "interview_scheduled"
+  | "interview_completed"
+  | "awaiting_response"
+  | "offer_received"
+  | "rejected"
+  | "withdrawn";
+
+export type WorkModeValue = "onsite" | "hybrid" | "remote";
+export type ActionStatusValue = "pending" | "completed" | "cancelled";
+export type ActionPriorityValue = "low" | "medium" | "high";
+
+export interface ProfileRow {
+  id: string;
+  full_name: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProfileInsert {
+  id: string;
+  full_name: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type ProfileUpdate = Partial<ProfileInsert>;
+
+export interface CompanyRow {
+  id: string;
+  user_id: string;
+  name: string;
+  website: string | null;
+  location: string | null;
+  industry: string | null;
+  work_mode: WorkModeValue | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface CompanyInsert {
+  id?: string;
+  user_id: string;
+  name: string;
+  website?: string | null;
+  location?: string | null;
+  industry?: string | null;
+  work_mode?: WorkModeValue | null;
+  notes?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type CompanyUpdate = Partial<CompanyInsert>;
+
+export interface RecruiterRow {
+  id: string;
+  user_id: string;
+  company_id: string | null;
+  name: string;
+  email: string | null;
+  phone: string | null;
+  job_title: string | null;
+  linkedin_url: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RecruiterInsert {
+  id?: string;
+  user_id: string;
+  company_id?: string | null;
+  name: string;
+  email?: string | null;
+  phone?: string | null;
+  job_title?: string | null;
+  linkedin_url?: string | null;
+  notes?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type RecruiterUpdate = Partial<RecruiterInsert>;
+
+export interface OpportunityRow {
+  id: string;
+  user_id: string;
+  company_id: string;
+  title: string;
+  location: string | null;
+  work_mode: WorkModeValue | null;
+  employment_type: string | null;
+  salary_min: number | null;
+  salary_max: number | null;
+  currency: string;
+  job_url: string | null;
+  skills: string[];
+  summary: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface OpportunityInsert {
+  id?: string;
+  user_id: string;
+  company_id: string;
+  title: string;
+  location?: string | null;
+  work_mode?: WorkModeValue | null;
+  employment_type?: string | null;
+  salary_min?: number | null;
+  salary_max?: number | null;
+  currency?: string;
+  job_url?: string | null;
+  skills?: string[];
+  summary?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type OpportunityUpdate = Partial<OpportunityInsert>;
+
+export interface ApplicationRow {
+  id: string;
+  user_id: string;
+  opportunity_id: string;
+  primary_recruiter_id: string | null;
+  status: ApplicationStatusValue;
+  application_date: string;
+  source: string | null;
+  expected_salary: number | null;
+  summary_notes: string | null;
+  next_action_summary: string | null;
+  follow_up_date: string | null;
+  interview_preparation: string | null;
+  questions_for_company: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ApplicationInsert {
+  id?: string;
+  user_id: string;
+  opportunity_id: string;
+  primary_recruiter_id?: string | null;
+  status?: ApplicationStatusValue;
+  application_date?: string;
+  source?: string | null;
+  expected_salary?: number | null;
+  summary_notes?: string | null;
+  next_action_summary?: string | null;
+  follow_up_date?: string | null;
+  interview_preparation?: string | null;
+  questions_for_company?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type ApplicationUpdate = Partial<ApplicationInsert>;
+
+export interface InterviewRow {
+  id: string;
+  user_id: string;
+  application_id: string;
+  interview_type: string;
+  scheduled_at: string;
+  location_or_url: string | null;
+  participants: string[];
+  preparation: string | null;
+  feedback: string | null;
+  result: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface InterviewInsert {
+  id?: string;
+  user_id: string;
+  application_id: string;
+  interview_type: string;
+  scheduled_at: string;
+  location_or_url?: string | null;
+  participants?: string[];
+  preparation?: string | null;
+  feedback?: string | null;
+  result?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type InterviewUpdate = Partial<InterviewInsert>;
+
+export interface NoteRow {
+  id: string;
+  user_id: string;
+  application_id: string;
+  content: string;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface NoteInsert {
+  id?: string;
+  user_id: string;
+  application_id: string;
+  content: string;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type NoteUpdate = Partial<NoteInsert>;
+
+export interface ActionRow {
+  id: string;
+  user_id: string;
+  application_id: string;
+  description: string;
+  due_date: string | null;
+  status: ActionStatusValue;
+  priority: ActionPriorityValue;
+  completed_at: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ActionInsert {
+  id?: string;
+  user_id: string;
+  application_id: string;
+  description: string;
+  due_date?: string | null;
+  status?: ActionStatusValue;
+  priority?: ActionPriorityValue;
+  completed_at?: string | null;
+  created_at?: string;
+  updated_at?: string;
+}
+
+export type ActionUpdate = Partial<ActionInsert>;
+
+interface Relationship {
+  foreignKeyName: string;
+  columns: string[];
+  isOneToOne: boolean;
+  referencedRelation: string;
+  referencedColumns: string[];
+}
+
+interface TableDefinition<
+  Row,
+  Insert,
+  Update,
+  Relationships extends Relationship[] = [],
+> {
+  Row: Row;
+  Insert: Insert;
+  Update: Update;
+  Relationships: Relationships;
+}
+
+export interface Database {
+  public: {
+    Tables: {
+      profiles: TableDefinition<ProfileRow, ProfileInsert, ProfileUpdate>;
+      companies: TableDefinition<CompanyRow, CompanyInsert, CompanyUpdate>;
+      recruiters: TableDefinition<
+        RecruiterRow,
+        RecruiterInsert,
+        RecruiterUpdate,
+        [
+          {
+            foreignKeyName: "recruiters_company_same_user";
+            columns: ["user_id", "company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["user_id", "id"];
+          },
+        ]
+      >;
+      opportunities: TableDefinition<
+        OpportunityRow,
+        OpportunityInsert,
+        OpportunityUpdate,
+        [
+          {
+            foreignKeyName: "opportunities_company_same_user";
+            columns: ["user_id", "company_id"];
+            isOneToOne: false;
+            referencedRelation: "companies";
+            referencedColumns: ["user_id", "id"];
+          },
+        ]
+      >;
+      applications: TableDefinition<
+        ApplicationRow,
+        ApplicationInsert,
+        ApplicationUpdate,
+        [
+          {
+            foreignKeyName: "applications_opportunity_same_user";
+            columns: ["user_id", "opportunity_id"];
+            isOneToOne: false;
+            referencedRelation: "opportunities";
+            referencedColumns: ["user_id", "id"];
+          },
+          {
+            foreignKeyName: "applications_recruiter_same_user";
+            columns: ["user_id", "primary_recruiter_id"];
+            isOneToOne: false;
+            referencedRelation: "recruiters";
+            referencedColumns: ["user_id", "id"];
+          },
+        ]
+      >;
+      interviews: TableDefinition<
+        InterviewRow,
+        InterviewInsert,
+        InterviewUpdate,
+        [
+          {
+            foreignKeyName: "interviews_application_same_user";
+            columns: ["user_id", "application_id"];
+            isOneToOne: false;
+            referencedRelation: "applications";
+            referencedColumns: ["user_id", "id"];
+          },
+        ]
+      >;
+      notes: TableDefinition<
+        NoteRow,
+        NoteInsert,
+        NoteUpdate,
+        [
+          {
+            foreignKeyName: "notes_application_same_user";
+            columns: ["user_id", "application_id"];
+            isOneToOne: false;
+            referencedRelation: "applications";
+            referencedColumns: ["user_id", "id"];
+          },
+        ]
+      >;
+      actions: TableDefinition<
+        ActionRow,
+        ActionInsert,
+        ActionUpdate,
+        [
+          {
+            foreignKeyName: "actions_application_same_user";
+            columns: ["user_id", "application_id"];
+            isOneToOne: false;
+            referencedRelation: "applications";
+            referencedColumns: ["user_id", "id"];
+          },
+        ]
+      >;
+    };
+    Views: Record<string, never>;
+    Functions: Record<string, never>;
+    Enums: {
+      application_status: ApplicationStatusValue;
+      work_mode: WorkModeValue;
+      action_status: ActionStatusValue;
+      action_priority: ActionPriorityValue;
+    };
+    CompositeTypes: Record<string, never>;
+  };
+}
+
+export type PublicTableName = keyof Database["public"]["Tables"];
+export type TableRow<Name extends PublicTableName> =
+  Database["public"]["Tables"][Name]["Row"];
+export type TableInsert<Name extends PublicTableName> =
+  Database["public"]["Tables"][Name]["Insert"];
+export type TableUpdate<Name extends PublicTableName> =
+  Database["public"]["Tables"][Name]["Update"];

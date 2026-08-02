@@ -4,7 +4,7 @@ Aplicação web privada para organizar candidaturas, empresas, recrutadores, ent
 
 ## Estado atual
 
-O projeto concluiu a Fase 2. A base Next.js, os clientes Supabase, o sistema visual e a navegação responsiva estão configurados. As páginas usam dados de demonstração; a autenticação e o modelo de dados ainda não foram implementados.
+O projeto concluiu a Fase 3. A base Next.js, os clientes Supabase, o sistema visual, a navegação responsiva e o modelo inicial de dados estão configurados. As páginas continuam a usar dados de demonstração até a autenticação com políticas RLS ser concluída.
 
 ## Stack
 
@@ -73,4 +73,5 @@ pnpm format
 
 - A definição do produto encontra-se em `docs/product/`.
 - As decisões importantes encontram-se em `docs/decisions/`.
+- O esquema e as instruções da base de dados encontram-se em `docs/database.md`.
 - Os documentos que deram origem ao projeto encontram-se em `context/`.
