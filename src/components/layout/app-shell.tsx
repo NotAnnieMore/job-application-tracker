@@ -4,8 +4,15 @@ import { useState, type ReactNode } from "react";
 
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
+import type { CurrentUser } from "@/features/auth/types";
 
-export function AppShell({ children }: { children: ReactNode }) {
+export function AppShell({
+  children,
+  user,
+}: {
+  children: ReactNode;
+  user: CurrentUser;
+}) {
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -33,7 +40,7 @@ export function AppShell({ children }: { children: ReactNode }) {
       ) : null}
 
       <div className="min-w-0 flex-1">
-        <AppHeader onOpenMenu={() => setMobileMenuOpen(true)} />
+        <AppHeader user={user} onOpenMenu={() => setMobileMenuOpen(true)} />
         <main className="mx-auto w-full max-w-[1600px] p-4 sm:p-6 lg:p-8">
           {children}
         </main>

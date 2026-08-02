@@ -34,7 +34,7 @@ export function AuthShell({
           </p>
         </div>
         <p className="text-xs text-slate-500">
-          Interface de demonstração — Fase 2
+          Acesso privado com dados isolados por utilizador
         </p>
       </section>
 
@@ -49,7 +49,7 @@ export function AuthShell({
             </span>
             Job Application Tracker
           </Link>
-          <Badge variant="blue">Demonstração visual</Badge>
+          <Badge variant="blue">Área privada</Badge>
           <h1 className="mt-5 text-3xl font-bold tracking-tight text-slate-950">
             {title}
           </h1>

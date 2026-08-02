@@ -4,7 +4,7 @@ Aplicação web privada para organizar candidaturas, empresas, recrutadores, ent
 
 ## Estado atual
 
-O projeto concluiu a Fase 3. A base Next.js, os clientes Supabase, o sistema visual, a navegação responsiva e o modelo inicial de dados estão configurados. As páginas continuam a usar dados de demonstração até a autenticação com políticas RLS ser concluída.
+O projeto concluiu a Fase 4. A base Next.js, os clientes Supabase, o sistema visual, a navegação responsiva, o modelo inicial de dados e a autenticação estão configurados. As páginas privadas exigem uma sessão válida e as políticas RLS isolam os dados de cada utilizador. O conteúdo funcional continua a usar dados de demonstração até à integração com a base de dados na próxima fase.
 
 ## Stack
 
@@ -13,7 +13,7 @@ O projeto concluiu a Fase 3. A base Next.js, os clientes Supabase, o sistema vis
 - TypeScript em modo estrito
 - Tailwind CSS 4
 - ESLint e Prettier
-- Supabase e PostgreSQL nas próximas fases
+- Supabase Auth e PostgreSQL com Row Level Security
 - Vercel para publicação
 
 ## Páginas disponíveis
@@ -25,7 +25,7 @@ O projeto concluiu a Fase 3. A base Next.js, os clientes Supabase, o sistema vis
 - `/entrevistas`
 - `/acoes`
 - `/definicoes`
-- `/login` e `/registo`
+- `/login`, `/registo`, `/recuperar-password` e `/atualizar-password`
 
 ## Requisitos
 
@@ -74,4 +74,5 @@ pnpm format
 - A definição do produto encontra-se em `docs/product/`.
 - As decisões importantes encontram-se em `docs/decisions/`.
 - O esquema e as instruções da base de dados encontram-se em `docs/database.md`.
-- Os documentos que deram origem ao projeto encontram-se em `context/`.
+- A autenticação e os respetivos testes encontram-se documentados em `docs/authentication.md`.
+- Os documentos que deram origem ao projeto permanecem apenas na pasta local ignorada `context/`.

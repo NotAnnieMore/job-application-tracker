@@ -12,23 +12,23 @@ export type WorkModeValue = "onsite" | "hybrid" | "remote";
 export type ActionStatusValue = "pending" | "completed" | "cancelled";
 export type ActionPriorityValue = "low" | "medium" | "high";
 
-export interface ProfileRow {
+export type ProfileRow = {
   id: string;
   full_name: string;
   created_at: string;
   updated_at: string;
-}
+};
 
-export interface ProfileInsert {
+export type ProfileInsert = {
   id: string;
   full_name: string;
   created_at?: string;
   updated_at?: string;
-}
+};
 
 export type ProfileUpdate = Partial<ProfileInsert>;
 
-export interface CompanyRow {
+export type CompanyRow = {
   id: string;
   user_id: string;
   name: string;
@@ -39,9 +39,9 @@ export interface CompanyRow {
   notes: string | null;
   created_at: string;
   updated_at: string;
-}
+};
 
-export interface CompanyInsert {
+export type CompanyInsert = {
   id?: string;
   user_id: string;
   name: string;
@@ -52,11 +52,11 @@ export interface CompanyInsert {
   notes?: string | null;
   created_at?: string;
   updated_at?: string;
-}
+};
 
 export type CompanyUpdate = Partial<CompanyInsert>;
 
-export interface RecruiterRow {
+export type RecruiterRow = {
   id: string;
   user_id: string;
   company_id: string | null;
@@ -68,9 +68,9 @@ export interface RecruiterRow {
   notes: string | null;
   created_at: string;
   updated_at: string;
-}
+};
 
-export interface RecruiterInsert {
+export type RecruiterInsert = {
   id?: string;
   user_id: string;
   company_id?: string | null;
@@ -82,11 +82,11 @@ export interface RecruiterInsert {
   notes?: string | null;
   created_at?: string;
   updated_at?: string;
-}
+};
 
 export type RecruiterUpdate = Partial<RecruiterInsert>;
 
-export interface OpportunityRow {
+export type OpportunityRow = {
   id: string;
   user_id: string;
   company_id: string;
@@ -102,9 +102,9 @@ export interface OpportunityRow {
   summary: string | null;
   created_at: string;
   updated_at: string;
-}
+};
 
-export interface OpportunityInsert {
+export type OpportunityInsert = {
   id?: string;
   user_id: string;
   company_id: string;
@@ -120,11 +120,11 @@ export interface OpportunityInsert {
   summary?: string | null;
   created_at?: string;
   updated_at?: string;
-}
+};
 
 export type OpportunityUpdate = Partial<OpportunityInsert>;
 
-export interface ApplicationRow {
+export type ApplicationRow = {
   id: string;
   user_id: string;
   opportunity_id: string;
@@ -140,9 +140,9 @@ export interface ApplicationRow {
   questions_for_company: string | null;
   created_at: string;
   updated_at: string;
-}
+};
 
-export interface ApplicationInsert {
+export type ApplicationInsert = {
   id?: string;
   user_id: string;
   opportunity_id: string;
@@ -158,11 +158,11 @@ export interface ApplicationInsert {
   questions_for_company?: string | null;
   created_at?: string;
   updated_at?: string;
-}
+};
 
 export type ApplicationUpdate = Partial<ApplicationInsert>;
 
-export interface InterviewRow {
+export type InterviewRow = {
   id: string;
   user_id: string;
   application_id: string;
@@ -175,9 +175,9 @@ export interface InterviewRow {
   result: string | null;
   created_at: string;
   updated_at: string;
-}
+};
 
-export interface InterviewInsert {
+export type InterviewInsert = {
   id?: string;
   user_id: string;
   application_id: string;
@@ -190,31 +190,31 @@ export interface InterviewInsert {
   result?: string | null;
   created_at?: string;
   updated_at?: string;
-}
+};
 
 export type InterviewUpdate = Partial<InterviewInsert>;
 
-export interface NoteRow {
+export type NoteRow = {
   id: string;
   user_id: string;
   application_id: string;
   content: string;
   created_at: string;
   updated_at: string;
-}
+};
 
-export interface NoteInsert {
+export type NoteInsert = {
   id?: string;
   user_id: string;
   application_id: string;
   content: string;
   created_at?: string;
   updated_at?: string;
-}
+};
 
 export type NoteUpdate = Partial<NoteInsert>;
 
-export interface ActionRow {
+export type ActionRow = {
   id: string;
   user_id: string;
   application_id: string;
@@ -225,9 +225,9 @@ export interface ActionRow {
   completed_at: string | null;
   created_at: string;
   updated_at: string;
-}
+};
 
-export interface ActionInsert {
+export type ActionInsert = {
   id?: string;
   user_id: string;
   application_id: string;
@@ -238,7 +238,7 @@ export interface ActionInsert {
   completed_at?: string | null;
   created_at?: string;
   updated_at?: string;
-}
+};
 
 export type ActionUpdate = Partial<ActionInsert>;
 

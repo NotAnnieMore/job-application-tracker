@@ -8,12 +8,14 @@ export function FormField({
   htmlFor,
   required,
   hint,
+  error,
   children,
 }: {
   label: string;
   htmlFor: string;
   required?: boolean;
   hint?: string;
+  error?: string;
   children: ReactNode;
 }) {
   return (
@@ -23,7 +25,19 @@ export function FormField({
         {required ? <span className="ml-1 text-red-500">*</span> : null}
       </label>
       <div className="mt-2">{children}</div>
-      {hint ? <p className="mt-1.5 text-xs text-slate-500">{hint}</p> : null}
+      {error ? (
+        <p
+          id={`${htmlFor}-error`}
+          role="alert"
+          className="mt-1.5 text-xs font-medium text-red-600"
+        >
+          {error}
+        </p>
+      ) : hint ? (
+        <p id={`${htmlFor}-hint`} className="mt-1.5 text-xs text-slate-500">
+          {hint}
+        </p>
+      ) : null}
     </div>
   );
 }

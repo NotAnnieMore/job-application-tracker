@@ -76,7 +76,7 @@ As ações usam os estados `pending`, `completed` e `cancelled`, com prioridades
 
 Todas as tabelas têm Row Level Security ativo. A role `anon` não recebe permissões e a role `authenticated` recebe as operações necessárias, mas ainda não existem políticas RLS. Consequentemente, o acesso através da Data API permanece fechado.
 
-As políticas que usam `auth.uid()` serão criadas na Fase 4 e testadas com duas contas antes de qualquer página privada usar dados reais.
+As políticas que usam `auth.uid()` foram criadas e testadas com duas contas na Fase 4. Cada tabela funcional permite consultar, criar, editar e eliminar apenas linhas pertencentes ao utilizador autenticado.
 
 ## Aplicar no Supabase
 
