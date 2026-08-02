@@ -4,7 +4,7 @@ Aplicação web privada para organizar candidaturas, empresas, recrutadores, ent
 
 ## Estado atual
 
-O projeto encontra-se na Fase 1. A base Next.js está configurada; a ligação ao Supabase e a autenticação ainda não foram implementadas.
+O projeto encontra-se na Fase 1. A base Next.js e os clientes Supabase estão configurados; a autenticação ainda não foi implementada.
 
 ## Stack
 
@@ -31,7 +31,7 @@ O Node.js disponível por defeito no computador durante a criação do projeto e
    pnpm install
    ```
 
-2. Copiar `.env.example` para `.env.local` e preencher os valores quando o projeto Supabase estiver disponível.
+2. Copiar `.env.example` para `.env.local` e preencher a URL e a publishable key do projeto Supabase.
 
 3. Iniciar o servidor de desenvolvimento:
 
@@ -40,6 +40,8 @@ O Node.js disponível por defeito no computador durante a criação do projeto e
    ```
 
 4. Abrir [http://localhost:3000](http://localhost:3000).
+
+5. Confirmar a ligação ao Supabase em [http://localhost:3000/api/health](http://localhost:3000/api/health). A resposta não inclui credenciais nem detalhes internos do projeto.
 
 ## Verificações
 

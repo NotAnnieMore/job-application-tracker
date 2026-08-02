@@ -24,9 +24,8 @@ export default function Home() {
           A base do projeto está pronta.
         </h1>
         <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600 sm:text-lg">
-          Next.js, TypeScript, Tailwind CSS e as ferramentas de qualidade já
-          estão configurados. A próxima tarefa será ligar a aplicação ao
-          Supabase.
+          Next.js, TypeScript, Tailwind CSS e Supabase já estão configurados. A
+          próxima tarefa será implementar a autenticação.
         </p>
 
         <div className="mt-10 grid gap-3 sm:grid-cols-2">
@@ -35,6 +34,7 @@ export default function Home() {
             "TypeScript em modo estrito",
             "Tailwind CSS",
             "ESLint e Prettier",
+            "Ligação ao Supabase validada",
           ].map((item) => (
             <div
               key={item}
