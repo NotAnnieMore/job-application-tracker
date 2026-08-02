@@ -4,7 +4,7 @@ Aplicação web privada para organizar candidaturas, empresas, recrutadores, ent
 
 ## Estado atual
 
-O projeto encontra-se na Fase 1. A base Next.js e os clientes Supabase estão configurados; a autenticação ainda não foi implementada.
+O projeto concluiu a Fase 2. A base Next.js, os clientes Supabase, o sistema visual e a navegação responsiva estão configurados. As páginas usam dados de demonstração; a autenticação e o modelo de dados ainda não foram implementados.
 
 ## Stack
 
@@ -15,6 +15,17 @@ O projeto encontra-se na Fase 1. A base Next.js e os clientes Supabase estão co
 - ESLint e Prettier
 - Supabase e PostgreSQL nas próximas fases
 - Vercel para publicação
+
+## Páginas disponíveis
+
+- `/` e `/dashboard` — dashboard responsivo
+- `/candidaturas` e `/candidaturas/nova`
+- `/empresas`
+- `/recrutadores`
+- `/entrevistas`
+- `/acoes`
+- `/definicoes`
+- `/login` e `/registo`
 
 ## Requisitos
 
