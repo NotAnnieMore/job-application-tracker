@@ -1,0 +1,260 @@
+JOB APPLICATION TRACKER
+QUESTIONÁRIO DE DESIGN E EXPERIÊNCIA
+
+Este ficheiro deve ser respondido antes de avançar demasiado na interface.
+
+Não é necessário decidir tudo de uma vez. As respostas podem ser revistas.
+
+1. IDENTIDADE VISUAL
+
+1.1. Qual deve ser a sensação principal da aplicação?
+- Profissional e corporativa
+- Moderna e tecnológica
+- Minimalista
+- Colorida e pessoal
+- Semelhante a uma ferramenta SaaS
+- Outra:
+
+Resposta:
+
+1.2. Pretendes usar uma marca própria?
+- Nome pessoal
+- Nome Job Application Tracker
+- Outro nome
+- Sem marca, apenas produto
+
+Resposta:
+
+1.3. Pretendes um logótipo?
+Resposta:
+
+2. CORES
+
+2.1. Tens cores preferidas?
+Resposta:
+
+2.2. Tens cores que não queres usar?
+Resposta:
+
+2.3. Preferes:
+- fundo claro;
+- fundo escuro;
+- ambos;
+- sistema automático.
+
+Resposta:
+
+2.4. Os estados das candidaturas devem ter cores próprias?
+Exemplo:
+- Interessado: cinzento
+- Candidatura enviada: azul
+- Entrevista: roxo
+- A aguardar: amarelo
+- Proposta: verde
+- Rejeitada: vermelho
+- Retirada: neutro
+
+Resposta:
+
+3. NAVEGAÇÃO
+
+3.1. Preferes:
+- sidebar fixa;
+- sidebar recolhível;
+- barra superior;
+- combinação das duas.
+
+Resposta:
+
+3.2. Quais itens devem aparecer na navegação principal?
+Sugestão:
+- Dashboard
+- Candidaturas
+- Empresas
+- Recrutadores
+- Entrevistas
+- Próximas ações
+- Estatísticas
+- Definições
+
+Resposta:
+
+3.3. No telemóvel, preferes:
+- menu lateral;
+- barra inferior;
+- menu no cabeçalho.
+
+Resposta:
+
+4. DASHBOARD
+
+4.1. O que queres ver imediatamente após o login?
+Sugestões:
+- próximas entrevistas;
+- follow-ups em atraso;
+- últimas candidaturas;
+- candidaturas por estado;
+- ações prioritárias;
+- estatísticas.
+
+Resposta:
+
+4.2. Preferes:
+- dashboard compacto;
+- dashboard com muitos indicadores;
+- dashboard personalizável no futuro.
+
+Resposta:
+
+4.3. Queres gráficos?
+- Não no início
+- Gráfico circular
+- Gráfico de barras
+- Linha temporal
+- Vários
+
+Resposta:
+
+5. LISTAS E TABELAS
+
+5.1. Para candidaturas, preferes:
+- tabela tradicional;
+- cartões;
+- Kanban por estado;
+- tabela no computador e cartões no telemóvel;
+- possibilidade de alternar.
+
+Resposta:
+
+5.2. Que colunas devem aparecer na lista principal?
+Sugestão:
+- Vaga
+- Empresa
+- Estado
+- Data de candidatura
+- Próxima ação
+- Follow-up
+- Recrutador
+
+Resposta:
+
+5.3. Queres ações rápidas na lista?
+Exemplos:
+- alterar estado;
+- editar;
+- marcar follow-up como concluído;
+- abrir detalhes.
+
+Resposta:
+
+6. FORMULÁRIOS
+
+6.1. Preferes:
+- formulários numa página;
+- modais;
+- painéis laterais;
+- combinação conforme a complexidade.
+
+Resposta:
+
+6.2. O formulário de candidatura deve ser:
+- simples e curto;
+- dividido por secções;
+- dividido por passos.
+
+Resposta:
+
+6.3. Quais campos devem ser obrigatórios?
+Resposta:
+
+7. PÁGINA DE DETALHE DA CANDIDATURA
+
+7.1. Que secções devem existir?
+Sugestão:
+- resumo;
+- oportunidade;
+- empresa;
+- recrutadores;
+- entrevistas;
+- notas;
+- próximas ações;
+- histórico.
+
+Resposta:
+
+7.2. Preferes:
+- separadores;
+- página longa;
+- cartões;
+- linha temporal.
+
+Resposta:
+
+8. TOM E LINGUAGEM
+
+8.1. A aplicação deve usar linguagem:
+- formal;
+- profissional mas simples;
+- informal;
+- muito direta.
+
+Resposta:
+
+8.2. Exemplos a decidir:
+- "Nova candidatura" ou "Adicionar candidatura"
+- "Eliminar" ou "Apagar"
+- "A guardar" ou "A processar"
+- "A aguardar resposta" ou "Em espera"
+
+Resposta:
+
+9. PERSONALIZAÇÃO
+
+9.1. Queres que o utilizador possa escolher:
+- modo de cor;
+- ordem das colunas;
+- indicadores do dashboard;
+- formato de data;
+- estados personalizados.
+
+Resposta:
+
+9.2. O que deve ficar fora da primeira versão?
+Resposta:
+
+10. REFERÊNCIAS VISUAIS
+
+Indica aplicações ou sites cujo estilo gostas.
+Exemplos:
+- Notion
+- Linear
+- Trello
+- Jira
+- HubSpot
+- Todoist
+- Monday
+- Outra:
+
+Resposta:
+
+11. DECISÕES RECOMENDADAS PARA COMEÇAR
+
+Proposta inicial:
+- estilo SaaS limpo;
+- modo claro primeiro;
+- sidebar recolhível;
+- dashboard com cartões e listas;
+- tabela para candidaturas em computador;
+- cartões no telemóvel;
+- página de detalhe com separadores;
+- badges coloridos para estados;
+- formulários em páginas ou painéis laterais;
+- português de Portugal em toda a interface;
+- possibilidade de internacionalização preparada, mas não implementada no MVP.
+
+Aceito esta proposta:
+- Sim
+- Parcialmente
+- Não
+
+Alterações pretendidas:
