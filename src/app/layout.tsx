@@ -13,7 +13,6 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Job Application Tracker",
   description: "Organiza candidaturas, entrevistas e próximas ações.",
 };
 

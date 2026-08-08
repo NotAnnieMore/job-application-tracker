@@ -21,6 +21,7 @@ import {
   type ActiveFilter,
 } from "@/components/shared/active-filters";
 import { PageHeader } from "@/components/shared/page-header";
+import { SuccessToast } from "@/components/shared/success-toast";
 import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -33,6 +34,7 @@ import {
   getActions,
 } from "@/features/actions/data";
 import type { ActionDueFilter } from "@/features/actions/types";
+import { isValidUuid } from "@/lib/validation";
 import type {
   ActionPriorityValue,
   ActionStatusValue,
@@ -92,7 +94,8 @@ export default async function ActionsPage({
   const timing = validTiming(rawTiming) ? rawTiming : undefined;
   const dueFrom = validDate(rawDueFrom) ? rawDueFrom : undefined;
   const dueTo = validDate(rawDueTo) ? rawDueTo : undefined;
-  const applicationId = singleValue(params.candidatura);
+  const rawApplicationId = singleValue(params.candidatura);
+  const applicationId = isValidUuid(rawApplicationId) ? rawApplicationId : "";
   const [data, applications] = await Promise.all([
     getActions({
       status,
@@ -165,14 +168,7 @@ export default async function ActionsPage({
         }
       />
 
-      {notice ? (
-        <p
-          role="status"
-          className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
-        >
-          {notice}
-        </p>
-      ) : null}
+      <SuccessToast message={notice} queryParam="aviso" />
 
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[

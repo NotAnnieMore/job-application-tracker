@@ -20,6 +20,7 @@ import {
 } from "@/components/shared/active-filters";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
+import { SuccessToast } from "@/components/shared/success-toast";
 import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -36,6 +37,7 @@ import {
   getInterviews,
 } from "@/features/interviews/data";
 import type { InterviewListItem } from "@/features/interviews/types";
+import { isValidUuid } from "@/lib/validation";
 import type { InterviewStatusValue } from "@/types/database.types";
 
 const notices: Record<string, string> = {
@@ -164,7 +166,8 @@ export default async function InterviewsPage({
   const params = await searchParams;
   const rawStatus = singleValue(params.estado);
   const status = validStatus(rawStatus) ? rawStatus : undefined;
-  const applicationId = singleValue(params.candidatura);
+  const rawApplicationId = singleValue(params.candidatura);
+  const applicationId = isValidUuid(rawApplicationId) ? rawApplicationId : "";
   const rawDateFrom = singleValue(params.desde);
   const rawDateTo = singleValue(params.ate);
   const dateFrom = validDate(rawDateFrom) ? rawDateFrom : undefined;
@@ -221,14 +224,7 @@ export default async function InterviewsPage({
         }
       />
 
-      {notice ? (
-        <p
-          role="status"
-          className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
-        >
-          {notice}
-        </p>
-      ) : null}
+      <SuccessToast message={notice} queryParam="aviso" />
 
       <Card>
         <form

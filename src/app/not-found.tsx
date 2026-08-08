@@ -4,6 +4,7 @@ import Link from "next/link";
 export default function NotFound() {
   return (
     <main className="flex min-h-screen items-center justify-center bg-slate-50 p-6">
+      <title>Página não encontrada | Job Application Tracker</title>
       <div className="max-w-md text-center">
         <span className="mx-auto flex size-14 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
           <FileQuestion aria-hidden="true" className="size-7" />

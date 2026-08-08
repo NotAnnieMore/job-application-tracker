@@ -30,7 +30,7 @@ export function ActionQuickStatusForm({
 
   const completed = status === "completed";
   return (
-    <form action={formAction}>
+    <form action={formAction} className="space-y-1">
       <Button
         type="submit"
         variant={completed ? "secondary" : "primary"}
@@ -50,7 +50,11 @@ export function ActionQuickStatusForm({
           {completed ? "Reabrir" : "Concluir"}
         </span>
       </Button>
-      {state.message ? <span className="sr-only">{state.message}</span> : null}
+      {state.message ? (
+        <p role="alert" className="max-w-36 text-xs font-medium text-red-600">
+          {state.message}
+        </p>
+      ) : null}
     </form>
   );
 }

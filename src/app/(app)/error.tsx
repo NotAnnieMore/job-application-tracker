@@ -1,9 +1,10 @@
 "use client";
 
 import { AlertTriangle } from "lucide-react";
+import Link from "next/link";
 import { useEffect } from "react";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonClassName } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 export default function ErrorPage({
@@ -19,6 +20,7 @@ export default function ErrorPage({
 
   return (
     <Card className="flex min-h-96 flex-col items-center justify-center p-8 text-center">
+      <title>Erro | Job Application Tracker</title>
       <span className="flex size-12 items-center justify-center rounded-2xl bg-red-50 text-red-600">
         <AlertTriangle aria-hidden="true" className="size-6" />
       </span>
@@ -29,9 +31,15 @@ export default function ErrorPage({
         Ocorreu um erro inesperado. Tenta novamente; se continuar, regressa ao
         dashboard.
       </p>
-      <Button className="mt-5" onClick={unstable_retry}>
-        Tentar novamente
-      </Button>
+      <div className="mt-5 flex flex-col gap-3 sm:flex-row">
+        <Button onClick={unstable_retry}>Tentar novamente</Button>
+        <Link
+          href="/dashboard"
+          className={buttonClassName({ variant: "secondary" })}
+        >
+          Voltar ao dashboard
+        </Link>
+      </div>
     </Card>
   );
 }

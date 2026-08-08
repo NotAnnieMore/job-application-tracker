@@ -8,10 +8,8 @@ import type {
 } from "@/features/companies/types";
 import { requireCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { isValidUuid } from "@/lib/validation";
 import type { CompanyRow } from "@/types/database.types";
-
-const uuidPattern =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function toCompanyValues(company: CompanyRow): CompanyFormValues {
   return {
@@ -102,7 +100,7 @@ export async function getCompanies(): Promise<CompanyListItem[]> {
 export async function getCompanyById(
   companyId: string,
 ): Promise<CompanyDetails | null> {
-  if (!uuidPattern.test(companyId)) return null;
+  if (!isValidUuid(companyId)) return null;
 
   const user = await requireCurrentUser();
   const supabase = await createClient();

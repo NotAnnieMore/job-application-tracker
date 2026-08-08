@@ -1,6 +1,6 @@
 "use client";
 
-import { Bell, LogOut, Menu, Search } from "lucide-react";
+import { LogOut, Menu, Search } from "lucide-react";
 import Link from "next/link";
 
 import { UserAvatar } from "@/components/profile/user-avatar";
@@ -27,29 +27,30 @@ export function AppHeader({
         <Menu aria-hidden="true" className="size-5" />
       </Button>
 
-      <label className="relative hidden max-w-xl flex-1 sm:block">
-        <span className="sr-only">Pesquisar</span>
+      <form
+        action="/candidaturas"
+        method="get"
+        role="search"
+        className="relative hidden max-w-xl flex-1 sm:block"
+      >
+        <label htmlFor="global-search" className="sr-only">
+          Pesquisar candidaturas
+        </label>
         <Search
           aria-hidden="true"
           className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
         />
         <input
+          id="global-search"
+          name="q"
           type="search"
-          placeholder="Pesquisar candidaturas, empresas..."
+          maxLength={100}
+          placeholder="Pesquisar vaga, empresa ou recrutador..."
           className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pr-4 pl-10 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-3 focus:ring-blue-100"
-          aria-label="Pesquisar candidaturas e empresas"
         />
-      </label>
+      </form>
 
       <div className="ml-auto flex items-center gap-2">
-        <Button
-          variant="ghost"
-          size="icon"
-          aria-label="Notificações"
-          title="Notificações serão implementadas numa fase futura"
-        >
-          <Bell aria-hidden="true" className="size-5" />
-        </Button>
         <div className="hidden h-8 w-px bg-slate-200 sm:block" />
         <Link
           href="/definicoes"

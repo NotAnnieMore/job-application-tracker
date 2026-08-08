@@ -11,6 +11,7 @@ export function PageHeader({
 }) {
   return (
     <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+      <title>{`${title} | Job Application Tracker`}</title>
       <div>
         <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
           {title}

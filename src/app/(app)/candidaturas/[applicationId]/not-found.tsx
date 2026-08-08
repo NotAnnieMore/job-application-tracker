@@ -5,6 +5,7 @@ import { buttonClassName } from "@/components/ui/button";
 export default function ApplicationNotFound() {
   return (
     <div className="mx-auto max-w-xl rounded-2xl border border-slate-200 bg-white p-8 text-center shadow-sm">
+      <title>Candidatura não encontrada | Job Application Tracker</title>
       <h1 className="text-xl font-bold text-slate-950">
         Candidatura não encontrada
       </h1>

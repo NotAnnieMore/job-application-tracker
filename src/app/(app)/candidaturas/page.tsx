@@ -10,6 +10,7 @@ import {
 } from "@/components/shared/active-filters";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
+import { SuccessToast } from "@/components/shared/success-toast";
 import { buttonClassName } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import {
@@ -23,6 +24,7 @@ import {
   getRecruiterOptions,
 } from "@/features/applications/data";
 import type { ApplicationListFilters } from "@/features/applications/types";
+import { isValidUuid } from "@/lib/validation";
 import type {
   ApplicationStatusValue,
   WorkModeValue,
@@ -71,6 +73,8 @@ export default async function ApplicationsPage({
   const rawStatus = singleValue(params.status);
   const rawCompanyId = singleValue(params.empresa);
   const rawRecruiterId = singleValue(params.recrutador);
+  const companyId = isValidUuid(rawCompanyId) ? rawCompanyId : "";
+  const recruiterId = isValidUuid(rawRecruiterId) ? rawRecruiterId : "";
   const rawWorkMode = singleValue(params.modalidade);
   const rawDateFrom = singleValue(params.desde);
   const rawDateTo = singleValue(params.ate);
@@ -93,8 +97,8 @@ export default async function ApplicationsPage({
   const filters: ApplicationListFilters = {
     query: query || undefined,
     status,
-    companyId: rawCompanyId || undefined,
-    recruiterId: rawRecruiterId || undefined,
+    companyId: companyId || undefined,
+    recruiterId: recruiterId || undefined,
     workMode,
     dateFrom,
     dateTo,
@@ -119,22 +123,22 @@ export default async function ApplicationsPage({
           },
         ]
       : []),
-    ...(rawCompanyId
+    ...(companyId
       ? [
           {
             label: "Empresa",
             value:
-              companies.find((company) => company.id === rawCompanyId)?.name ??
+              companies.find((company) => company.id === companyId)?.name ??
               "Desconhecida",
           },
         ]
       : []),
-    ...(rawRecruiterId
+    ...(recruiterId
       ? [
           {
             label: "Recrutador",
             value:
-              recruiters.find((recruiter) => recruiter.id === rawRecruiterId)
+              recruiters.find((recruiter) => recruiter.id === recruiterId)
                 ?.name ?? "Desconhecido",
           },
         ]
@@ -173,14 +177,7 @@ export default async function ApplicationsPage({
         }
       />
 
-      {notice ? (
-        <p
-          role="status"
-          className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
-        >
-          {notice}
-        </p>
-      ) : null}
+      <SuccessToast message={notice} />
 
       <Card>
         <form
@@ -221,7 +218,7 @@ export default async function ApplicationsPage({
             <span className="sr-only">Filtrar por recrutador</span>
             <AutoSubmitSelect
               name="recrutador"
-              defaultValue={rawRecruiterId}
+              defaultValue={recruiterId}
               className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
             >
               <option value="">Todos os recrutadores</option>
@@ -236,7 +233,7 @@ export default async function ApplicationsPage({
             <span className="sr-only">Filtrar por empresa</span>
             <AutoSubmitSelect
               name="empresa"
-              defaultValue={rawCompanyId}
+              defaultValue={companyId}
               className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
             >
               <option value="">Todas as empresas</option>

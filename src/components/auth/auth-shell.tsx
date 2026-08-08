@@ -14,6 +14,7 @@ export function AuthShell({
 }) {
   return (
     <main className="grid min-h-screen bg-slate-50 lg:grid-cols-[minmax(0,1fr)_minmax(520px,0.85fr)]">
+      <title>{`${title} | Job Application Tracker`}</title>
       <section className="hidden bg-slate-950 p-12 text-white lg:flex lg:flex-col lg:justify-between">
         <Link href="/" className="flex items-center gap-3 text-sm font-bold">
           <AppLogo />

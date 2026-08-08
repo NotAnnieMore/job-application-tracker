@@ -7,6 +7,7 @@ import { Card } from "@/components/ui/card";
 export default function ApplicationNotFound() {
   return (
     <Card className="flex min-h-80 flex-col items-center justify-center p-8 text-center">
+      <title>Candidatura não encontrada | Job Application Tracker</title>
       <span className="flex size-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
         <FileText aria-hidden="true" className="size-6" />
       </span>

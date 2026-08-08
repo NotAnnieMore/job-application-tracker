@@ -3,9 +3,8 @@ import type {
   InterviewFormatValue,
   InterviewStatusValue,
 } from "@/types/database.types";
+import { isValidUuid } from "@/lib/validation";
 
-const uuidPattern =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const localDateTimePattern = /^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})$/u;
 const interviewStatuses = new Set<InterviewStatusValue>([
   "scheduled",
@@ -68,10 +67,10 @@ export function validateInterviewForm(formData: FormData) {
   const result = readText(formData, "result");
   const fieldErrors: NonNullable<InterviewActionState["fieldErrors"]> = {};
 
-  if (!uuidPattern.test(applicationId)) {
+  if (!isValidUuid(applicationId)) {
     fieldErrors.applicationId = "Seleciona uma candidatura válida.";
   }
-  if (recruiterId && !uuidPattern.test(recruiterId)) {
+  if (recruiterId && !isValidUuid(recruiterId)) {
     fieldErrors.recruiterId = "Seleciona um contacto válido.";
   }
   if (!interviewType) {
@@ -152,5 +151,5 @@ export function hasInterviewFieldErrors(
 }
 
 export function isValidInterviewId(value: string) {
-  return uuidPattern.test(value);
+  return isValidUuid(value);
 }

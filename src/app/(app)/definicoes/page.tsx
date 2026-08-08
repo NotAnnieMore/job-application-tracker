@@ -1,5 +1,6 @@
 import { ProfileForm } from "@/components/profile/profile-form";
 import { PageHeader } from "@/components/shared/page-header";
+import { SuccessToast } from "@/components/shared/success-toast";
 import { requireCurrentUser } from "@/lib/auth/session";
 
 const notices: Record<string, string> = {
@@ -21,14 +22,7 @@ export default async function SettingsPage({
         title="Definições"
         description="Gere os dados apresentados na tua conta."
       />
-      {notice ? (
-        <p
-          role="status"
-          className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
-        >
-          {notice}
-        </p>
-      ) : null}
+      <SuccessToast message={notice} />
       <ProfileForm
         key={`${user.fullName}-${user.avatarUrl}`}
         fullName={user.fullName}

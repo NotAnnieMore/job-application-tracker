@@ -17,12 +17,14 @@ import { AutoSubmitSelect } from "@/components/applications/auto-submit-select";
 import { CompanyLogo } from "@/components/companies/company-logo";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
+import { SuccessToast } from "@/components/shared/success-toast";
 import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
   getRecruiterCompanyOptions,
   getRecruiters,
 } from "@/features/recruiters/data";
+import { isValidUuid } from "@/lib/validation";
 
 const notices: Record<string, string> = {
   "contacto-criado": "Contacto criado com sucesso.",
@@ -52,7 +54,8 @@ export default async function RecruitersPage({
 }) {
   const params = await searchParams;
   const query = singleValue(params.q).slice(0, 100);
-  const companyId = singleValue(params.empresa);
+  const rawCompanyId = singleValue(params.empresa);
+  const companyId = isValidUuid(rawCompanyId) ? rawCompanyId : "";
   const [recruiters, companies] = await Promise.all([
     getRecruiters({
       query: query || undefined,
@@ -76,14 +79,7 @@ export default async function RecruitersPage({
         }
       />
 
-      {notice ? (
-        <p
-          role="status"
-          className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
-        >
-          {notice}
-        </p>
-      ) : null}
+      <SuccessToast message={notice} />
 
       <Card>
         <form

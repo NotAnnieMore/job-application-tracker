@@ -14,10 +14,9 @@ import {
 } from "@/features/companies/validation";
 import { requireCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import { isValidUuid } from "@/lib/validation";
 
 const companiesPath = "/empresas";
-const uuidPattern =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 function validationError(
   fieldErrors: NonNullable<CompanyActionState["fieldErrors"]>,
@@ -74,7 +73,7 @@ export async function updateCompanyAction(
   _previousState: CompanyActionState,
   formData: FormData,
 ): Promise<CompanyActionState> {
-  if (!uuidPattern.test(companyId)) {
+  if (!isValidUuid(companyId)) {
     return { status: "error", message: "A empresa indicada não é válida." };
   }
 
@@ -111,7 +110,7 @@ export async function deleteCompanyAction(
   void _previousState;
   void _formData;
 
-  if (!uuidPattern.test(companyId)) {
+  if (!isValidUuid(companyId)) {
     return { status: "error", message: "A empresa indicada não é válida." };
   }
 
@@ -180,7 +179,7 @@ export async function updateCompanyLogosAction(
   }
 
   const normalizedSelections = selections.flatMap((selection) => {
-    if (!selection || !uuidPattern.test(selection.companyId)) return [];
+    if (!selection || !isValidUuid(selection.companyId)) return [];
 
     const logoUrl = normalizeHttpsUrl(selection.logoUrl, 1000);
     const website = normalizeHttpsUrl(selection.website, 500);

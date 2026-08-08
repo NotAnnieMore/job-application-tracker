@@ -27,6 +27,7 @@ import { InterviewStatusBadge } from "@/components/interviews/interview-status-b
 import { NoteCreateForm } from "@/components/notes/note-create-form";
 import { NoteItem } from "@/components/notes/note-item";
 import { PageHeader } from "@/components/shared/page-header";
+import { SuccessToast } from "@/components/shared/success-toast";
 import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getActions } from "@/features/actions/data";
@@ -179,14 +180,7 @@ export default async function ApplicationDetailPage({
         }
       />
 
-      {notice ? (
-        <p
-          role="status"
-          className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
-        >
-          {notice}
-        </p>
-      ) : null}
+      <SuccessToast message={notice} queryParam="aviso" />
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(20rem,0.65fr)]">
         <Card>

@@ -1,7 +1,6 @@
 import type { RecruiterActionState } from "@/features/recruiters/types";
+import { isValidUuid } from "@/lib/validation";
 
-const uuidPattern =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
 const phonePattern = /^[+\d\s()./-]+$/u;
 
@@ -47,7 +46,7 @@ export function validateRecruiterForm(formData: FormData) {
   const notes = readText(formData, "notes");
   const fieldErrors: NonNullable<RecruiterActionState["fieldErrors"]> = {};
 
-  if (companyId && !uuidPattern.test(companyId)) {
+  if (companyId && !isValidUuid(companyId)) {
     fieldErrors.companyId = "Seleciona uma empresa válida.";
   }
 
@@ -106,5 +105,5 @@ export function hasRecruiterFieldErrors(
 }
 
 export function isValidRecruiterId(value: string) {
-  return uuidPattern.test(value);
+  return isValidUuid(value);
 }

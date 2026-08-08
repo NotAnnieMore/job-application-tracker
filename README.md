@@ -4,7 +4,7 @@ Aplicação web privada para organizar candidaturas, empresas, recrutadores, ent
 
 ## Estado atual
 
-O projeto está na Fase 10. A base Next.js, os clientes Supabase, o sistema visual, a navegação responsiva, o modelo inicial de dados e a autenticação estão configurados. As páginas privadas exigem uma sessão válida e as políticas RLS isolam os dados de cada utilizador. Empresas, vagas, candidaturas, recrutadores, entrevistas, ações, notas e o dashboard estatístico já usam dados reais do Supabase. As listas operacionais incluem pesquisa, filtros combináveis e intervalos de datas guardados no URL. A Agenda agrega entrevistas, follow-ups e ações numa cronologia única. As Definições permitem também atualizar o nome e a fotografia reais da conta.
+O projeto está na Fase 11, em validação final do MVP. A base Next.js, os clientes Supabase, o sistema visual, a navegação responsiva, o modelo inicial de dados e a autenticação estão configurados. As páginas privadas exigem uma sessão válida e as políticas RLS isolam os dados de cada utilizador. Empresas, vagas, candidaturas, recrutadores, entrevistas, ações, notas e o dashboard estatístico já usam dados reais do Supabase. As listas operacionais incluem pesquisa, filtros combináveis e intervalos de datas guardados no URL. A Agenda agrega entrevistas, follow-ups e ações numa cronologia única. As Definições permitem também atualizar o nome e a fotografia reais da conta.
 
 ## Stack
 
@@ -82,4 +82,5 @@ pnpm format
 - As decisões importantes encontram-se em `docs/decisions/`.
 - O esquema e as instruções da base de dados encontram-se em `docs/database.md`.
 - A autenticação e os respetivos testes encontram-se documentados em `docs/authentication.md`.
+- A matriz de qualidade e os testes finais encontram-se em `docs/testing.md`.
 - Os documentos que deram origem ao projeto permanecem apenas na pasta local ignorada `context/`.

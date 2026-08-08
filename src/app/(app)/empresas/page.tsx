@@ -14,6 +14,7 @@ import Link from "next/link";
 import { CompanyLogo } from "@/components/companies/company-logo";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
+import { SuccessToast } from "@/components/shared/success-toast";
 import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCompanies } from "@/features/companies/data";
@@ -67,14 +68,7 @@ export default async function CompaniesPage({
         }
       />
 
-      {notice ? (
-        <p
-          role="status"
-          className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
-        >
-          {notice}
-        </p>
-      ) : null}
+      <SuccessToast message={notice} />
 
       {companies.length === 0 ? (
         <EmptyState

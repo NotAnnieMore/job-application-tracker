@@ -78,6 +78,7 @@ export function AppSidebar({
             <Link
               key={item.href}
               href={item.href}
+              aria-current={isActive ? "page" : undefined}
               title={compact ? item.label : undefined}
               onClick={onClose}
               className={cn(
@@ -98,9 +99,9 @@ export function AppSidebar({
       <div className="border-t border-slate-100 p-3">
         {!compact ? (
           <div className="mb-3 rounded-xl bg-slate-50 px-3 py-3">
-            <p className="text-xs font-semibold text-slate-700">Fase 10</p>
+            <p className="text-xs font-semibold text-slate-700">Fase 11</p>
             <p className="mt-1 text-xs leading-5 text-slate-500">
-              Agenda, lembretes e perfil
+              Testes e refinamento
             </p>
           </div>
         ) : null}

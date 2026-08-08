@@ -7,9 +7,8 @@ import type {
   ApplicationTransactionArgs,
   WorkModeValue,
 } from "@/types/database.types";
+import { isValidUuid } from "@/lib/validation";
 
-const uuidPattern =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const statusValues = new Set<ApplicationStatusValue>([
   "interested",
@@ -114,11 +113,11 @@ export function validateApplicationForm(formData: FormData) {
   const interviewPreparation = readText(formData, "interviewPreparation");
   const questionsForCompany = readText(formData, "questionsForCompany");
 
-  if (!uuidPattern.test(companyId)) {
+  if (!isValidUuid(companyId)) {
     fieldErrors.companyId = "Seleciona uma empresa válida.";
   }
 
-  if (primaryRecruiterId && !uuidPattern.test(primaryRecruiterId)) {
+  if (primaryRecruiterId && !isValidUuid(primaryRecruiterId)) {
     fieldErrors.primaryRecruiterId = "Seleciona um recrutador válido.";
   }
 
@@ -270,5 +269,5 @@ export function hasApplicationFieldErrors(
 }
 
 export function isValidApplicationId(value: string) {
-  return uuidPattern.test(value);
+  return isValidUuid(value);
 }
