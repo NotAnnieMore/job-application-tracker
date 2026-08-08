@@ -1,9 +1,10 @@
 "use client";
 
-import { BriefcaseBusiness, ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
+import { AppLogo } from "@/components/shared/app-logo";
 import { Button } from "@/components/ui/button";
 import { mainNavigation } from "@/config/navigation";
 import { cn } from "@/lib/utils";
@@ -42,9 +43,7 @@ export function AppSidebar({
           className="flex min-w-0 items-center gap-3 rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
           onClick={onClose}
         >
-          <span className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-blue-600 text-white shadow-sm shadow-blue-200">
-            <BriefcaseBusiness aria-hidden="true" className="size-5" />
-          </span>
+          <AppLogo />
           {!compact ? (
             <span className="truncate text-sm font-bold text-slate-950">
               Job Application Tracker

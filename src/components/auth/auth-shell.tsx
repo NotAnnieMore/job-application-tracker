@@ -1,6 +1,6 @@
-import { BriefcaseBusiness } from "lucide-react";
 import Link from "next/link";
 
+import { AppLogo } from "@/components/shared/app-logo";
 import { Badge } from "@/components/ui/badge";
 
 export function AuthShell({
@@ -16,9 +16,7 @@ export function AuthShell({
     <main className="grid min-h-screen bg-slate-50 lg:grid-cols-[minmax(0,1fr)_minmax(520px,0.85fr)]">
       <section className="hidden bg-slate-950 p-12 text-white lg:flex lg:flex-col lg:justify-between">
         <Link href="/" className="flex items-center gap-3 text-sm font-bold">
-          <span className="flex size-10 items-center justify-center rounded-xl bg-blue-600">
-            <BriefcaseBusiness aria-hidden="true" className="size-5" />
-          </span>
+          <AppLogo />
           Job Application Tracker
         </Link>
         <div className="max-w-xl">
@@ -44,9 +42,7 @@ export function AuthShell({
             href="/"
             className="mb-10 flex items-center gap-3 font-bold text-slate-950 lg:hidden"
           >
-            <span className="flex size-10 items-center justify-center rounded-xl bg-blue-600 text-white">
-              <BriefcaseBusiness aria-hidden="true" className="size-5" />
-            </span>
+            <AppLogo />
             Job Application Tracker
           </Link>
           <Badge variant="blue">Área privada</Badge>
