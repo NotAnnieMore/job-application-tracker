@@ -76,9 +76,11 @@ export function CompanyLogo({
   return (
     <span
       className={cn(
-        "relative flex shrink-0 items-center justify-center overflow-hidden font-bold ring-1 ring-black/5",
+        "relative flex shrink-0 items-center justify-center overflow-hidden font-bold ring-1",
         sizeClasses[size],
-        getColorClass(name),
+        logoUrl
+          ? "bg-white text-slate-700 ring-slate-200"
+          : `${getColorClass(name)} ring-black/5`,
         className,
       )}
       aria-hidden={logoUrl ? undefined : true}
