@@ -252,7 +252,7 @@ export default async function ApplicationsPage({
                   <tr key={application.id} className="hover:bg-slate-50/60">
                     <td className="px-5 py-4">
                       <Link
-                        href={`/candidaturas/${application.id}/editar`}
+                        href={`/candidaturas/${application.id}`}
                         className="font-semibold text-slate-950 hover:text-blue-700"
                       >
                         {application.title}
@@ -330,7 +330,7 @@ export default async function ApplicationsPage({
                     />
                     <div className="min-w-0">
                       <Link
-                        href={`/candidaturas/${application.id}/editar`}
+                        href={`/candidaturas/${application.id}`}
                         className="font-semibold text-slate-950 hover:text-blue-700"
                       >
                         {application.title}

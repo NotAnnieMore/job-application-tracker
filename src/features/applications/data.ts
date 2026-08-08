@@ -193,10 +193,49 @@ export async function getApplicationById(
     throw new Error("Não foi possível consultar a vaga da candidatura.");
   }
 
+  const { data: company, error: companyError } = await supabase
+    .from("companies")
+    .select("id, name, logo_url, website")
+    .eq("id", opportunity.company_id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (companyError || !company) {
+    throw new Error("Não foi possível consultar a empresa da candidatura.");
+  }
+
+  let recruiter: {
+    name: string;
+    email: string | null;
+    phone: string | null;
+    linkedin_url: string | null;
+  } | null = null;
+
+  if (application.primary_recruiter_id) {
+    const { data, error } = await supabase
+      .from("recruiters")
+      .select("name, email, phone, linkedin_url")
+      .eq("id", application.primary_recruiter_id)
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    if (error) {
+      throw new Error("Não foi possível consultar o contacto da candidatura.");
+    }
+    recruiter = data;
+  }
+
   return {
     id: application.id,
     companyId: opportunity.company_id,
+    companyName: company.name,
+    companyLogoUrl: company.logo_url ?? "",
+    companyWebsite: company.website ?? "",
     primaryRecruiterId: application.primary_recruiter_id ?? "",
+    recruiterName: recruiter?.name ?? "",
+    recruiterEmail: recruiter?.email ?? "",
+    recruiterPhone: recruiter?.phone ?? "",
+    recruiterLinkedinUrl: recruiter?.linkedin_url ?? "",
     title: opportunity.title,
     location: opportunity.location ?? "",
     workMode: opportunity.work_mode ?? "",

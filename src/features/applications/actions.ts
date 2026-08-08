@@ -66,6 +66,7 @@ function saveError(): ApplicationActionState {
 
 function revalidateApplicationPages() {
   revalidatePath(applicationsPath);
+  revalidatePath("/candidaturas/[applicationId]", "page");
   revalidatePath("/empresas");
   revalidatePath("/dashboard");
 }

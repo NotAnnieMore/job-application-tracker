@@ -92,6 +92,13 @@ export type ApplicationListFilters = {
 
 export type ApplicationDetails = ApplicationFormValues & {
   id: string;
+  companyName: string;
+  companyLogoUrl: string;
+  companyWebsite: string;
+  recruiterName: string;
+  recruiterEmail: string;
+  recruiterPhone: string;
+  recruiterLinkedinUrl: string;
 };
 
 export const initialApplicationActionState: ApplicationActionState = {

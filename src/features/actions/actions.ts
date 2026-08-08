@@ -35,6 +35,7 @@ function revalidateActionPages() {
   revalidatePath(actionsPath);
   revalidatePath("/dashboard");
   revalidatePath("/candidaturas");
+  revalidatePath("/candidaturas/[applicationId]", "page");
 }
 
 async function applicationBelongsToUser(applicationId: string, userId: string) {

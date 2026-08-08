@@ -200,6 +200,20 @@ O Dashboard apresenta o número de ações em atraso, as que vencem nos sete dia
 seguintes e uma lista das prioridades pendentes. O formulário da candidatura
 inclui também um atalho para criar uma ação já associada ao processo.
 
+## Detalhe da candidatura e notas
+
+A rota `/candidaturas/[id]` funciona como ponto central de consulta de cada
+processo. Reúne os dados da vaga, empresa, contacto principal, preparação,
+entrevistas, ações e notas sem obrigar o utilizador a entrar no formulário de
+edição.
+
+O histórico usa diretamente a tabela `notes` do esquema inicial, sem nova
+migração. As notas são apresentadas da mais recente para a mais antiga e podem
+ser criadas, editadas e eliminadas. Cada operação valida novamente a sessão, o
+UUID, a propriedade da candidatura e o limite de 5000 caracteres. A consulta e
+as alterações incluem sempre `user_id`, mantendo as políticas RLS como segunda
+camada de proteção.
+
 ## Aplicar no Supabase
 
 1. Abrir o projeto no Supabase.

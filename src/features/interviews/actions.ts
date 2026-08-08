@@ -35,6 +35,7 @@ function revalidateInterviewPages() {
   revalidatePath(interviewsPath);
   revalidatePath("/dashboard");
   revalidatePath("/candidaturas");
+  revalidatePath("/candidaturas/[applicationId]", "page");
 }
 
 async function getApplicationCompany(applicationId: string, userId: string) {
