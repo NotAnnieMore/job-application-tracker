@@ -1,15 +1,21 @@
 import {
+  Activity,
   ArrowRight,
+  BarChart3,
   BriefcaseBusiness,
   Building2,
   CalendarDays,
   CalendarClock,
+  CheckCircle2,
   ChevronRight,
   FileText,
   Inbox,
   ListChecks,
+  MessageSquare,
+  Percent,
   Plus,
   Video,
+  XCircle,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -22,7 +28,10 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { workModeLabels } from "@/features/applications/constants";
 import { formatActionDate } from "@/features/actions/date";
 import { getDashboardData } from "@/features/dashboard/data";
-import type { DashboardFollowUp } from "@/features/dashboard/types";
+import type {
+  DashboardActivityKind,
+  DashboardFollowUp,
+} from "@/features/dashboard/types";
 import { interviewFormatLabels } from "@/features/interviews/constants";
 import { formatInterviewDateTime } from "@/features/interviews/date";
 import { cn } from "@/lib/utils";
@@ -67,6 +76,41 @@ function followUpLabel(followUp: DashboardFollowUp, today: string) {
   return formatDate(followUp.followUpDate);
 }
 
+function formatActivityTime(value: string) {
+  const differenceMinutes = Math.max(
+    0,
+    Math.round((Date.now() - Date.parse(value)) / 60_000),
+  );
+
+  if (differenceMinutes < 1) return "Agora";
+  if (differenceMinutes < 60) return `Há ${differenceMinutes} min`;
+
+  const differenceHours = Math.round(differenceMinutes / 60);
+  if (differenceHours < 24) return `Há ${differenceHours} h`;
+
+  const differenceDays = Math.round(differenceHours / 24);
+  if (differenceDays < 7) {
+    return `Há ${differenceDays} dia${differenceDays === 1 ? "" : "s"}`;
+  }
+
+  return new Intl.DateTimeFormat("pt-PT", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    timeZone: "Europe/Lisbon",
+  }).format(new Date(value));
+}
+
+const activityIcons: Record<
+  DashboardActivityKind,
+  { icon: typeof FileText; className: string }
+> = {
+  application: { icon: FileText, className: "bg-blue-50 text-blue-600" },
+  note: { icon: MessageSquare, className: "bg-cyan-50 text-cyan-700" },
+  interview: { icon: CalendarDays, className: "bg-violet-50 text-violet-600" },
+  action: { icon: ListChecks, className: "bg-amber-50 text-amber-700" },
+};
+
 function SectionLink({
   href,
   label = "Ver todas",
@@ -94,6 +138,7 @@ export async function DashboardPage() {
       detail: `${data.stats.applicationsLast30Days} nos últimos 30 dias`,
       icon: FileText,
       iconClass: "bg-blue-50 text-blue-600",
+      href: "/candidaturas",
     },
     {
       label: "Candidaturas ativas",
@@ -101,6 +146,15 @@ export async function DashboardPage() {
       detail: `${data.stats.interviewApplications} em fase de entrevista`,
       icon: BriefcaseBusiness,
       iconClass: "bg-violet-50 text-violet-600",
+      href: "/candidaturas",
+    },
+    {
+      label: "Próximas entrevistas",
+      value: data.stats.upcomingInterviews,
+      detail: "Agendadas para os próximos dias",
+      icon: CalendarDays,
+      iconClass: "bg-purple-50 text-purple-600",
+      href: "/entrevistas?estado=scheduled",
     },
     {
       label: "Ações em atraso",
@@ -111,6 +165,31 @@ export async function DashboardPage() {
         data.stats.overdueActions > 0
           ? "bg-amber-50 text-amber-600"
           : "bg-emerald-50 text-emerald-600",
+      href: "/acoes?estado=pending",
+    },
+    {
+      label: "Taxa de resposta",
+      value: `${data.stats.responseRate}%`,
+      detail: `${data.stats.respondedApplications} de ${data.stats.sentApplications} enviadas`,
+      icon: Percent,
+      iconClass: "bg-indigo-50 text-indigo-600",
+      href: "/candidaturas",
+    },
+    {
+      label: "Propostas recebidas",
+      value: data.stats.offersReceived,
+      detail: "Processos com proposta",
+      icon: CheckCircle2,
+      iconClass: "bg-emerald-50 text-emerald-600",
+      href: "/candidaturas?status=offer_received",
+    },
+    {
+      label: "Rejeições",
+      value: data.stats.rejections,
+      detail: "Processos terminados",
+      icon: XCircle,
+      iconClass: "bg-red-50 text-red-600",
+      href: "/candidaturas?status=rejected",
     },
     {
       label: "Empresas",
@@ -118,6 +197,7 @@ export async function DashboardPage() {
       detail: `${data.stats.companiesWithApplications} com candidatura`,
       icon: Building2,
       iconClass: "bg-cyan-50 text-cyan-700",
+      href: "/empresas",
     },
   ];
 
@@ -142,27 +222,33 @@ export async function DashboardPage() {
           const Icon = stat.icon;
 
           return (
-            <Card key={stat.label} className="p-5">
-              <div className="flex items-start gap-4">
-                <span
-                  className={cn(
-                    "flex size-12 shrink-0 items-center justify-center rounded-2xl",
-                    stat.iconClass,
-                  )}
-                >
-                  <Icon aria-hidden="true" className="size-6" />
-                </span>
-                <div className="min-w-0">
-                  <p className="text-sm text-slate-600">{stat.label}</p>
-                  <p className="mt-1 text-3xl font-bold tracking-tight text-slate-950">
-                    {stat.value}
-                  </p>
-                  <p className="mt-1 text-xs font-medium text-slate-500">
-                    {stat.detail}
-                  </p>
+            <Link
+              key={stat.label}
+              href={stat.href}
+              className="group rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+            >
+              <Card className="h-full p-5 transition group-hover:-translate-y-0.5 group-hover:border-blue-200 group-hover:shadow-md">
+                <div className="flex items-start gap-4">
+                  <span
+                    className={cn(
+                      "flex size-12 shrink-0 items-center justify-center rounded-2xl",
+                      stat.iconClass,
+                    )}
+                  >
+                    <Icon aria-hidden="true" className="size-6" />
+                  </span>
+                  <div className="min-w-0">
+                    <p className="text-sm text-slate-600">{stat.label}</p>
+                    <p className="mt-1 text-3xl font-bold tracking-tight text-slate-950">
+                      {stat.value}
+                    </p>
+                    <p className="mt-1 text-xs font-medium text-slate-500">
+                      {stat.detail}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            </Card>
+              </Card>
+            </Link>
           );
         })}
       </section>
@@ -497,6 +583,114 @@ export async function DashboardPage() {
                   />
                 </Link>
               ))}
+            </div>
+          )}
+        </Card>
+
+        <Card>
+          <CardHeader>
+            <div>
+              <h2 className="font-bold text-slate-950">
+                Evolução das candidaturas
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Registos efetuados nos últimos seis meses
+              </p>
+            </div>
+            <span className="flex size-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+              <BarChart3 aria-hidden="true" className="size-4" />
+            </span>
+          </CardHeader>
+          <CardContent>
+            <div
+              role="img"
+              aria-label={`Gráfico de candidaturas nos últimos seis meses: ${data.applicationTrend
+                .map((point) => `${point.label}, ${point.value}`)
+                .join("; ")}`}
+              className="flex h-56 items-end gap-2 sm:gap-4"
+            >
+              {data.applicationTrend.map((point) => (
+                <div
+                  key={point.key}
+                  className="flex h-full min-w-0 flex-1 flex-col items-center justify-end"
+                >
+                  <span className="mb-2 text-sm font-bold text-slate-700">
+                    {point.value}
+                  </span>
+                  <div className="flex h-40 w-full items-end rounded-xl bg-slate-50 px-1.5 pt-2">
+                    <div
+                      className={cn(
+                        "w-full rounded-lg bg-blue-500 transition-all",
+                        point.value === 0 && "bg-slate-200",
+                      )}
+                      style={{
+                        height:
+                          point.value === 0
+                            ? "2px"
+                            : `${Math.max(point.percentage, 8)}%`,
+                      }}
+                    />
+                  </div>
+                  <span className="mt-2 text-[11px] font-bold tracking-wide text-slate-500">
+                    {point.label}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="overflow-hidden">
+          <CardHeader>
+            <div>
+              <h2 className="font-bold text-slate-950">Atividade recente</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                Alterações mais recentes no teu acompanhamento
+              </p>
+            </div>
+            <Activity aria-hidden="true" className="size-5 text-slate-400" />
+          </CardHeader>
+          {data.recentActivity.length === 0 ? (
+            <div className="flex min-h-56 flex-col items-center justify-center px-6 text-center">
+              <Activity aria-hidden="true" className="size-8 text-slate-300" />
+              <p className="mt-3 text-sm text-slate-500">
+                A atividade aparece quando começares a atualizar candidaturas.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {data.recentActivity.map((activity) => {
+                const config = activityIcons[activity.kind];
+                const Icon = config.icon;
+
+                return (
+                  <Link
+                    key={activity.id}
+                    href={activity.href}
+                    className="flex items-center gap-3 px-5 py-3.5 transition hover:bg-slate-50"
+                  >
+                    <span
+                      className={cn(
+                        "flex size-9 shrink-0 items-center justify-center rounded-xl",
+                        config.className,
+                      )}
+                    >
+                      <Icon aria-hidden="true" className="size-4" />
+                    </span>
+                    <span className="min-w-0 flex-1">
+                      <span className="block text-sm font-semibold text-slate-800">
+                        {activity.label}
+                      </span>
+                      <span className="mt-0.5 block truncate text-xs text-slate-500">
+                        {activity.description}
+                      </span>
+                    </span>
+                    <span className="shrink-0 text-[11px] font-medium text-slate-400">
+                      {formatActivityTime(activity.occurredAt)}
+                    </span>
+                  </Link>
+                );
+              })}
             </div>
           )}
         </Card>

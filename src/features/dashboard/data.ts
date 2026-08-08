@@ -2,11 +2,13 @@ import "server-only";
 
 import { applicationStatusOptions } from "@/features/applications/constants";
 import type {
+  DashboardActivity,
   DashboardApplication,
   DashboardAction,
   DashboardData,
   DashboardFollowUp,
   DashboardInterview,
+  DashboardTrendPoint,
 } from "@/features/dashboard/types";
 import { requireCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -19,6 +21,12 @@ const inactiveStatuses = new Set<ApplicationStatusValue>([
 const interviewStatuses = new Set<ApplicationStatusValue>([
   "interview_scheduled",
   "interview_completed",
+]);
+const responseStatuses = new Set<ApplicationStatusValue>([
+  "interview_scheduled",
+  "interview_completed",
+  "offer_received",
+  "rejected",
 ]);
 
 function lisbonDateParts(date: Date) {
@@ -55,6 +63,51 @@ function addDays(value: string, days: number) {
     date.getUTCMonth() + 1,
     date.getUTCDate(),
   );
+}
+
+function getApplicationTrend(
+  applications: DashboardApplication[],
+  currentYear: number,
+  currentMonth: number,
+): DashboardTrendPoint[] {
+  const currentMonthIndex = currentYear * 12 + currentMonth - 1;
+  const values = Array.from({ length: 6 }, (_, index) => {
+    const monthIndex = currentMonthIndex - 5 + index;
+    const year = Math.floor(monthIndex / 12);
+    const month = (monthIndex % 12) + 1;
+    const key = `${year}-${month.toString().padStart(2, "0")}`;
+
+    return {
+      key,
+      label: new Intl.DateTimeFormat("pt-PT", {
+        month: "short",
+        timeZone: "UTC",
+      })
+        .format(new Date(Date.UTC(year, month - 1, 1)))
+        .replace(".", "")
+        .toLocaleUpperCase("pt-PT"),
+      value: applications.filter((application) =>
+        application.applicationDate.startsWith(key),
+      ).length,
+    };
+  });
+  const maximum = Math.max(...values.map((value) => value.value), 1);
+
+  return values.map((value) => ({
+    ...value,
+    percentage: Math.round((value.value / maximum) * 100),
+  }));
+}
+
+function activityLabel(
+  createdAt: string,
+  updatedAt: string,
+  labels: {
+    created: string;
+    updated: string;
+  },
+) {
+  return createdAt === updatedAt ? labels.created : labels.updated;
 }
 
 function toDashboardApplication(
@@ -97,11 +150,12 @@ export async function getDashboardData(): Promise<DashboardData> {
     companiesResult,
     interviewsResult,
     actionsResult,
+    notesResult,
   ] = await Promise.all([
     supabase
       .from("applications")
       .select(
-        "id, opportunity_id, status, application_date, next_action_summary, follow_up_date, created_at",
+        "id, opportunity_id, status, application_date, next_action_summary, follow_up_date, created_at, updated_at",
       )
       .eq("user_id", user.id),
     supabase
@@ -115,15 +169,21 @@ export async function getDashboardData(): Promise<DashboardData> {
     supabase
       .from("interviews")
       .select(
-        "id, application_id, interview_type, scheduled_at, status, format",
+        "id, application_id, interview_type, scheduled_at, status, format, created_at, updated_at",
       )
-      .eq("user_id", user.id)
-      .eq("status", "scheduled"),
+      .eq("user_id", user.id),
     supabase
       .from("actions")
-      .select("id, application_id, description, due_date, priority")
+      .select(
+        "id, application_id, description, due_date, priority, status, created_at, updated_at",
+      )
+      .eq("user_id", user.id),
+    supabase
+      .from("notes")
+      .select("id, application_id, content, created_at, updated_at")
       .eq("user_id", user.id)
-      .eq("status", "pending"),
+      .order("updated_at", { ascending: false })
+      .limit(10),
   ]);
 
   if (
@@ -131,7 +191,8 @@ export async function getDashboardData(): Promise<DashboardData> {
     opportunitiesResult.error ||
     companiesResult.error ||
     interviewsResult.error ||
-    actionsResult.error
+    actionsResult.error ||
+    notesResult.error
   ) {
     throw new Error("Não foi possível consultar os dados do dashboard.");
   }
@@ -144,6 +205,9 @@ export async function getDashboardData(): Promise<DashboardData> {
   );
   const companies = new Map(
     companiesResult.data.map((company) => [company.id, company]),
+  );
+  const applicationRecords = new Map(
+    applicationsResult.data.map((application) => [application.id, application]),
   );
   const applicationCreatedAt = new Map(
     applicationsResult.data.map((application) => [
@@ -202,6 +266,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     }));
 
   const pendingActions: DashboardAction[] = actionsResult.data
+    .filter((action) => action.status === "pending")
     .flatMap((action) => {
       const application = applicationsResult.data.find(
         (item) => item.id === action.application_id,
@@ -265,8 +330,12 @@ export async function getDashboardData(): Promise<DashboardData> {
   });
 
   const now = Date.now();
-  const upcomingInterviews: DashboardInterview[] = interviewsResult.data
-    .filter((interview) => Date.parse(interview.scheduled_at) >= now)
+  const allUpcomingInterviews: DashboardInterview[] = interviewsResult.data
+    .filter(
+      (interview) =>
+        interview.status === "scheduled" &&
+        Date.parse(interview.scheduled_at) >= now,
+    )
     .flatMap((interview) => {
       const application = applicationsResult.data.find(
         (item) => item.id === interview.application_id,
@@ -291,8 +360,122 @@ export async function getDashboardData(): Promise<DashboardData> {
         },
       ];
     })
-    .sort((left, right) => left.scheduledAt.localeCompare(right.scheduledAt))
-    .slice(0, 4);
+    .sort((left, right) => left.scheduledAt.localeCompare(right.scheduledAt));
+  const upcomingInterviews = allUpcomingInterviews.slice(0, 4);
+
+  function getActivityContext(applicationId: string) {
+    const application = applicationRecords.get(applicationId);
+    const opportunity = application
+      ? opportunities.get(application.opportunity_id)
+      : null;
+    const company = opportunity ? companies.get(opportunity.company_id) : null;
+
+    return application && opportunity && company
+      ? { application, opportunity, company }
+      : null;
+  }
+
+  const applicationActivity: DashboardActivity[] =
+    applicationsResult.data.flatMap((application) => {
+      const context = getActivityContext(application.id);
+      if (!context) return [];
+
+      return [
+        {
+          id: `application-${application.id}`,
+          kind: "application",
+          label: activityLabel(application.created_at, application.updated_at, {
+            created: "Candidatura criada",
+            updated: "Candidatura atualizada",
+          }),
+          description: `${context.opportunity.title} · ${context.company.name}`,
+          occurredAt: application.updated_at,
+          href: "/candidaturas",
+        },
+      ];
+    });
+
+  const noteActivity: DashboardActivity[] = notesResult.data.flatMap((note) => {
+    const context = getActivityContext(note.application_id);
+    if (!context) return [];
+    const excerpt = note.content.replace(/\s+/gu, " ").trim().slice(0, 72);
+
+    return [
+      {
+        id: `note-${note.id}`,
+        kind: "note",
+        label: activityLabel(note.created_at, note.updated_at, {
+          created: "Nota adicionada",
+          updated: "Nota atualizada",
+        }),
+        description: `${excerpt}${note.content.length > 72 ? "…" : ""} · ${context.company.name}`,
+        occurredAt: note.updated_at,
+        href: `/candidaturas/${note.application_id}#notas`,
+      },
+    ];
+  });
+
+  const interviewActivity: DashboardActivity[] = interviewsResult.data.flatMap(
+    (interview) => {
+      const context = getActivityContext(interview.application_id);
+      if (!context) return [];
+
+      return [
+        {
+          id: `interview-${interview.id}`,
+          kind: "interview",
+          label: activityLabel(interview.created_at, interview.updated_at, {
+            created: "Entrevista registada",
+            updated: "Entrevista atualizada",
+          }),
+          description: `${interview.interview_type} · ${context.company.name}`,
+          occurredAt: interview.updated_at,
+          href: "/entrevistas",
+        },
+      ];
+    },
+  );
+
+  const actionActivity: DashboardActivity[] = actionsResult.data.flatMap(
+    (action) => {
+      const context = getActivityContext(action.application_id);
+      if (!context) return [];
+
+      return [
+        {
+          id: `action-${action.id}`,
+          kind: "action",
+          label: activityLabel(action.created_at, action.updated_at, {
+            created: "Ação criada",
+            updated: "Ação atualizada",
+          }),
+          description: `${action.description} · ${context.company.name}`,
+          occurredAt: action.updated_at,
+          href: "/acoes",
+        },
+      ];
+    },
+  );
+
+  const recentActivity = [
+    ...applicationActivity,
+    ...noteActivity,
+    ...interviewActivity,
+    ...actionActivity,
+  ]
+    .sort((left, right) => right.occurredAt.localeCompare(left.occurredAt))
+    .slice(0, 8);
+  const applicationTrend = getApplicationTrend(
+    applications,
+    todayParts.year,
+    todayParts.month,
+  );
+  const sentApplications = applications.filter(
+    (application) => application.status !== "interested",
+  );
+  const respondedApplications = sentApplications.filter((application) =>
+    responseStatuses.has(application.status),
+  );
 
   return {
     today,
@@ -308,14 +491,33 @@ export async function getDashboardData(): Promise<DashboardData> {
         interviewStatuses.has(application.status),
       ).length,
       overdueActions: actionsResult.data.filter(
-        (action) => action.due_date && action.due_date < today,
+        (action) =>
+          action.status === "pending" &&
+          action.due_date &&
+          action.due_date < today,
       ).length,
       upcomingActions: actionsResult.data.filter(
         (action) =>
+          action.status === "pending" &&
           action.due_date &&
           action.due_date >= today &&
           action.due_date <= sevenDaysFromNow,
       ).length,
+      upcomingInterviews: allUpcomingInterviews.length,
+      offersReceived: applications.filter(
+        (application) => application.status === "offer_received",
+      ).length,
+      rejections: applications.filter(
+        (application) => application.status === "rejected",
+      ).length,
+      responseRate:
+        sentApplications.length === 0
+          ? 0
+          : Math.round(
+              (respondedApplications.length / sentApplications.length) * 100,
+            ),
+      respondedApplications: respondedApplications.length,
+      sentApplications: sentApplications.length,
       totalCompanies: companiesResult.data.length,
       companiesWithApplications: companyIdsWithApplications.size,
     },
@@ -324,5 +526,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     pendingActions,
     upcomingInterviews,
     statusSummary,
+    applicationTrend,
+    recentActivity,
   };
 }

@@ -200,6 +200,20 @@ O Dashboard apresenta o número de ações em atraso, as que vencem nos sete dia
 seguintes e uma lista das prioridades pendentes. O formulário da candidatura
 inclui também um atalho para criar uma ação já associada ao processo.
 
+### Estatísticas e atividade
+
+Na Fase 8, o Dashboard passou também a calcular propostas, rejeições, próximas
+entrevistas, taxa de resposta e a evolução mensal das candidaturas. A taxa de
+resposta usa como denominador todas as candidaturas que já saíram do estado
+`interested`. Conta como resposta um processo em `interview_scheduled`,
+`interview_completed`, `offer_received` ou `rejected`.
+
+A atividade recente combina `created_at` e `updated_at` de candidaturas,
+entrevistas, ações e notas. Os eventos continuam a ser derivados das tabelas
+existentes e não constituem ainda um registo de auditoria permanente. As notas
+são limitadas aos dez registos atualizados mais recentemente antes da
+combinação, e o Dashboard apresenta os oito eventos mais recentes no total.
+
 ## Detalhe da candidatura e notas
 
 A rota `/candidaturas/[id]` funciona como ponto central de consulta de cada

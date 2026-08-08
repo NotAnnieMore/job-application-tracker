@@ -56,6 +56,25 @@ export type DashboardAction = {
   companyLogoUrl: string;
 };
 
+export type DashboardTrendPoint = {
+  key: string;
+  label: string;
+  value: number;
+  percentage: number;
+};
+
+export type DashboardActivityKind =
+  "application" | "note" | "interview" | "action";
+
+export type DashboardActivity = {
+  id: string;
+  kind: DashboardActivityKind;
+  label: string;
+  description: string;
+  occurredAt: string;
+  href: string;
+};
+
 export type DashboardData = {
   today: string;
   stats: {
@@ -65,6 +84,12 @@ export type DashboardData = {
     interviewApplications: number;
     overdueActions: number;
     upcomingActions: number;
+    upcomingInterviews: number;
+    offersReceived: number;
+    rejections: number;
+    responseRate: number;
+    respondedApplications: number;
+    sentApplications: number;
     totalCompanies: number;
     companiesWithApplications: number;
   };
@@ -73,4 +98,6 @@ export type DashboardData = {
   pendingActions: DashboardAction[];
   upcomingInterviews: DashboardInterview[];
   statusSummary: DashboardStatusSummary[];
+  applicationTrend: DashboardTrendPoint[];
+  recentActivity: DashboardActivity[];
 };
