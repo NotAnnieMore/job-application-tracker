@@ -155,7 +155,7 @@ export async function updateApplicationAction(
   }
 
   revalidateApplicationPages();
-  redirect(`${applicationsPath}?estado=candidatura-atualizada`);
+  redirect(`${applicationsPath}/${applicationId}?aviso=candidatura-atualizada`);
 }
 
 export async function deleteApplicationAction(

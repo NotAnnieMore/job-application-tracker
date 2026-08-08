@@ -40,6 +40,11 @@ import { formatInterviewDateTime } from "@/features/interviews/date";
 import { getApplicationNotes } from "@/features/notes/data";
 
 const notices: Record<string, string> = {
+  "candidatura-atualizada": "Candidatura atualizada com sucesso.",
+  "entrevista-atualizada": "Entrevista atualizada com sucesso.",
+  "entrevista-eliminada": "Entrevista eliminada com sucesso.",
+  "acao-atualizada": "Ação atualizada com sucesso.",
+  "acao-eliminada": "Ação eliminada com sucesso.",
   "nota-criada": "Nota adicionada com sucesso.",
   "nota-atualizada": "Nota atualizada com sucesso.",
   "nota-eliminada": "Nota eliminada com sucesso.",
@@ -490,7 +495,7 @@ export default async function ApplicationDetailPage({
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <Link
-                          href={`/entrevistas/${interview.id}/editar`}
+                          href={`/entrevistas/${interview.id}/editar?regressar=candidatura`}
                           className="font-semibold text-slate-950 hover:text-blue-700"
                         >
                           {interview.interviewType}
@@ -546,7 +551,7 @@ export default async function ApplicationDetailPage({
                     <div className="flex items-start justify-between gap-3">
                       <div className="min-w-0">
                         <Link
-                          href={`/acoes/${action.id}/editar`}
+                          href={`/acoes/${action.id}/editar?regressar=candidatura`}
                           className="font-semibold text-slate-950 hover:text-blue-700"
                         >
                           {action.description}

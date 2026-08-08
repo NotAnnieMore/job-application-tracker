@@ -23,6 +23,11 @@ tabela `notes`, apesar de existir no esquema inicial, ainda não tinha interface
   migração.
 - Fazer o título na listagem abrir o detalhe e reservar o ícone de lápis para a
   edição direta.
+- Depois de editar a candidatura, regressar ao respetivo detalhe para confirmar
+  os dados atualizados.
+- Quando uma entrevista ou ação é aberta a partir do detalhe, preservar esse
+  contexto ao guardar, cancelar ou eliminar; acessos iniciados nas listas
+  continuam a regressar às listas correspondentes.
 
 ## Consequências
 

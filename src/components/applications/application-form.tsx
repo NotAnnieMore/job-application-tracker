@@ -49,12 +49,14 @@ export function ApplicationForm({
   recruiters,
   initialValues,
   submitLabel,
+  cancelHref = "/candidaturas",
 }: {
   action: ApplicationFormAction;
   companies: CompanyOption[];
   recruiters: RecruiterOption[];
   initialValues: ApplicationFormValues;
   submitLabel: string;
+  cancelHref?: string;
 }) {
   const [state, formAction] = useActionState(
     action,
@@ -659,7 +661,7 @@ export function ApplicationForm({
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Link
-          href="/candidaturas"
+          href={cancelHref}
           className={buttonClassName({ variant: "secondary" })}
         >
           Cancelar

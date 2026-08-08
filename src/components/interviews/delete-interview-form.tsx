@@ -10,11 +10,17 @@ import { initialInterviewActionState } from "@/features/interviews/types";
 export function DeleteInterviewForm({
   interviewId,
   interviewType,
+  returnToApplication = false,
 }: {
   interviewId: string;
   interviewType: string;
+  returnToApplication?: boolean;
 }) {
-  const action = deleteInterviewAction.bind(null, interviewId);
+  const action = deleteInterviewAction.bind(
+    null,
+    interviewId,
+    returnToApplication,
+  );
   const [state, formAction, pending] = useActionState(
     action,
     initialInterviewActionState,

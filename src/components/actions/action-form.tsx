@@ -47,11 +47,13 @@ export function ActionForm({
   applications,
   initialValues,
   submitLabel,
+  cancelHref = "/acoes",
 }: {
   action: ActionFormAction;
   applications: ActionApplicationOption[];
   initialValues: ActionFormValues;
   submitLabel: string;
+  cancelHref?: string;
 }) {
   const [state, formAction] = useActionState(action, initialActionActionState);
 
@@ -183,7 +185,7 @@ export function ActionForm({
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Link
-          href="/acoes"
+          href={cancelHref}
           className={buttonClassName({ variant: "secondary" })}
         >
           Cancelar

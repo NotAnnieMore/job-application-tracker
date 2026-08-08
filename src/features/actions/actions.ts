@@ -77,6 +77,7 @@ export async function createActionAction(
 
 export async function updateActionAction(
   actionId: string,
+  returnToApplication: boolean,
   _previousState: ActionActionState,
   formData: FormData,
 ): Promise<ActionActionState> {
@@ -123,11 +124,16 @@ export async function updateActionAction(
   }
 
   revalidateActionPages();
-  redirect(`${actionsPath}?aviso=acao-atualizada`);
+  redirect(
+    returnToApplication
+      ? `/candidaturas/${values.application_id}?aviso=acao-atualizada`
+      : `${actionsPath}?aviso=acao-atualizada`,
+  );
 }
 
 export async function deleteActionAction(
   actionId: string,
+  returnToApplication: boolean,
   _previousState: ActionActionState,
   _formData: FormData,
 ): Promise<ActionActionState> {
@@ -145,7 +151,7 @@ export async function deleteActionAction(
     .delete()
     .eq("id", actionId)
     .eq("user_id", user.id)
-    .select("id")
+    .select("id, application_id")
     .maybeSingle();
 
   if (error) {
@@ -159,7 +165,11 @@ export async function deleteActionAction(
   }
 
   revalidateActionPages();
-  redirect(`${actionsPath}?aviso=acao-eliminada`);
+  redirect(
+    returnToApplication
+      ? `/candidaturas/${data.application_id}?aviso=acao-eliminada`
+      : `${actionsPath}?aviso=acao-eliminada`,
+  );
 }
 
 async function setActionCompletion(

@@ -29,15 +29,16 @@ export default async function EditApplicationPage({
   if (!application) notFound();
 
   const action = updateApplicationAction.bind(null, application.id);
+  const detailHref = `/candidaturas/${application.id}`;
 
   return (
     <div className="space-y-6">
       <Link
-        href="/candidaturas"
+        href={detailHref}
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        Voltar às candidaturas
+        Voltar à candidatura
       </Link>
       <PageHeader
         title={`Editar ${application.title}`}
@@ -67,6 +68,7 @@ export default async function EditApplicationPage({
         recruiters={recruiters}
         initialValues={application}
         submitLabel="Guardar alterações"
+        cancelHref={detailHref}
       />
 
       <Card className="border-red-200">

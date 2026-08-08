@@ -15,10 +15,12 @@ import {
 
 export default async function EditInterviewPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ interviewId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const { interviewId } = await params;
+  const [{ interviewId }, query] = await Promise.all([params, searchParams]);
   const [interview, applications, recruiters] = await Promise.all([
     getInterviewById(interviewId),
     getInterviewApplicationOptions(),
@@ -26,16 +28,24 @@ export default async function EditInterviewPage({
   ]);
 
   if (!interview) notFound();
-  const action = updateInterviewAction.bind(null, interview.id);
+  const returnToApplication = query.regressar === "candidatura";
+  const returnHref = returnToApplication
+    ? `/candidaturas/${interview.applicationId}`
+    : "/entrevistas";
+  const action = updateInterviewAction.bind(
+    null,
+    interview.id,
+    returnToApplication,
+  );
 
   return (
     <div className="space-y-6">
       <Link
-        href="/entrevistas"
+        href={returnHref}
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        Voltar às entrevistas
+        {returnToApplication ? "Voltar à candidatura" : "Voltar às entrevistas"}
       </Link>
       <PageHeader
         title={`Preparar ${interview.interviewType}`}
@@ -47,6 +57,7 @@ export default async function EditInterviewPage({
         recruiters={recruiters}
         initialValues={interview}
         submitLabel="Guardar alterações"
+        cancelHref={returnHref}
       />
 
       <Card className="border-red-200">
@@ -62,6 +73,7 @@ export default async function EditInterviewPage({
           <DeleteInterviewForm
             interviewId={interview.id}
             interviewType={interview.interviewType}
+            returnToApplication={returnToApplication}
           />
         </CardContent>
       </Card>

@@ -10,11 +10,13 @@ import { initialActionActionState } from "@/features/actions/types";
 export function DeleteActionForm({
   actionId,
   description,
+  returnToApplication = false,
 }: {
   actionId: string;
   description: string;
+  returnToApplication?: boolean;
 }) {
-  const action = deleteActionAction.bind(null, actionId);
+  const action = deleteActionAction.bind(null, actionId, returnToApplication);
   const [state, formAction, pending] = useActionState(
     action,
     initialActionActionState,

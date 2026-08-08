@@ -72,12 +72,14 @@ export function InterviewForm({
   recruiters,
   initialValues,
   submitLabel,
+  cancelHref = "/entrevistas",
 }: {
   action: InterviewFormAction;
   applications: InterviewApplicationOption[];
   recruiters: InterviewRecruiterOption[];
   initialValues: InterviewFormValues;
   submitLabel: string;
+  cancelHref?: string;
 }) {
   const [state, formAction] = useActionState(
     action,
@@ -465,7 +467,7 @@ export function InterviewForm({
 
       <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
         <Link
-          href="/entrevistas"
+          href={cancelHref}
           className={buttonClassName({ variant: "secondary" })}
         >
           Cancelar

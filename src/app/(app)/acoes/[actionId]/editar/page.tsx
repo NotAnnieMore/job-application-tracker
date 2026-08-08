@@ -14,26 +14,36 @@ import {
 
 export default async function EditActionPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ actionId: string }>;
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
-  const { actionId } = await params;
+  const [{ actionId }, query] = await Promise.all([params, searchParams]);
   const [actionDetails, applications] = await Promise.all([
     getActionById(actionId),
     getActionApplicationOptions(),
   ]);
 
   if (!actionDetails) notFound();
-  const action = updateActionAction.bind(null, actionDetails.id);
+  const returnToApplication = query.regressar === "candidatura";
+  const returnHref = returnToApplication
+    ? `/candidaturas/${actionDetails.applicationId}`
+    : "/acoes";
+  const action = updateActionAction.bind(
+    null,
+    actionDetails.id,
+    returnToApplication,
+  );
 
   return (
     <div className="space-y-6">
       <Link
-        href="/acoes"
+        href={returnHref}
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        Voltar às ações
+        {returnToApplication ? "Voltar à candidatura" : "Voltar às ações"}
       </Link>
       <PageHeader
         title="Editar ação"
@@ -44,6 +54,7 @@ export default async function EditActionPage({
         applications={applications}
         initialValues={actionDetails}
         submitLabel="Guardar alterações"
+        cancelHref={returnHref}
       />
 
       <Card className="border-red-200">
@@ -59,6 +70,7 @@ export default async function EditActionPage({
           <DeleteActionForm
             actionId={actionDetails.id}
             description={actionDetails.description}
+            returnToApplication={returnToApplication}
           />
         </CardContent>
       </Card>

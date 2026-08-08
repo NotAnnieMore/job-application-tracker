@@ -112,6 +112,7 @@ export async function createInterviewAction(
 
 export async function updateInterviewAction(
   interviewId: string,
+  returnToApplication: boolean,
   _previousState: InterviewActionState,
   formData: FormData,
 ): Promise<InterviewActionState> {
@@ -150,11 +151,16 @@ export async function updateInterviewAction(
   }
 
   revalidateInterviewPages();
-  redirect(`${interviewsPath}?aviso=entrevista-atualizada`);
+  redirect(
+    returnToApplication
+      ? `/candidaturas/${values.application_id}?aviso=entrevista-atualizada`
+      : `${interviewsPath}?aviso=entrevista-atualizada`,
+  );
 }
 
 export async function deleteInterviewAction(
   interviewId: string,
+  returnToApplication: boolean,
   _previousState: InterviewActionState,
   _formData: FormData,
 ): Promise<InterviewActionState> {
@@ -172,7 +178,7 @@ export async function deleteInterviewAction(
     .delete()
     .eq("id", interviewId)
     .eq("user_id", user.id)
-    .select("id")
+    .select("id, application_id")
     .maybeSingle();
 
   if (error) {
@@ -186,5 +192,9 @@ export async function deleteInterviewAction(
   }
 
   revalidateInterviewPages();
-  redirect(`${interviewsPath}?aviso=entrevista-eliminada`);
+  redirect(
+    returnToApplication
+      ? `/candidaturas/${data.application_id}?aviso=entrevista-eliminada`
+      : `${interviewsPath}?aviso=entrevista-eliminada`,
+  );
 }
