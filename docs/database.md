@@ -162,6 +162,28 @@ funções transacionais de criação e edição pelas versões que aceitam
 `p_primary_recruiter_id`. A validação correspondente encontra-se em
 `recruiter_application_catalog_checks.sql`.
 
+## Integração de entrevistas
+
+A área `/entrevistas` permite criar, filtrar, preparar, editar e eliminar
+entrevistas reais. Cada entrevista pertence a uma candidatura e pode ter um
+contacto principal compatível com a empresa da vaga. O agendamento guarda a
+data e hora como `timestamptz`, convertendo a hora local do dispositivo para um
+instante inequívoco na base de dados.
+
+Além do tipo, participantes, local ou ligação e notas já previstos no esquema
+inicial, a migração `20260808233000_expand_interviews.sql` acrescenta:
+
+- estado `scheduled`, `completed` ou `cancelled`;
+- formato `video`, `phone`, `onsite` ou `other`;
+- duração prevista entre 5 e 480 minutos;
+- recrutador opcional protegido por uma chave estrangeira composta com
+  `user_id`.
+
+O formulário mostra também o guião pessoal/CV e as perguntas para a empresa
+guardados na candidatura, juntamente com preparação específica, feedback e
+resultado da entrevista. As próximas entrevistas são apresentadas no
+Dashboard por ordem cronológica.
+
 ## Aplicar no Supabase
 
 1. Abrir o projeto no Supabase.
@@ -183,6 +205,10 @@ pela ordem do nome do ficheiro. Para a identidade visual das empresas, executar
 Para ativar a associação entre candidaturas e recrutadores, executar depois
 `supabase/migrations/20260808230000_add_primary_recruiter_transactions.sql` e
 validar com `supabase/tests/recruiter_application_catalog_checks.sql`.
+
+Para ativar a gestão real de entrevistas, executar depois
+`supabase/migrations/20260808233000_expand_interviews.sql` e validar com
+`supabase/tests/interview_catalog_checks.sql`.
 
 ## Dados de demonstração
 

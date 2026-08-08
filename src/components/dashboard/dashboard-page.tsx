@@ -2,12 +2,14 @@ import {
   ArrowRight,
   BriefcaseBusiness,
   Building2,
+  CalendarDays,
   CalendarClock,
   ChevronRight,
   Clock3,
   FileText,
   Inbox,
   Plus,
+  Video,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -19,6 +21,8 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { workModeLabels } from "@/features/applications/constants";
 import { getDashboardData } from "@/features/dashboard/data";
 import type { DashboardFollowUp } from "@/features/dashboard/types";
+import { interviewFormatLabels } from "@/features/interviews/constants";
+import { formatInterviewDateTime } from "@/features/interviews/date";
 import { cn } from "@/lib/utils";
 import type { ApplicationStatusValue } from "@/types/database.types";
 
@@ -369,6 +373,63 @@ export async function DashboardPage() {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)]">
+        <Card className="overflow-hidden xl:col-span-2">
+          <CardHeader>
+            <h2 className="font-bold text-slate-950">Próximas entrevistas</h2>
+            <SectionLink href="/entrevistas" />
+          </CardHeader>
+          {data.upcomingInterviews.length === 0 ? (
+            <div className="flex min-h-44 flex-col items-center justify-center px-6 text-center">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-violet-50 text-violet-600">
+                <CalendarDays aria-hidden="true" className="size-5" />
+              </span>
+              <p className="mt-3 font-semibold text-slate-900">
+                Nenhuma entrevista agendada
+              </p>
+              <p className="mt-1 text-sm leading-6 text-slate-500">
+                As próximas conversas irão aparecer aqui automaticamente.
+              </p>
+            </div>
+          ) : (
+            <div className="grid divide-y divide-slate-100 md:grid-cols-2 md:divide-x md:divide-y-0">
+              {data.upcomingInterviews.map((interview) => (
+                <Link
+                  key={interview.id}
+                  href={`/entrevistas/${interview.id}/editar`}
+                  className="flex items-center gap-3 p-5 transition hover:bg-slate-50"
+                >
+                  <CompanyLogo
+                    name={interview.companyName}
+                    logoUrl={interview.companyLogoUrl}
+                    size="md"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold text-slate-950">
+                      {interview.interviewType}
+                    </span>
+                    <span className="mt-0.5 block truncate text-xs text-slate-500">
+                      {interview.title} · {interview.companyName}
+                    </span>
+                    <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-violet-700">
+                      <span>
+                        {formatInterviewDateTime(interview.scheduledAt)}
+                      </span>
+                      <span className="flex items-center gap-1">
+                        <Video aria-hidden="true" className="size-3.5" />
+                        {interviewFormatLabels[interview.format]}
+                      </span>
+                    </span>
+                  </span>
+                  <ChevronRight
+                    aria-hidden="true"
+                    className="size-4 text-slate-400"
+                  />
+                </Link>
+              ))}
+            </div>
+          )}
+        </Card>
+
         <Card>
           <CardHeader>
             <h2 className="font-bold text-slate-950">
@@ -423,6 +484,17 @@ export async function DashboardPage() {
             >
               <Plus aria-hidden="true" className="size-4" />
               Registar candidatura
+              <ChevronRight
+                aria-hidden="true"
+                className="ml-auto size-4 text-slate-400"
+              />
+            </Link>
+            <Link
+              href="/entrevistas/nova"
+              className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50/50 hover:text-blue-700"
+            >
+              <CalendarDays aria-hidden="true" className="size-4" />
+              Agendar entrevista
               <ChevronRight
                 aria-hidden="true"
                 className="ml-auto size-4 text-slate-400"

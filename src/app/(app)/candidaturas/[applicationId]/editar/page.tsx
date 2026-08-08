@@ -1,10 +1,11 @@
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, CalendarPlus } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
 import { ApplicationForm } from "@/components/applications/application-form";
 import { DeleteApplicationForm } from "@/components/applications/delete-application-form";
 import { PageHeader } from "@/components/shared/page-header";
+import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { updateApplicationAction } from "@/features/applications/actions";
 import {
@@ -41,6 +42,15 @@ export default async function EditApplicationPage({
       <PageHeader
         title={`Editar ${application.title}`}
         description="Atualiza a vaga, o estado e a preparação desta candidatura."
+        action={
+          <Link
+            href={`/entrevistas/nova?candidatura=${application.id}`}
+            className={buttonClassName({ variant: "secondary" })}
+          >
+            <CalendarPlus aria-hidden="true" className="size-4" />
+            Agendar entrevista
+          </Link>
+        }
       />
       <ApplicationForm
         action={action}

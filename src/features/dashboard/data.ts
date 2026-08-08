@@ -5,6 +5,7 @@ import type {
   DashboardApplication,
   DashboardData,
   DashboardFollowUp,
+  DashboardInterview,
 } from "@/features/dashboard/types";
 import { requireCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -89,28 +90,40 @@ function toDashboardApplication(
 export async function getDashboardData(): Promise<DashboardData> {
   const user = await requireCurrentUser();
   const supabase = await createClient();
-  const [applicationsResult, opportunitiesResult, companiesResult] =
-    await Promise.all([
-      supabase
-        .from("applications")
-        .select(
-          "id, opportunity_id, status, application_date, next_action_summary, follow_up_date, created_at",
-        )
-        .eq("user_id", user.id),
-      supabase
-        .from("opportunities")
-        .select("id, company_id, title, location, work_mode")
-        .eq("user_id", user.id),
-      supabase
-        .from("companies")
-        .select("id, name, logo_url")
-        .eq("user_id", user.id),
-    ]);
+  const [
+    applicationsResult,
+    opportunitiesResult,
+    companiesResult,
+    interviewsResult,
+  ] = await Promise.all([
+    supabase
+      .from("applications")
+      .select(
+        "id, opportunity_id, status, application_date, next_action_summary, follow_up_date, created_at",
+      )
+      .eq("user_id", user.id),
+    supabase
+      .from("opportunities")
+      .select("id, company_id, title, location, work_mode")
+      .eq("user_id", user.id),
+    supabase
+      .from("companies")
+      .select("id, name, logo_url")
+      .eq("user_id", user.id),
+    supabase
+      .from("interviews")
+      .select(
+        "id, application_id, interview_type, scheduled_at, status, format",
+      )
+      .eq("user_id", user.id)
+      .eq("status", "scheduled"),
+  ]);
 
   if (
     applicationsResult.error ||
     opportunitiesResult.error ||
-    companiesResult.error
+    companiesResult.error ||
+    interviewsResult.error
   ) {
     throw new Error("Não foi possível consultar os dados do dashboard.");
   }
@@ -199,6 +212,36 @@ export async function getDashboardData(): Promise<DashboardData> {
     ];
   });
 
+  const now = Date.now();
+  const upcomingInterviews: DashboardInterview[] = interviewsResult.data
+    .filter((interview) => Date.parse(interview.scheduled_at) >= now)
+    .flatMap((interview) => {
+      const application = applicationsResult.data.find(
+        (item) => item.id === interview.application_id,
+      );
+      const opportunity = application
+        ? opportunities.get(application.opportunity_id)
+        : null;
+      const company = opportunity
+        ? companies.get(opportunity.company_id)
+        : null;
+      if (!application || !opportunity || !company) return [];
+
+      return [
+        {
+          id: interview.id,
+          title: opportunity.title,
+          companyName: company.name,
+          companyLogoUrl: company.logo_url ?? "",
+          interviewType: interview.interview_type,
+          scheduledAt: interview.scheduled_at,
+          format: interview.format,
+        },
+      ];
+    })
+    .sort((left, right) => left.scheduledAt.localeCompare(right.scheduledAt))
+    .slice(0, 4);
+
   return {
     today,
     stats: {
@@ -226,6 +269,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     },
     recentApplications,
     followUps,
+    upcomingInterviews,
     statusSummary,
   };
 }

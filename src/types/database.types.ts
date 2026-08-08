@@ -11,6 +11,8 @@ export type ApplicationStatusValue =
 export type WorkModeValue = "onsite" | "hybrid" | "remote";
 export type ActionStatusValue = "pending" | "completed" | "cancelled";
 export type ActionPriorityValue = "low" | "medium" | "high";
+export type InterviewStatusValue = "scheduled" | "completed" | "cancelled";
+export type InterviewFormatValue = "video" | "phone" | "onsite" | "other";
 
 export type ProfileRow = {
   id: string;
@@ -168,8 +170,12 @@ export type InterviewRow = {
   id: string;
   user_id: string;
   application_id: string;
+  recruiter_id: string | null;
   interview_type: string;
   scheduled_at: string;
+  status: InterviewStatusValue;
+  format: InterviewFormatValue;
+  duration_minutes: number;
   location_or_url: string | null;
   participants: string[];
   preparation: string | null;
@@ -183,8 +189,12 @@ export type InterviewInsert = {
   id?: string;
   user_id: string;
   application_id: string;
+  recruiter_id?: string | null;
   interview_type: string;
   scheduled_at: string;
+  status?: InterviewStatusValue;
+  format?: InterviewFormatValue;
+  duration_minutes?: number;
   location_or_url?: string | null;
   participants?: string[];
   preparation?: string | null;
@@ -354,6 +364,13 @@ export interface Database {
             referencedRelation: "applications";
             referencedColumns: ["user_id", "id"];
           },
+          {
+            foreignKeyName: "interviews_recruiter_same_user";
+            columns: ["user_id", "recruiter_id"];
+            isOneToOne: false;
+            referencedRelation: "recruiters";
+            referencedColumns: ["user_id", "id"];
+          },
         ]
       >;
       notes: TableDefinition<
@@ -405,6 +422,8 @@ export interface Database {
       work_mode: WorkModeValue;
       action_status: ActionStatusValue;
       action_priority: ActionPriorityValue;
+      interview_status: InterviewStatusValue;
+      interview_format: InterviewFormatValue;
     };
     CompositeTypes: Record<string, never>;
   };

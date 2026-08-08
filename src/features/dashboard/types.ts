@@ -1,5 +1,6 @@
 import type {
   ApplicationStatusValue,
+  InterviewFormatValue,
   WorkModeValue,
 } from "@/types/database.types";
 
@@ -33,6 +34,16 @@ export type DashboardStatusSummary = {
   percentage: number;
 };
 
+export type DashboardInterview = {
+  id: string;
+  title: string;
+  companyName: string;
+  companyLogoUrl: string;
+  interviewType: string;
+  scheduledAt: string;
+  format: InterviewFormatValue;
+};
+
 export type DashboardData = {
   today: string;
   stats: {
@@ -47,5 +58,6 @@ export type DashboardData = {
   };
   recentApplications: DashboardApplication[];
   followUps: DashboardFollowUp[];
+  upcomingInterviews: DashboardInterview[];
   statusSummary: DashboardStatusSummary[];
 };
