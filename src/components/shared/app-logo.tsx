@@ -1,11 +1,12 @@
 import Image from "next/image";
 
+import appIcon from "@/app/icon.png";
 import { cn } from "@/lib/utils";
 
 export function AppLogo({ className }: { className?: string }) {
   return (
     <Image
-      src="/app-icon.png"
+      src={appIcon}
       alt=""
       width={40}
       height={40}
