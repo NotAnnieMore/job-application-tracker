@@ -13,6 +13,7 @@ Data: 2 de agosto de 2026
 - Renovação da sessão através de cookies no Proxy do Next.js.
 - Proteção das páginas privadas.
 - Criação automática de `profiles` quando uma conta é criada.
+- Consulta do email real e edição do nome e da fotografia da conta.
 - Isolamento das linhas por utilizador através de políticas RLS.
 
 ## Decisões de segurança
@@ -24,6 +25,19 @@ Data: 2 de agosto de 2026
 - A palavra-passe tem entre 12 e 128 caracteres.
 - A recuperação devolve a mesma mensagem exista ou não uma conta para o email indicado.
 - Os caminhos recebidos no callback são limitados a caminhos internos para evitar redirecionamentos externos.
+- A fotografia usa um caminho fixo por utilizador, tipos de imagem permitidos e
+  um limite de 2 MB. A escrita no Storage é protegida por RLS.
+
+## Perfil da conta
+
+Em `/definicoes`, o utilizador pode alterar `profiles.full_name` e carregar,
+substituir ou remover a fotografia. O email apresentado vem da identidade
+validada pelo Supabase Auth e é apenas de leitura nesta área.
+
+O avatar é servido pelo bucket público `avatars`; por isso, quem conhecer o URL
+pode ver a imagem. Apenas o próprio utilizador autenticado tem permissão para
+escrever ou eliminar o respetivo objeto. Sem imagem, o cabeçalho mostra as
+iniciais do nome.
 
 ## Configuração local
 

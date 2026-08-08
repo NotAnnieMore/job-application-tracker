@@ -17,6 +17,7 @@ export type InterviewFormatValue = "video" | "phone" | "onsite" | "other";
 export type ProfileRow = {
   id: string;
   full_name: string;
+  avatar_path: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -24,6 +25,7 @@ export type ProfileRow = {
 export type ProfileInsert = {
   id: string;
   full_name: string;
+  avatar_path?: string | null;
   created_at?: string;
   updated_at?: string;
 };

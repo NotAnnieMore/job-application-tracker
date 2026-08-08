@@ -4,7 +4,7 @@ Aplicação web privada para organizar candidaturas, empresas, recrutadores, ent
 
 ## Estado atual
 
-O projeto está na Fase 10. A base Next.js, os clientes Supabase, o sistema visual, a navegação responsiva, o modelo inicial de dados e a autenticação estão configurados. As páginas privadas exigem uma sessão válida e as políticas RLS isolam os dados de cada utilizador. Empresas, vagas, candidaturas, recrutadores, entrevistas, ações, notas e o dashboard estatístico já usam dados reais do Supabase. As listas operacionais incluem pesquisa, filtros combináveis e intervalos de datas guardados no URL. A Agenda agrega entrevistas, follow-ups e ações numa cronologia única.
+O projeto está na Fase 10. A base Next.js, os clientes Supabase, o sistema visual, a navegação responsiva, o modelo inicial de dados e a autenticação estão configurados. As páginas privadas exigem uma sessão válida e as políticas RLS isolam os dados de cada utilizador. Empresas, vagas, candidaturas, recrutadores, entrevistas, ações, notas e o dashboard estatístico já usam dados reais do Supabase. As listas operacionais incluem pesquisa, filtros combináveis e intervalos de datas guardados no URL. A Agenda agrega entrevistas, follow-ups e ações numa cronologia única. As Definições permitem também atualizar o nome e a fotografia reais da conta.
 
 ## Stack
 
@@ -26,7 +26,7 @@ O projeto está na Fase 10. A base Next.js, os clientes Supabase, o sistema visu
 - `/recrutadores`, `/recrutadores/novo` e `/recrutadores/[id]/editar`
 - `/entrevistas`, `/entrevistas/nova` e `/entrevistas/[id]/editar`
 - `/acoes`, `/acoes/nova` e `/acoes/[id]/editar`
-- `/definicoes`
+- `/definicoes` — nome, email e fotografia reais da conta
 - `/login`, `/registo`, `/recuperar-password` e `/atualizar-password`
 
 ## Requisitos

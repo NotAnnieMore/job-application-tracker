@@ -100,7 +100,7 @@ export function AppSidebar({
           <div className="mb-3 rounded-xl bg-slate-50 px-3 py-3">
             <p className="text-xs font-semibold text-slate-700">Fase 10</p>
             <p className="mt-1 text-xs leading-5 text-slate-500">
-              Agenda e lembretes
+              Agenda, lembretes e perfil
             </p>
           </div>
         ) : null}

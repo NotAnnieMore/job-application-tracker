@@ -1,18 +1,12 @@
 "use client";
 
 import { Bell, LogOut, Menu, Search } from "lucide-react";
+import Link from "next/link";
 
+import { UserAvatar } from "@/components/profile/user-avatar";
 import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/features/auth/actions";
 import type { CurrentUser } from "@/features/auth/types";
-
-function userInitials(fullName: string) {
-  const parts = fullName.trim().split(/\s+/).filter(Boolean);
-
-  return (parts.length > 1 ? `${parts[0][0]}${parts.at(-1)?.[0]}` : parts[0])
-    ?.slice(0, 2)
-    .toUpperCase();
-}
 
 export function AppHeader({
   onOpenMenu,
@@ -57,10 +51,12 @@ export function AppHeader({
           <Bell aria-hidden="true" className="size-5" />
         </Button>
         <div className="hidden h-8 w-px bg-slate-200 sm:block" />
-        <div className="flex items-center gap-3 rounded-xl p-1.5 text-left">
-          <span className="flex size-9 items-center justify-center rounded-full bg-slate-900 text-xs font-bold text-white">
-            {userInitials(user.fullName) ?? "UT"}
-          </span>
+        <Link
+          href="/definicoes"
+          className="flex items-center gap-3 rounded-xl p-1.5 text-left transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+          aria-label="Abrir definições do perfil"
+        >
+          <UserAvatar fullName={user.fullName} imageUrl={user.avatarUrl} />
           <span className="hidden sm:block">
             <span className="block text-sm font-semibold text-slate-900">
               {user.fullName}
@@ -69,7 +65,7 @@ export function AppHeader({
               {user.email}
             </span>
           </span>
-        </div>
+        </Link>
         <form action={logoutAction}>
           <Button
             type="submit"

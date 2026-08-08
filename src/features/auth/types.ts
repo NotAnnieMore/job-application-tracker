@@ -10,6 +10,7 @@ export interface CurrentUser {
   id: string;
   email: string;
   fullName: string;
+  avatarUrl: string;
 }
 
 export const initialAuthActionState: AuthActionState = {

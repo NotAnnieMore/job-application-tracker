@@ -19,14 +19,19 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     typeof data.claims.email === "string" ? data.claims.email : "Sem email";
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name")
+    .select("full_name, avatar_path, updated_at")
     .eq("id", userId)
     .maybeSingle();
+
+  const avatarUrl = profile?.avatar_path
+    ? `${supabase.storage.from("avatars").getPublicUrl(profile.avatar_path).data.publicUrl}?v=${encodeURIComponent(profile.updated_at)}`
+    : "";
 
   return {
     id: userId,
     email,
     fullName: profile?.full_name ?? email.split("@")[0] ?? "Utilizador",
+    avatarUrl,
   };
 });
 

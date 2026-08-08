@@ -1,6 +1,6 @@
 # Base de dados
 
-Estado: migração inicial aplicada e validada na Fase 3
+Estado: migração inicial aplicada; evoluções documentadas até à Fase 10
 
 Data: 2 de agosto de 2026
 
@@ -271,6 +271,23 @@ A agregação é calculada no servidor e continua limitada pelo `user_id` e pela
 políticas RLS. Não existe duplicação de eventos nem uma nova tabela de
 calendário, pelo que esta fase também não exige uma migração.
 
+## Perfil e fotografia da conta
+
+A migração `20260808235900_add_profile_avatars.sql` acrescenta
+`profiles.avatar_path` e cria o bucket público `avatars` no Supabase Storage.
+O nome editável continua em `profiles.full_name`; o email é lido diretamente da
+identidade autenticada e não é duplicado na tabela pública.
+
+Cada utilizador tem um único objeto com o caminho `<user_id>/avatar`. As
+políticas em `storage.objects` permitem carregar, substituir e remover apenas o
+objeto pertencente ao próprio utilizador. O URL de leitura é público porque a
+fotografia é usada como imagem de apresentação no cabeçalho. Não devem ser
+guardadas imagens sensíveis neste bucket.
+
+O bucket aceita JPEG, PNG e WebP até 2 MB. A interface e a Server Action validam
+o tipo, o tamanho e a assinatura binária do ficheiro. Quando não existe uma
+fotografia válida, a aplicação apresenta as iniciais do nome.
+
 ## Aplicar no Supabase
 
 1. Abrir o projeto no Supabase.
@@ -296,6 +313,10 @@ validar com `supabase/tests/recruiter_application_catalog_checks.sql`.
 Para ativar a gestão real de entrevistas, executar depois
 `supabase/migrations/20260808233000_expand_interviews.sql` e validar com
 `supabase/tests/interview_catalog_checks.sql`.
+
+Para ativar o perfil e a fotografia da conta, executar depois
+`supabase/migrations/20260808235900_add_profile_avatars.sql` e validar com
+`supabase/tests/profile_avatar_catalog_checks.sql`.
 
 ## Dados de demonstração
 
