@@ -34,6 +34,24 @@ export type CompanyDetails = CompanyFormValues & {
   id: string;
 };
 
+export type CompanyWithoutLogo = {
+  id: string;
+  name: string;
+  website: string;
+};
+
+export type CompanyLogoSelection = {
+  companyId: string;
+  logoUrl: string;
+  website: string;
+};
+
+export type BulkCompanyLogoActionResult = {
+  status: "success" | "error";
+  message: string;
+  updatedIds: string[];
+};
+
 export const initialCompanyActionState: CompanyActionState = {
   status: "idle",
 };

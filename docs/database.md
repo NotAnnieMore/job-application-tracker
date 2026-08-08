@@ -102,6 +102,12 @@ utilizadores com sessão possam consultar o serviço a partir da aplicação. O
 Client ID fica configurado em `BRANDFETCH_CLIENT_ID`; sem essa variável, o URL
 manual e as iniciais continuam disponíveis.
 
+A página `/empresas/logotipos` pesquisa em grupos pequenos todas as empresas sem
+imagem. Nenhuma sugestão é aplicada automaticamente: o utilizador confirma as
+correspondências corretas e envia todas as escolhas numa única Server Action.
+Essa ação volta a validar a sessão, os identificadores, a propriedade dos
+registos e os endereços HTTPS antes de atualizar cada empresa.
+
 ## Integração de vagas e candidaturas
 
 Na Fase 5, `/candidaturas` e o respetivo formulário passaram a usar dados reais. O fluxo inclui:

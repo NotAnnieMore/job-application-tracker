@@ -21,6 +21,7 @@ O projeto está na Fase 5. A base Next.js, os clientes Supabase, o sistema visua
 - `/` e `/dashboard` — dashboard responsivo
 - `/candidaturas`, `/candidaturas/nova` e `/candidaturas/[id]/editar`
 - `/empresas`, `/empresas/nova` e `/empresas/[id]/editar`
+- `/empresas/logotipos` — pesquisa e confirmação de logótipos em lote
 - `/recrutadores`
 - `/entrevistas`
 - `/acoes`

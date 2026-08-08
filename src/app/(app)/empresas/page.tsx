@@ -6,6 +6,7 @@ import {
   MapPin,
   Pencil,
   Plus,
+  WandSparkles,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -37,6 +38,9 @@ export default async function CompaniesPage({
   const companies = await getCompanies();
   const status = (await searchParams).estado;
   const notice = typeof status === "string" ? notices[status] : undefined;
+  const missingLogoCount = companies.filter(
+    (company) => !company.logoUrl,
+  ).length;
 
   return (
     <div className="space-y-6">
@@ -44,10 +48,21 @@ export default async function CompaniesPage({
         title="Empresas"
         description="Mantém o contexto das empresas associado às tuas oportunidades."
         action={
-          <Link href="/empresas/nova" className={buttonClassName()}>
-            <Plus aria-hidden="true" className="size-4" />
-            Nova empresa
-          </Link>
+          <div className="flex flex-col gap-2 sm:flex-row">
+            {missingLogoCount > 0 ? (
+              <Link
+                href="/empresas/logotipos"
+                className={buttonClassName({ variant: "secondary" })}
+              >
+                <WandSparkles aria-hidden="true" className="size-4" />
+                Completar logótipos ({missingLogoCount})
+              </Link>
+            ) : null}
+            <Link href="/empresas/nova" className={buttonClassName()}>
+              <Plus aria-hidden="true" className="size-4" />
+              Nova empresa
+            </Link>
+          </div>
         }
       />
 

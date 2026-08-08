@@ -4,6 +4,7 @@ import type {
   CompanyDetails,
   CompanyFormValues,
   CompanyListItem,
+  CompanyWithoutLogo,
 } from "@/features/companies/types";
 import { requireCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -105,4 +106,25 @@ export async function getCompanyById(
     id: data.id,
     ...toCompanyValues(data),
   };
+}
+
+export async function getCompaniesWithoutLogo(): Promise<CompanyWithoutLogo[]> {
+  const user = await requireCurrentUser();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("companies")
+    .select("id, name, website")
+    .eq("user_id", user.id)
+    .is("logo_url", null)
+    .order("name", { ascending: true });
+
+  if (error) {
+    throw new Error("Não foi possível consultar as empresas sem logótipo.");
+  }
+
+  return data.map((company) => ({
+    id: company.id,
+    name: company.name,
+    website: company.website ?? "",
+  }));
 }
