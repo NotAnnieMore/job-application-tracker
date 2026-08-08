@@ -212,7 +212,7 @@ export async function DashboardPage() {
                       >
                         <td className="px-5 py-4">
                           <Link
-                            href={`/candidaturas/${application.id}/editar`}
+                            href="/candidaturas"
                             className="font-semibold text-slate-950 hover:text-blue-700"
                           >
                             {application.title}
@@ -261,7 +261,7 @@ export async function DashboardPage() {
                         </td>
                         <td className="px-3 py-4">
                           <Link
-                            href={`/candidaturas/${application.id}/editar`}
+                            href="/candidaturas"
                             aria-label={`Abrir candidatura a ${application.title}`}
                             className="flex size-9 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
                           >
@@ -288,7 +288,7 @@ export async function DashboardPage() {
                       />
                       <div className="min-w-0 flex-1">
                         <Link
-                          href={`/candidaturas/${application.id}/editar`}
+                          href="/candidaturas"
                           className="font-semibold text-slate-950 hover:text-blue-700"
                         >
                           {application.title}
@@ -337,7 +337,7 @@ export async function DashboardPage() {
               {data.followUps.map((followUp) => (
                 <Link
                   key={followUp.id}
-                  href={`/candidaturas/${followUp.id}/editar`}
+                  href="/candidaturas"
                   className="flex items-center gap-3 px-5 py-4 transition hover:bg-slate-50"
                 >
                   <CompanyLogo
@@ -395,7 +395,7 @@ export async function DashboardPage() {
               {data.upcomingInterviews.map((interview) => (
                 <Link
                   key={interview.id}
-                  href={`/entrevistas/${interview.id}/editar`}
+                  href="/entrevistas"
                   className="flex items-center gap-3 p-5 transition hover:bg-slate-50"
                 >
                   <CompanyLogo
