@@ -1,30 +1,26 @@
 import { Badge } from "@/components/ui/badge";
-
-export type ApplicationStatus =
-  | "Interessado"
-  | "Candidatura enviada"
-  | "Entrevista agendada"
-  | "Entrevista concluída"
-  | "A aguardar resposta"
-  | "Proposta recebida"
-  | "Rejeitada"
-  | "Retirada";
+import { applicationStatusLabels } from "@/features/applications/constants";
+import type { ApplicationStatusValue } from "@/types/database.types";
 
 const statusVariants = {
-  Interessado: "neutral",
-  "Candidatura enviada": "blue",
-  "Entrevista agendada": "purple",
-  "Entrevista concluída": "purple",
-  "A aguardar resposta": "amber",
-  "Proposta recebida": "green",
-  Rejeitada: "red",
-  Retirada: "neutral",
+  interested: "neutral",
+  applied: "blue",
+  interview_scheduled: "purple",
+  interview_completed: "purple",
+  awaiting_response: "amber",
+  offer_received: "green",
+  rejected: "red",
+  withdrawn: "neutral",
 } as const;
 
 export function ApplicationStatusBadge({
   status,
 }: {
-  status: ApplicationStatus;
+  status: ApplicationStatusValue;
 }) {
-  return <Badge variant={statusVariants[status]}>{status}</Badge>;
+  return (
+    <Badge variant={statusVariants[status]}>
+      {applicationStatusLabels[status]}
+    </Badge>
+  );
 }

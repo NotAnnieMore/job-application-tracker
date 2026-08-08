@@ -1,4 +1,4 @@
-import type { ApplicationStatus } from "@/components/applications/application-status-badge";
+import type { ApplicationStatusValue } from "@/types/database.types";
 
 export interface RecentApplication {
   id: string;
@@ -6,7 +6,7 @@ export interface RecentApplication {
   company: string;
   companyInitial: string;
   companyColor: string;
-  status: ApplicationStatus;
+  status: ApplicationStatusValue;
   applicationDate: string;
   nextAction: string;
   actionDate?: string;
@@ -19,7 +19,7 @@ export const recentApplications: RecentApplication[] = [
     company: "Coverflex",
     companyInitial: "C",
     companyColor: "bg-violet-600",
-    status: "Candidatura enviada",
+    status: "applied",
     applicationDate: "30/07/2026",
     nextAction: "Enviar follow-up",
     actionDate: "05/08/2026",
@@ -30,7 +30,7 @@ export const recentApplications: RecentApplication[] = [
     company: "Feedzai",
     companyInitial: "F",
     companyColor: "bg-cyan-700",
-    status: "Entrevista agendada",
+    status: "interview_scheduled",
     applicationDate: "28/07/2026",
     nextAction: "Entrevista técnica",
     actionDate: "04/08/2026",
@@ -41,7 +41,7 @@ export const recentApplications: RecentApplication[] = [
     company: "Sword Health",
     companyInitial: "S",
     companyColor: "bg-blue-600",
-    status: "A aguardar resposta",
+    status: "awaiting_response",
     applicationDate: "25/07/2026",
     nextAction: "Aguardar resposta",
     actionDate: "06/08/2026",
@@ -52,7 +52,7 @@ export const recentApplications: RecentApplication[] = [
     company: "Blip",
     companyInitial: "B",
     companyColor: "bg-slate-950",
-    status: "Rejeitada",
+    status: "rejected",
     applicationDate: "20/07/2026",
     nextAction: "Sem ação pendente",
   },
@@ -62,7 +62,7 @@ export const recentApplications: RecentApplication[] = [
     company: "Critical TechWorks",
     companyInitial: "CT",
     companyColor: "bg-amber-600",
-    status: "Proposta recebida",
+    status: "offer_received",
     applicationDate: "18/07/2026",
     nextAction: "Rever proposta",
     actionDate: "03/08/2026",

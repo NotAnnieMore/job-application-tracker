@@ -262,6 +262,29 @@ interface TableDefinition<
   Relationships: Relationships;
 }
 
+export type ApplicationTransactionArgs = {
+  p_company_id: string;
+  p_title: string;
+  p_location: string | null;
+  p_work_mode: WorkModeValue | null;
+  p_employment_type: string | null;
+  p_salary_min: number | null;
+  p_salary_max: number | null;
+  p_currency: string;
+  p_job_url: string | null;
+  p_skills: string[];
+  p_opportunity_summary: string | null;
+  p_status: ApplicationStatusValue;
+  p_application_date: string;
+  p_source: string | null;
+  p_expected_salary: number | null;
+  p_summary_notes: string | null;
+  p_next_action_summary: string | null;
+  p_follow_up_date: string | null;
+  p_interview_preparation: string | null;
+  p_questions_for_company: string | null;
+};
+
 export interface Database {
   public: {
     Tables: {
@@ -360,7 +383,20 @@ export interface Database {
       >;
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      create_application_with_opportunity: {
+        Args: ApplicationTransactionArgs;
+        Returns: string;
+      };
+      update_application_with_opportunity: {
+        Args: ApplicationTransactionArgs & { p_application_id: string };
+        Returns: boolean;
+      };
+      delete_application_with_opportunity: {
+        Args: { p_application_id: string };
+        Returns: boolean;
+      };
+    };
     Enums: {
       application_status: ApplicationStatusValue;
       work_mode: WorkModeValue;

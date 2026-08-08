@@ -90,6 +90,23 @@ Na Fase 5, a página `/empresas` passou a consultar dados reais. A integração 
 
 Os fluxos foram testados no browser com uma conta real, incluindo criação, edição, rejeição de duplicados e eliminação.
 
+## Integração de vagas e candidaturas
+
+Na Fase 5, `/candidaturas` e o respetivo formulário passaram a usar dados reais. O fluxo inclui:
+
+- criação conjunta de uma vaga e candidatura;
+- edição conjunta dos dois registos;
+- eliminação da candidatura, da vaga e dos dados claramente dependentes;
+- pesquisa por vaga, empresa ou recrutador;
+- filtros por estado, empresa e modalidade;
+- ordenação por data da candidatura ou próximo follow-up;
+- atualização automática ao alterar filtros de seleção;
+- campos de preparação pessoal/CV e perguntas para a empresa.
+
+As operações que abrangem as duas tabelas usam funções PostgreSQL transacionais com `security invoker`. As funções obtêm o utilizador através de `auth.uid()`, respeitam as políticas RLS e não aceitam um `user_id` enviado pelo browser.
+
+A migração `20260808160000_add_application_transactions.sql` também garante que uma oportunidade só pode ter uma candidatura por utilizador. O catálogo e as permissões das três funções foram validados com `application_transactions_catalog_checks.sql`.
+
 ## Aplicar no Supabase
 
 1. Abrir o projeto no Supabase.
