@@ -1,4 +1,5 @@
 import type {
+  ActionPriorityValue,
   ApplicationStatusValue,
   InterviewFormatValue,
   WorkModeValue,
@@ -44,6 +45,17 @@ export type DashboardInterview = {
   format: InterviewFormatValue;
 };
 
+export type DashboardAction = {
+  id: string;
+  description: string;
+  dueDate: string;
+  priority: ActionPriorityValue;
+  timing: "overdue" | "today" | "upcoming" | "no_date";
+  title: string;
+  companyName: string;
+  companyLogoUrl: string;
+};
+
 export type DashboardData = {
   today: string;
   stats: {
@@ -51,13 +63,14 @@ export type DashboardData = {
     applicationsLast30Days: number;
     activeApplications: number;
     interviewApplications: number;
-    overdueFollowUps: number;
-    upcomingFollowUps: number;
+    overdueActions: number;
+    upcomingActions: number;
     totalCompanies: number;
     companiesWithApplications: number;
   };
   recentApplications: DashboardApplication[];
   followUps: DashboardFollowUp[];
+  pendingActions: DashboardAction[];
   upcomingInterviews: DashboardInterview[];
   statusSummary: DashboardStatusSummary[];
 };

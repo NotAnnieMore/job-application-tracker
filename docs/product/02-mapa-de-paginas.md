@@ -27,6 +27,8 @@ Data: 2 de agosto de 2026
 | Detalhe do recrutador  | `/recrutadores/[id]`        | Consultar contactos e candidaturas relacionadas.                              |
 | Entrevistas            | `/entrevistas`              | Consultar entrevistas futuras e passadas.                                     |
 | Ações                  | `/acoes`                    | Consultar ações pendentes, concluídas e em atraso.                            |
+| Nova ação              | `/acoes/nova`               | Criar uma tarefa associada a uma candidatura.                                 |
+| Editar ação            | `/acoes/[id]/editar`        | Atualizar, concluir, cancelar ou eliminar uma tarefa.                         |
 | Definições             | `/definicoes`               | Gerir o perfil e opções essenciais da conta.                                  |
 
 ## Navegação principal

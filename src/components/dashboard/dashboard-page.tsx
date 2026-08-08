@@ -5,20 +5,22 @@ import {
   CalendarDays,
   CalendarClock,
   ChevronRight,
-  Clock3,
   FileText,
   Inbox,
+  ListChecks,
   Plus,
   Video,
 } from "lucide-react";
 import Link from "next/link";
 
 import { ApplicationStatusBadge } from "@/components/applications/application-status-badge";
+import { ActionPriorityBadge } from "@/components/actions/action-badges";
 import { CompanyLogo } from "@/components/companies/company-logo";
 import { PageHeader } from "@/components/shared/page-header";
 import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { workModeLabels } from "@/features/applications/constants";
+import { formatActionDate } from "@/features/actions/date";
 import { getDashboardData } from "@/features/dashboard/data";
 import type { DashboardFollowUp } from "@/features/dashboard/types";
 import { interviewFormatLabels } from "@/features/interviews/constants";
@@ -101,12 +103,12 @@ export async function DashboardPage() {
       iconClass: "bg-violet-50 text-violet-600",
     },
     {
-      label: "Follow-ups em atraso",
-      value: data.stats.overdueFollowUps,
-      detail: `${data.stats.upcomingFollowUps} até aos próximos 7 dias`,
-      icon: Clock3,
+      label: "Ações em atraso",
+      value: data.stats.overdueActions,
+      detail: `${data.stats.upcomingActions} até aos próximos 7 dias`,
+      icon: ListChecks,
       iconClass:
-        data.stats.overdueFollowUps > 0
+        data.stats.overdueActions > 0
           ? "bg-amber-50 text-amber-600"
           : "bg-emerald-50 text-emerald-600",
     },
@@ -375,6 +377,75 @@ export async function DashboardPage() {
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)]">
         <Card className="overflow-hidden xl:col-span-2">
           <CardHeader>
+            <h2 className="font-bold text-slate-950">Ações pendentes</h2>
+            <SectionLink href="/acoes" />
+          </CardHeader>
+          {data.pendingActions.length === 0 ? (
+            <div className="flex min-h-44 flex-col items-center justify-center px-6 text-center">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                <ListChecks aria-hidden="true" className="size-5" />
+              </span>
+              <p className="mt-3 font-semibold text-slate-900">
+                Nenhuma ação pendente
+              </p>
+              <p className="mt-1 text-sm leading-6 text-slate-500">
+                As tarefas das candidaturas irão aparecer aqui.
+              </p>
+            </div>
+          ) : (
+            <div className="grid divide-y divide-slate-100 md:grid-cols-2 md:divide-x md:divide-y-0">
+              {data.pendingActions.map((action) => (
+                <Link
+                  key={action.id}
+                  href="/acoes"
+                  className="flex items-center gap-3 p-5 transition hover:bg-slate-50"
+                >
+                  <CompanyLogo
+                    name={action.companyName}
+                    logoUrl={action.companyLogoUrl}
+                    size="md"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold text-slate-950">
+                      {action.description}
+                    </span>
+                    <span className="mt-0.5 block truncate text-xs text-slate-500">
+                      {action.title} · {action.companyName}
+                    </span>
+                    <span className="mt-2 flex flex-wrap items-center gap-2">
+                      <ActionPriorityBadge priority={action.priority} />
+                      <span
+                        className={cn(
+                          "text-xs font-semibold",
+                          action.timing === "overdue"
+                            ? "text-red-600"
+                            : action.timing === "today"
+                              ? "text-amber-600"
+                              : "text-slate-500",
+                        )}
+                      >
+                        {action.dueDate
+                          ? action.timing === "today"
+                            ? "Hoje"
+                            : action.timing === "overdue"
+                              ? `Em atraso · ${formatActionDate(action.dueDate)}`
+                              : formatActionDate(action.dueDate)
+                          : "Sem prazo"}
+                      </span>
+                    </span>
+                  </span>
+                  <ChevronRight
+                    aria-hidden="true"
+                    className="size-4 text-slate-400"
+                  />
+                </Link>
+              ))}
+            </div>
+          )}
+        </Card>
+
+        <Card className="overflow-hidden xl:col-span-2">
+          <CardHeader>
             <h2 className="font-bold text-slate-950">Próximas entrevistas</h2>
             <SectionLink href="/entrevistas" />
           </CardHeader>
@@ -484,6 +555,17 @@ export async function DashboardPage() {
             >
               <Plus aria-hidden="true" className="size-4" />
               Registar candidatura
+              <ChevronRight
+                aria-hidden="true"
+                className="ml-auto size-4 text-slate-400"
+              />
+            </Link>
+            <Link
+              href="/acoes/nova"
+              className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50/50 hover:text-blue-700"
+            >
+              <ListChecks aria-hidden="true" className="size-4" />
+              Criar ação
               <ChevronRight
                 aria-hidden="true"
                 className="ml-auto size-4 text-slate-400"

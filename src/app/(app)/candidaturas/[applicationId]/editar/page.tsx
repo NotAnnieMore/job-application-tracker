@@ -1,4 +1,4 @@
-import { ArrowLeft, CalendarPlus } from "lucide-react";
+import { ArrowLeft, CalendarPlus, ListPlus } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
@@ -43,13 +43,22 @@ export default async function EditApplicationPage({
         title={`Editar ${application.title}`}
         description="Atualiza a vaga, o estado e a preparação desta candidatura."
         action={
-          <Link
-            href={`/entrevistas/nova?candidatura=${application.id}`}
-            className={buttonClassName({ variant: "secondary" })}
-          >
-            <CalendarPlus aria-hidden="true" className="size-4" />
-            Agendar entrevista
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href={`/acoes/nova?candidatura=${application.id}`}
+              className={buttonClassName({ variant: "secondary" })}
+            >
+              <ListPlus aria-hidden="true" className="size-4" />
+              Nova ação
+            </Link>
+            <Link
+              href={`/entrevistas/nova?candidatura=${application.id}`}
+              className={buttonClassName({ variant: "secondary" })}
+            >
+              <CalendarPlus aria-hidden="true" className="size-4" />
+              Agendar entrevista
+            </Link>
+          </div>
         }
       />
       <ApplicationForm

@@ -184,6 +184,22 @@ guardados na candidatura, juntamente com preparação específica, feedback e
 resultado da entrevista. As próximas entrevistas são apresentadas no
 Dashboard por ordem cronológica.
 
+## Integração de ações
+
+A área `/acoes` usa diretamente a tabela `actions` criada pelo esquema inicial,
+sem necessidade de uma nova migração. Permite criar, filtrar, editar, concluir,
+reabrir, cancelar e eliminar tarefas associadas a candidaturas. Cada ação pode
+ter uma data limite e prioridade `low`, `medium` ou `high`.
+
+A conclusão rápida atualiza em conjunto `status` e `completed_at`, respeitando
+a restrição de consistência existente na base de dados. A aplicação volta a
+confirmar a sessão e a propriedade da candidatura em todas as operações; as
+políticas RLS continuam a limitar cada registo ao respetivo utilizador.
+
+O Dashboard apresenta o número de ações em atraso, as que vencem nos sete dias
+seguintes e uma lista das prioridades pendentes. O formulário da candidatura
+inclui também um atalho para criar uma ação já associada ao processo.
+
 ## Aplicar no Supabase
 
 1. Abrir o projeto no Supabase.

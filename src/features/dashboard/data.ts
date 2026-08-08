@@ -3,6 +3,7 @@ import "server-only";
 import { applicationStatusOptions } from "@/features/applications/constants";
 import type {
   DashboardApplication,
+  DashboardAction,
   DashboardData,
   DashboardFollowUp,
   DashboardInterview,
@@ -95,6 +96,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     opportunitiesResult,
     companiesResult,
     interviewsResult,
+    actionsResult,
   ] = await Promise.all([
     supabase
       .from("applications")
@@ -117,13 +119,19 @@ export async function getDashboardData(): Promise<DashboardData> {
       )
       .eq("user_id", user.id)
       .eq("status", "scheduled"),
+    supabase
+      .from("actions")
+      .select("id, application_id, description, due_date, priority")
+      .eq("user_id", user.id)
+      .eq("status", "pending"),
   ]);
 
   if (
     applicationsResult.error ||
     opportunitiesResult.error ||
     companiesResult.error ||
-    interviewsResult.error
+    interviewsResult.error ||
+    actionsResult.error
   ) {
     throw new Error("Não foi possível consultar os dados do dashboard.");
   }
@@ -193,6 +201,50 @@ export async function getDashboardData(): Promise<DashboardData> {
             : "upcoming",
     }));
 
+  const pendingActions: DashboardAction[] = actionsResult.data
+    .flatMap((action) => {
+      const application = applicationsResult.data.find(
+        (item) => item.id === action.application_id,
+      );
+      const opportunity = application
+        ? opportunities.get(application.opportunity_id)
+        : null;
+      const company = opportunity
+        ? companies.get(opportunity.company_id)
+        : null;
+      if (!application || !opportunity || !company) return [];
+
+      return [
+        {
+          id: action.id,
+          description: action.description,
+          dueDate: action.due_date ?? "",
+          priority: action.priority,
+          timing: !action.due_date
+            ? ("no_date" as const)
+            : action.due_date < today
+              ? ("overdue" as const)
+              : action.due_date === today
+                ? ("today" as const)
+                : ("upcoming" as const),
+          title: opportunity.title,
+          companyName: company.name,
+          companyLogoUrl: company.logo_url ?? "",
+        },
+      ];
+    })
+    .sort((left, right) => {
+      if (left.dueDate && right.dueDate) {
+        const dateOrder = left.dueDate.localeCompare(right.dueDate);
+        if (dateOrder !== 0) return dateOrder;
+      } else if (left.dueDate !== right.dueDate) {
+        return left.dueDate ? -1 : 1;
+      }
+      const priorityOrder = { high: 0, medium: 1, low: 2 } as const;
+      return priorityOrder[left.priority] - priorityOrder[right.priority];
+    })
+    .slice(0, 6);
+
   const statusSummary = applicationStatusOptions.flatMap((option) => {
     const value = applications.filter(
       (application) => application.status === option.value,
@@ -255,20 +307,21 @@ export async function getDashboardData(): Promise<DashboardData> {
       interviewApplications: activeApplications.filter((application) =>
         interviewStatuses.has(application.status),
       ).length,
-      overdueFollowUps: activeApplications.filter(
-        (application) =>
-          application.followUpDate && application.followUpDate < today,
+      overdueActions: actionsResult.data.filter(
+        (action) => action.due_date && action.due_date < today,
       ).length,
-      upcomingFollowUps: activeApplications.filter(
-        (application) =>
-          application.followUpDate >= today &&
-          application.followUpDate <= sevenDaysFromNow,
+      upcomingActions: actionsResult.data.filter(
+        (action) =>
+          action.due_date &&
+          action.due_date >= today &&
+          action.due_date <= sevenDaysFromNow,
       ).length,
       totalCompanies: companiesResult.data.length,
       companiesWithApplications: companyIdsWithApplications.size,
     },
     recentApplications,
     followUps,
+    pendingActions,
     upcomingInterviews,
     statusSummary,
   };
