@@ -1,6 +1,7 @@
 import {
   Building2,
   CalendarDays,
+  CalendarRange,
   FileText,
   LayoutDashboard,
   ListChecks,
@@ -17,6 +18,7 @@ export interface NavigationItem {
 
 export const mainNavigation: NavigationItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Agenda", href: "/agenda", icon: CalendarRange },
   { label: "Candidaturas", href: "/candidaturas", icon: FileText },
   { label: "Empresas", href: "/empresas", icon: Building2 },
   { label: "Recrutadores", href: "/recrutadores", icon: Users },

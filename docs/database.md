@@ -248,6 +248,24 @@ lista e podem ser limpos em conjunto.
 Esta funcionalidade usa consultas e colunas existentes, pelo que não exige
 uma nova migração no Supabase.
 
+## Agenda agregada
+
+Na Fase 10, `/agenda` passou a combinar numa única cronologia:
+
+- entrevistas com estado `scheduled`, usando `scheduled_at` no fuso
+  `Europe/Lisbon`;
+- follow-ups de candidaturas que não estejam rejeitadas nem retiradas, usando
+  `follow_up_date`;
+- ações pendentes com data limite, usando `due_date`.
+
+A página calcula os indicadores de itens em atraso, previstos para hoje e para
+os sete dias seguintes. As ações pendentes sem data são contabilizadas à parte
+e encaminham para a lista de ações, onde podem ser corrigidas.
+
+A agregação é calculada no servidor e continua limitada pelo `user_id` e pelas
+políticas RLS. Não existe duplicação de eventos nem uma nova tabela de
+calendário, pelo que esta fase também não exige uma migração.
+
 ## Aplicar no Supabase
 
 1. Abrir o projeto no Supabase.

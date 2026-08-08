@@ -17,6 +17,7 @@ Data: 2 de agosto de 2026
 | Página                 | Caminho proposto            | Objetivo                                                                      |
 | ---------------------- | --------------------------- | ----------------------------------------------------------------------------- |
 | Dashboard              | `/dashboard`                | Mostrar indicadores, prioridades e atividade recente.                         |
+| Agenda                 | `/agenda`                   | Reunir entrevistas, follow-ups e ações numa cronologia.                       |
 | Candidaturas           | `/candidaturas`             | Pesquisar, filtrar, ordenar e consultar candidaturas.                         |
 | Nova candidatura       | `/candidaturas/nova`        | Criar a oportunidade e a candidatura num fluxo único.                         |
 | Detalhe da candidatura | `/candidaturas/[id]`        | Consultar resumo, empresa, recrutador, entrevistas, notas, ações e histórico. |
@@ -36,12 +37,13 @@ Data: 2 de agosto de 2026
 A navegação apresenta, por esta ordem:
 
 1. Dashboard
-2. Candidaturas
-3. Empresas
-4. Recrutadores
-5. Entrevistas
-6. Ações
-7. Definições
+2. Agenda
+3. Candidaturas
+4. Empresas
+5. Recrutadores
+6. Entrevistas
+7. Ações
+8. Definições
 
 No computador será usada uma sidebar recolhível. No telemóvel será usado um menu no cabeçalho.
 
