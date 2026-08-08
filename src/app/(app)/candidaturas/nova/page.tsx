@@ -5,11 +5,17 @@ import { ApplicationForm } from "@/components/applications/application-form";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { createApplicationAction } from "@/features/applications/actions";
-import { getCompanyOptions } from "@/features/applications/data";
+import {
+  getCompanyOptions,
+  getRecruiterOptions,
+} from "@/features/applications/data";
 import { createEmptyApplicationFormValues } from "@/features/applications/types";
 
 export default async function NewApplicationPage() {
-  const companies = await getCompanyOptions();
+  const [companies, recruiters] = await Promise.all([
+    getCompanyOptions(),
+    getRecruiterOptions(),
+  ]);
 
   return (
     <div className="space-y-6">
@@ -36,6 +42,7 @@ export default async function NewApplicationPage() {
         <ApplicationForm
           action={createApplicationAction}
           companies={companies}
+          recruiters={recruiters}
           initialValues={createEmptyApplicationFormValues()}
           submitLabel="Guardar candidatura"
         />

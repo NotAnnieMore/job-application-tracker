@@ -5,6 +5,7 @@ import type {
 
 export type ApplicationField =
   | "companyId"
+  | "primaryRecruiterId"
   | "title"
   | "location"
   | "workMode"
@@ -33,6 +34,7 @@ export type ApplicationActionState = {
 
 export type ApplicationFormValues = {
   companyId: string;
+  primaryRecruiterId: string;
   title: string;
   location: string;
   workMode: WorkModeValue | "";
@@ -57,6 +59,12 @@ export type ApplicationFormValues = {
 export type CompanyOption = {
   id: string;
   name: string;
+};
+
+export type RecruiterOption = {
+  id: string;
+  name: string;
+  companyId: string;
 };
 
 export type ApplicationListItem = {
@@ -93,6 +101,7 @@ export const initialApplicationActionState: ApplicationActionState = {
 export function createEmptyApplicationFormValues(): ApplicationFormValues {
   return {
     companyId: "",
+    primaryRecruiterId: "",
     title: "",
     location: "",
     workMode: "",

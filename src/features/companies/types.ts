@@ -28,6 +28,7 @@ export type CompanyFormValues = {
 export type CompanyListItem = CompanyFormValues & {
   id: string;
   applicationCount: number;
+  recruiterCount: number;
 };
 
 export type CompanyDetails = CompanyFormValues & {

@@ -2,7 +2,7 @@
 
 import { ExternalLink, LoaderCircle, Save } from "lucide-react";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { Button, buttonClassName } from "@/components/ui/button";
@@ -16,6 +16,7 @@ import type {
   ApplicationActionState,
   ApplicationFormValues,
   CompanyOption,
+  RecruiterOption,
 } from "@/features/applications/types";
 import { initialApplicationActionState } from "@/features/applications/types";
 
@@ -45,11 +46,13 @@ function SubmitButton({ label }: { label: string }) {
 export function ApplicationForm({
   action,
   companies,
+  recruiters,
   initialValues,
   submitLabel,
 }: {
   action: ApplicationFormAction;
   companies: CompanyOption[];
+  recruiters: RecruiterOption[];
   initialValues: ApplicationFormValues;
   submitLabel: string;
 }) {
@@ -57,6 +60,30 @@ export function ApplicationForm({
     action,
     initialApplicationActionState,
   );
+  const [selectedCompanyId, setSelectedCompanyId] = useState(
+    initialValues.companyId,
+  );
+  const [selectedRecruiterId, setSelectedRecruiterId] = useState(
+    initialValues.primaryRecruiterId,
+  );
+  const availableRecruiters = recruiters.filter(
+    (recruiter) =>
+      !recruiter.companyId || recruiter.companyId === selectedCompanyId,
+  );
+
+  function changeCompany(companyId: string) {
+    setSelectedCompanyId(companyId);
+    const selectedRecruiter = recruiters.find(
+      (recruiter) => recruiter.id === selectedRecruiterId,
+    );
+
+    if (
+      selectedRecruiter?.companyId &&
+      selectedRecruiter.companyId !== companyId
+    ) {
+      setSelectedRecruiterId("");
+    }
+  }
 
   return (
     <form action={formAction} className="space-y-6">
@@ -112,7 +139,8 @@ export function ApplicationForm({
               <select
                 id="application-company"
                 name="companyId"
-                defaultValue={initialValues.companyId}
+                value={selectedCompanyId}
+                onChange={(event) => changeCompany(event.target.value)}
                 className={fieldClassName}
                 aria-invalid={Boolean(state.fieldErrors?.companyId)}
                 aria-describedby={
@@ -457,6 +485,52 @@ export function ApplicationForm({
                   : undefined
               }
             />
+          </FormField>
+          <FormField
+            label="Recrutador principal"
+            htmlFor="application-recruiter"
+            hint="Opcional. São mostrados os contactos sem empresa ou associados à empresa escolhida."
+            error={state.fieldErrors?.primaryRecruiterId}
+          >
+            <div className="flex gap-2">
+              <select
+                id="application-recruiter"
+                name="primaryRecruiterId"
+                value={selectedRecruiterId}
+                onChange={(event) => setSelectedRecruiterId(event.target.value)}
+                className={fieldClassName}
+                aria-invalid={Boolean(state.fieldErrors?.primaryRecruiterId)}
+                aria-describedby={
+                  state.fieldErrors?.primaryRecruiterId
+                    ? "application-recruiter-error"
+                    : "application-recruiter-hint"
+                }
+              >
+                <option value="">Sem recrutador principal</option>
+                {availableRecruiters.map((recruiter) => (
+                  <option key={recruiter.id} value={recruiter.id}>
+                    {recruiter.name}
+                    {recruiter.companyId ? "" : " · Sem empresa"}
+                  </option>
+                ))}
+              </select>
+              <Link
+                href={
+                  selectedCompanyId
+                    ? `/recrutadores/novo?empresa=${selectedCompanyId}`
+                    : "/recrutadores/novo"
+                }
+                target="_blank"
+                aria-label="Criar contacto num novo separador"
+                title="Criar contacto num novo separador"
+                className={buttonClassName({
+                  variant: "secondary",
+                  size: "icon",
+                })}
+              >
+                <ExternalLink aria-hidden="true" className="size-4" />
+              </Link>
+            </div>
           </FormField>
           <FormField
             label="Próxima ação"

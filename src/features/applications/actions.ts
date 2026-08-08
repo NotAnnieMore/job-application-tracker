@@ -36,6 +36,27 @@ async function companyBelongsToUser(companyId: string, userId: string) {
   return !error && Boolean(data);
 }
 
+async function recruiterIsAvailable(
+  recruiterId: string | null,
+  companyId: string,
+  userId: string,
+) {
+  if (!recruiterId) return true;
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("recruiters")
+    .select("id, company_id")
+    .eq("id", recruiterId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  return (
+    !error &&
+    Boolean(data) &&
+    (!data?.company_id || data.company_id === companyId)
+  );
+}
+
 function saveError(): ApplicationActionState {
   return {
     status: "error",
@@ -61,6 +82,18 @@ export async function createApplicationAction(
   const user = await requireCurrentUser();
   if (!(await companyBelongsToUser(values.p_company_id, user.id))) {
     return validationError({ companyId: "Seleciona uma empresa disponível." });
+  }
+  if (
+    !(await recruiterIsAvailable(
+      values.p_primary_recruiter_id,
+      values.p_company_id,
+      user.id,
+    ))
+  ) {
+    return validationError({
+      primaryRecruiterId:
+        "Seleciona um recrutador sem empresa ou associado a esta empresa.",
+    });
   }
 
   const supabase = await createClient();
@@ -92,6 +125,18 @@ export async function updateApplicationAction(
   const user = await requireCurrentUser();
   if (!(await companyBelongsToUser(values.p_company_id, user.id))) {
     return validationError({ companyId: "Seleciona uma empresa disponível." });
+  }
+  if (
+    !(await recruiterIsAvailable(
+      values.p_primary_recruiter_id,
+      values.p_company_id,
+      user.id,
+    ))
+  ) {
+    return validationError({
+      primaryRecruiterId:
+        "Seleciona um recrutador sem empresa ou associado a esta empresa.",
+    });
   }
 
   const supabase = await createClient();

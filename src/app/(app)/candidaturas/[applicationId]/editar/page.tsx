@@ -10,6 +10,7 @@ import { updateApplicationAction } from "@/features/applications/actions";
 import {
   getApplicationById,
   getCompanyOptions,
+  getRecruiterOptions,
 } from "@/features/applications/data";
 
 export default async function EditApplicationPage({
@@ -18,9 +19,10 @@ export default async function EditApplicationPage({
   params: Promise<{ applicationId: string }>;
 }) {
   const { applicationId } = await params;
-  const [application, companies] = await Promise.all([
+  const [application, companies, recruiters] = await Promise.all([
     getApplicationById(applicationId),
     getCompanyOptions(),
+    getRecruiterOptions(),
   ]);
 
   if (!application) notFound();
@@ -43,6 +45,7 @@ export default async function EditApplicationPage({
       <ApplicationForm
         action={action}
         companies={companies}
+        recruiters={recruiters}
         initialValues={application}
         submitLabel="Guardar alterações"
       />

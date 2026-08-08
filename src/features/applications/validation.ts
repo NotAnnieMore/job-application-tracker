@@ -93,6 +93,7 @@ function normalizeUrl(
 export function validateApplicationForm(formData: FormData) {
   const fieldErrors: NonNullable<ApplicationActionState["fieldErrors"]> = {};
   const companyId = readText(formData, "companyId");
+  const primaryRecruiterId = readText(formData, "primaryRecruiterId");
   const title = readText(formData, "title");
   const location = readText(formData, "location");
   const rawWorkMode = readText(formData, "workMode");
@@ -115,6 +116,10 @@ export function validateApplicationForm(formData: FormData) {
 
   if (!uuidPattern.test(companyId)) {
     fieldErrors.companyId = "Seleciona uma empresa válida.";
+  }
+
+  if (primaryRecruiterId && !uuidPattern.test(primaryRecruiterId)) {
+    fieldErrors.primaryRecruiterId = "Seleciona um recrutador válido.";
   }
 
   if (!title) {
@@ -191,6 +196,7 @@ export function validateApplicationForm(formData: FormData) {
 
   const values: ApplicationTransactionArgs = {
     p_company_id: companyId,
+    p_primary_recruiter_id: primaryRecruiterId || null,
     p_title: title,
     p_location: optionalText(
       location,

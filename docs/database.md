@@ -141,6 +141,27 @@ As datas de referência são calculadas no fuso horário `Europe/Lisbon`. Estado
 `rejected` e `withdrawn` não contam como processos ativos, nem geram follow-ups
 pendentes no dashboard.
 
+## Integração de recrutadores
+
+A área `/recrutadores` permite criar, consultar, filtrar, editar e eliminar
+contactos reais. Cada contacto pode estar associado a uma empresa, mas essa
+associação é opcional para suportar recrutadores externos ou contactos ainda
+sem empresa identificada. Email, telefone, cargo, LinkedIn e notas também são
+opcionais e validados no servidor.
+
+Uma candidatura pode escolher um `primary_recruiter_id`. O formulário apresenta
+apenas contactos sem empresa ou contactos associados à empresa da vaga. As
+Server Actions voltam a confirmar utilizador e empresa, e as funções
+transacionais PostgreSQL aplicam a mesma regra antes de criar ou atualizar a
+candidatura. Eliminar um contacto mantém a candidatura e remove apenas a
+associação ao recrutador principal, conforme a chave estrangeira existente.
+
+A migração
+`20260808230000_add_primary_recruiter_transactions.sql` substitui as duas
+funções transacionais de criação e edição pelas versões que aceitam
+`p_primary_recruiter_id`. A validação correspondente encontra-se em
+`recruiter_application_catalog_checks.sql`.
+
 ## Aplicar no Supabase
 
 1. Abrir o projeto no Supabase.
@@ -158,6 +179,10 @@ Depois da configuração inicial, as alterações seguintes devem ser aplicadas
 pela ordem do nome do ficheiro. Para a identidade visual das empresas, executar
 `supabase/migrations/20260808190000_add_company_logos.sql` e validar com
 `supabase/tests/company_logos_catalog_checks.sql`.
+
+Para ativar a associação entre candidaturas e recrutadores, executar depois
+`supabase/migrations/20260808230000_add_primary_recruiter_transactions.sql` e
+validar com `supabase/tests/recruiter_application_catalog_checks.sql`.
 
 ## Dados de demonstração
 

@@ -6,6 +6,7 @@ import {
   MapPin,
   Pencil,
   Plus,
+  Users,
   WandSparkles,
 } from "lucide-react";
 import Link from "next/link";
@@ -124,6 +125,16 @@ export default async function CompaniesPage({
                     />
                     {company.applicationCount} candidatura(s)
                   </p>
+                  <Link
+                    href={`/recrutadores?empresa=${company.id}`}
+                    className="flex items-center gap-2 hover:text-blue-700"
+                  >
+                    <Users
+                      aria-hidden="true"
+                      className="size-4 text-slate-400"
+                    />
+                    {company.recruiterCount} contacto(s)
+                  </Link>
                   {company.website ? (
                     <a
                       href={company.website}

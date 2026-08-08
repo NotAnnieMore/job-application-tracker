@@ -28,29 +28,39 @@ function toCompanyValues(company: CompanyRow): CompanyFormValues {
 export async function getCompanies(): Promise<CompanyListItem[]> {
   const user = await requireCurrentUser();
   const supabase = await createClient();
-  const [companiesResult, opportunitiesResult, applicationsResult] =
-    await Promise.all([
-      supabase
-        .from("companies")
-        .select(
-          "id, user_id, name, website, logo_url, location, industry, work_mode, notes, created_at, updated_at",
-        )
-        .eq("user_id", user.id)
-        .order("name", { ascending: true }),
-      supabase
-        .from("opportunities")
-        .select("id, company_id")
-        .eq("user_id", user.id),
-      supabase
-        .from("applications")
-        .select("opportunity_id")
-        .eq("user_id", user.id),
-    ]);
+  const [
+    companiesResult,
+    opportunitiesResult,
+    applicationsResult,
+    recruitersResult,
+  ] = await Promise.all([
+    supabase
+      .from("companies")
+      .select(
+        "id, user_id, name, website, logo_url, location, industry, work_mode, notes, created_at, updated_at",
+      )
+      .eq("user_id", user.id)
+      .order("name", { ascending: true }),
+    supabase
+      .from("opportunities")
+      .select("id, company_id")
+      .eq("user_id", user.id),
+    supabase
+      .from("applications")
+      .select("opportunity_id")
+      .eq("user_id", user.id),
+    supabase
+      .from("recruiters")
+      .select("company_id")
+      .eq("user_id", user.id)
+      .not("company_id", "is", null),
+  ]);
 
   if (
     companiesResult.error ||
     opportunitiesResult.error ||
-    applicationsResult.error
+    applicationsResult.error ||
+    recruitersResult.error
   ) {
     throw new Error("Não foi possível consultar as empresas.");
   }
@@ -62,6 +72,7 @@ export async function getCompanies(): Promise<CompanyListItem[]> {
     ]),
   );
   const applicationCountByCompany = new Map<string, number>();
+  const recruiterCountByCompany = new Map<string, number>();
 
   applicationsResult.data.forEach((application) => {
     const companyId = companyByOpportunity.get(application.opportunity_id);
@@ -72,11 +83,19 @@ export async function getCompanies(): Promise<CompanyListItem[]> {
       (applicationCountByCompany.get(companyId) ?? 0) + 1,
     );
   });
+  recruitersResult.data.forEach((recruiter) => {
+    if (!recruiter.company_id) return;
+    recruiterCountByCompany.set(
+      recruiter.company_id,
+      (recruiterCountByCompany.get(recruiter.company_id) ?? 0) + 1,
+    );
+  });
 
   return companiesResult.data.map((company) => ({
     id: company.id,
     ...toCompanyValues(company),
     applicationCount: applicationCountByCompany.get(company.id) ?? 0,
+    recruiterCount: recruiterCountByCompany.get(company.id) ?? 0,
   }));
 }
 

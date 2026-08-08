@@ -266,6 +266,7 @@ interface TableDefinition<
 
 export type ApplicationTransactionArgs = {
   p_company_id: string;
+  p_primary_recruiter_id: string | null;
   p_title: string;
   p_location: string | null;
   p_work_mode: WorkModeValue | null;

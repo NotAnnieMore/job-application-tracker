@@ -5,6 +5,7 @@ import type {
   ApplicationListFilters,
   ApplicationListItem,
   CompanyOption,
+  RecruiterOption,
 } from "@/features/applications/types";
 import { isValidApplicationId } from "@/features/applications/validation";
 import { requireCurrentUser } from "@/lib/auth/session";
@@ -28,6 +29,23 @@ export async function getCompanyOptions(): Promise<CompanyOption[]> {
 
   if (error) throw new Error("Não foi possível consultar as empresas.");
   return data;
+}
+
+export async function getRecruiterOptions(): Promise<RecruiterOption[]> {
+  const user = await requireCurrentUser();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("recruiters")
+    .select("id, name, company_id")
+    .eq("user_id", user.id)
+    .order("name", { ascending: true });
+
+  if (error) throw new Error("Não foi possível consultar os recrutadores.");
+  return data.map((recruiter) => ({
+    id: recruiter.id,
+    name: recruiter.name,
+    companyId: recruiter.company_id ?? "",
+  }));
 }
 
 export async function getApplications(
@@ -151,7 +169,7 @@ export async function getApplicationById(
   const { data: application, error: applicationError } = await supabase
     .from("applications")
     .select(
-      "id, opportunity_id, status, application_date, source, expected_salary, summary_notes, next_action_summary, follow_up_date, interview_preparation, questions_for_company",
+      "id, opportunity_id, primary_recruiter_id, status, application_date, source, expected_salary, summary_notes, next_action_summary, follow_up_date, interview_preparation, questions_for_company",
     )
     .eq("id", applicationId)
     .eq("user_id", user.id)
@@ -178,6 +196,7 @@ export async function getApplicationById(
   return {
     id: application.id,
     companyId: opportunity.company_id,
+    primaryRecruiterId: application.primary_recruiter_id ?? "",
     title: opportunity.title,
     location: opportunity.location ?? "",
     workMode: opportunity.work_mode ?? "",
