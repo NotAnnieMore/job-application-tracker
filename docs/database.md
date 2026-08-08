@@ -228,6 +228,26 @@ UUID, a propriedade da candidatura e o limite de 5000 caracteres. A consulta e
 as alterações incluem sempre `user_id`, mantendo as políticas RLS como segunda
 camada de proteção.
 
+## Pesquisa, filtros e ordenação
+
+Na Fase 9, as listas principais passaram a aceitar combinações de filtros
+através dos parâmetros do URL:
+
+- candidaturas por texto, estado, empresa, recrutador, modalidade e intervalo
+  da data de candidatura, mantendo a ordenação selecionada;
+- entrevistas por estado, candidatura e intervalo da data agendada;
+- ações por estado, prioridade, candidatura, tipo de prazo e intervalo da
+  data limite.
+
+Os valores fixos são validados por listas permitidas e as datas pelo formato
+ISO `AAAA-MM-DD` antes de chegarem à camada de consulta. Para entrevistas, o
+dia é calculado no fuso `Europe/Lisbon`; as datas de candidaturas e ações já
+são guardadas como datas sem hora. Os filtros ativos ficam visíveis junto da
+lista e podem ser limpos em conjunto.
+
+Esta funcionalidade usa consultas e colunas existentes, pelo que não exige
+uma nova migração no Supabase.
+
 ## Aplicar no Supabase
 
 1. Abrir o projeto no Supabase.

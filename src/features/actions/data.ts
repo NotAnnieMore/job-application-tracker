@@ -174,6 +174,21 @@ export async function getActions(
         !filters.applicationId ||
         action.applicationId === filters.applicationId,
     )
+    .filter((action) => {
+      if (!filters.timing) return true;
+      if (filters.timing === "no_date") return !action.dueDate;
+      return action.timing === filters.timing;
+    })
+    .filter(
+      (action) =>
+        !filters.dueFrom ||
+        Boolean(action.dueDate && action.dueDate >= filters.dueFrom),
+    )
+    .filter(
+      (action) =>
+        !filters.dueTo ||
+        Boolean(action.dueDate && action.dueDate <= filters.dueTo),
+    )
     .sort((left, right) => {
       const leftPending = left.status === "pending";
       const rightPending = right.status === "pending";

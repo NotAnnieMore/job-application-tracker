@@ -1,10 +1,10 @@
 import {
   CalendarClock,
   CircleAlert,
+  Filter,
   ListChecks,
   Pencil,
   Plus,
-  X,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -16,6 +16,10 @@ import { ActionQuickStatusForm } from "@/components/actions/action-quick-status-
 import { AutoSubmitSelect } from "@/components/applications/auto-submit-select";
 import { CompanyLogo } from "@/components/companies/company-logo";
 import { EmptyState } from "@/components/shared/empty-state";
+import {
+  ActiveFilters,
+  type ActiveFilter,
+} from "@/components/shared/active-filters";
 import { PageHeader } from "@/components/shared/page-header";
 import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -28,6 +32,7 @@ import {
   getActionApplicationOptions,
   getActions,
 } from "@/features/actions/data";
+import type { ActionDueFilter } from "@/features/actions/types";
 import type {
   ActionPriorityValue,
   ActionStatusValue,
@@ -38,6 +43,13 @@ const notices: Record<string, string> = {
   "acao-atualizada": "Ação atualizada com sucesso.",
   "acao-eliminada": "Ação eliminada com sucesso.",
 };
+
+const dueFilterOptions: Array<{ value: ActionDueFilter; label: string }> = [
+  { value: "overdue", label: "Em atraso" },
+  { value: "today", label: "Para hoje" },
+  { value: "upcoming", label: "Futuras" },
+  { value: "no_date", label: "Sem prazo" },
+];
 
 function singleValue(value: string | string[] | undefined) {
   return typeof value === "string" ? value : "";
@@ -51,6 +63,19 @@ function validPriority(value: string): value is ActionPriorityValue {
   return actionPriorityOptions.some((option) => option.value === value);
 }
 
+function validTiming(value: string): value is ActionDueFilter {
+  return dueFilterOptions.some((option) => option.value === value);
+}
+
+function validDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/u.test(value)) return false;
+
+  const date = new Date(`${value}T00:00:00Z`);
+  return (
+    !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value
+  );
+}
+
 export default async function ActionsPage({
   searchParams,
 }: {
@@ -59,15 +84,73 @@ export default async function ActionsPage({
   const params = await searchParams;
   const rawStatus = singleValue(params.estado);
   const rawPriority = singleValue(params.prioridade);
+  const rawTiming = singleValue(params.prazo);
+  const rawDueFrom = singleValue(params.desde);
+  const rawDueTo = singleValue(params.ate);
   const status = validStatus(rawStatus) ? rawStatus : undefined;
   const priority = validPriority(rawPriority) ? rawPriority : undefined;
+  const timing = validTiming(rawTiming) ? rawTiming : undefined;
+  const dueFrom = validDate(rawDueFrom) ? rawDueFrom : undefined;
+  const dueTo = validDate(rawDueTo) ? rawDueTo : undefined;
   const applicationId = singleValue(params.candidatura);
   const [data, applications] = await Promise.all([
-    getActions({ status, priority, applicationId: applicationId || undefined }),
+    getActions({
+      status,
+      priority,
+      applicationId: applicationId || undefined,
+      timing,
+      dueFrom,
+      dueTo,
+    }),
     getActionApplicationOptions(),
   ]);
   const notice = notices[singleValue(params.aviso)];
-  const hasFilters = Boolean(status || priority || applicationId);
+  const activeFilters: ActiveFilter[] = [
+    ...(status
+      ? [
+          {
+            label: "Estado",
+            value:
+              actionStatusOptions.find((option) => option.value === status)
+                ?.label ?? status,
+          },
+        ]
+      : []),
+    ...(priority
+      ? [
+          {
+            label: "Prioridade",
+            value:
+              actionPriorityOptions.find((option) => option.value === priority)
+                ?.label ?? priority,
+          },
+        ]
+      : []),
+    ...(timing
+      ? [
+          {
+            label: "Prazo",
+            value:
+              dueFilterOptions.find((option) => option.value === timing)
+                ?.label ?? timing,
+          },
+        ]
+      : []),
+    ...(applicationId
+      ? [
+          {
+            label: "Candidatura",
+            value:
+              applications.find(
+                (application) => application.id === applicationId,
+              )?.title ?? "Desconhecida",
+          },
+        ]
+      : []),
+    ...(dueFrom ? [{ label: "Desde", value: formatActionDate(dueFrom) }] : []),
+    ...(dueTo ? [{ label: "Até", value: formatActionDate(dueTo) }] : []),
+  ];
+  const hasFilters = activeFilters.length > 0;
 
   return (
     <div className="space-y-6">
@@ -127,7 +210,7 @@ export default async function ActionsPage({
         <form
           action="/acoes"
           method="get"
-          className="grid gap-3 p-4 md:grid-cols-[13rem_13rem_minmax(16rem,1fr)_auto]"
+          className="grid items-end gap-3 p-4 md:grid-cols-2 xl:grid-cols-4"
         >
           <AutoSubmitSelect
             name="estado"
@@ -156,6 +239,19 @@ export default async function ActionsPage({
             ))}
           </AutoSubmitSelect>
           <AutoSubmitSelect
+            name="prazo"
+            defaultValue={timing ?? ""}
+            aria-label="Filtrar por prazo"
+            className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
+          >
+            <option value="">Todos os prazos</option>
+            {dueFilterOptions.map((option) => (
+              <option key={option.value} value={option.value}>
+                {option.label}
+              </option>
+            ))}
+          </AutoSubmitSelect>
+          <AutoSubmitSelect
             name="candidatura"
             defaultValue={applicationId}
             aria-label="Filtrar por candidatura"
@@ -168,23 +264,37 @@ export default async function ActionsPage({
               </option>
             ))}
           </AutoSubmitSelect>
-          {hasFilters ? (
-            <Link
-              href="/acoes"
-              aria-label="Limpar filtros"
-              title="Limpar filtros"
-              className={buttonClassName({
-                variant: "secondary",
-                size: "icon",
-              })}
-            >
-              <X aria-hidden="true" className="size-4" />
-            </Link>
-          ) : (
-            <span />
-          )}
+          <label className="grid gap-1.5 text-xs font-semibold text-slate-600">
+            Prazo desde
+            <input
+              type="date"
+              name="desde"
+              defaultValue={dueFrom ?? ""}
+              max={dueTo}
+              className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm font-normal text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
+            />
+          </label>
+          <label className="grid gap-1.5 text-xs font-semibold text-slate-600">
+            Prazo até
+            <input
+              type="date"
+              name="ate"
+              defaultValue={dueTo ?? ""}
+              min={dueFrom}
+              className="h-10 rounded-xl border border-slate-200 bg-white px-3 text-sm font-normal text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
+            />
+          </label>
+          <button
+            type="submit"
+            className={buttonClassName({ variant: "secondary" })}
+          >
+            <Filter aria-hidden="true" className="size-4" />
+            Aplicar datas
+          </button>
         </form>
       </Card>
+
+      <ActiveFilters filters={activeFilters} clearHref="/acoes" />
 
       {data.items.length === 0 ? (
         <EmptyState

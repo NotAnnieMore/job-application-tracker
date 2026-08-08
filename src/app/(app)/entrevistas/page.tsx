@@ -2,18 +2,22 @@ import {
   CalendarDays,
   Clock3,
   ExternalLink,
+  Filter,
   MapPin,
   Pencil,
   Plus,
   UserRound,
   Video,
-  X,
 } from "lucide-react";
 import Link from "next/link";
 
 import { AutoSubmitSelect } from "@/components/applications/auto-submit-select";
 import { CompanyLogo } from "@/components/companies/company-logo";
 import { InterviewStatusBadge } from "@/components/interviews/interview-status-badge";
+import {
+  ActiveFilters,
+  type ActiveFilter,
+} from "@/components/shared/active-filters";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { buttonClassName } from "@/components/ui/button";
@@ -46,6 +50,24 @@ function singleValue(value: string | string[] | undefined) {
 
 function validStatus(value: string): value is InterviewStatusValue {
   return interviewStatusOptions.some((option) => option.value === value);
+}
+
+function validDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/u.test(value)) return false;
+
+  const date = new Date(`${value}T00:00:00Z`);
+  return (
+    !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value
+  );
+}
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("pt-PT", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${value}T00:00:00Z`));
 }
 
 function isExternalLocation(value: string) {
@@ -143,17 +165,48 @@ export default async function InterviewsPage({
   const rawStatus = singleValue(params.estado);
   const status = validStatus(rawStatus) ? rawStatus : undefined;
   const applicationId = singleValue(params.candidatura);
+  const rawDateFrom = singleValue(params.desde);
+  const rawDateTo = singleValue(params.ate);
+  const dateFrom = validDate(rawDateFrom) ? rawDateFrom : undefined;
+  const dateTo = validDate(rawDateTo) ? rawDateTo : undefined;
   const [interviews, applications] = await Promise.all([
     getInterviews({
       status,
       applicationId: applicationId || undefined,
+      dateFrom,
+      dateTo,
     }),
     getInterviewApplicationOptions(),
   ]);
   const notice = notices[singleValue(params.aviso)];
   const upcoming = interviews.filter((interview) => interview.isUpcoming);
   const history = interviews.filter((interview) => !interview.isUpcoming);
-  const hasFilters = Boolean(status || applicationId);
+  const activeFilters: ActiveFilter[] = [
+    ...(status
+      ? [
+          {
+            label: "Estado",
+            value:
+              interviewStatusOptions.find((option) => option.value === status)
+                ?.label ?? status,
+          },
+        ]
+      : []),
+    ...(applicationId
+      ? [
+          {
+            label: "Candidatura",
+            value:
+              applications.find(
+                (application) => application.id === applicationId,
+              )?.title ?? "Desconhecida",
+          },
+        ]
+      : []),
+    ...(dateFrom ? [{ label: "Desde", value: formatDate(dateFrom) }] : []),
+    ...(dateTo ? [{ label: "Até", value: formatDate(dateTo) }] : []),
+  ];
+  const hasFilters = activeFilters.length > 0;
 
   return (
     <div className="space-y-6">
@@ -181,7 +234,7 @@ export default async function InterviewsPage({
         <form
           action="/entrevistas"
           method="get"
-          className="grid gap-3 p-4 md:grid-cols-[14rem_minmax(16rem,1fr)_auto]"
+          className="grid items-end gap-3 p-4 md:grid-cols-2 xl:grid-cols-[12rem_minmax(16rem,1fr)_12rem_12rem_auto]"
         >
           <label>
             <span className="sr-only">Filtrar por estado</span>
@@ -213,23 +266,38 @@ export default async function InterviewsPage({
               ))}
             </AutoSubmitSelect>
           </label>
-          {hasFilters ? (
-            <Link
-              href="/entrevistas"
-              aria-label="Limpar filtros"
-              title="Limpar filtros"
-              className={buttonClassName({
-                variant: "secondary",
-                size: "icon",
-              })}
-            >
-              <X aria-hidden="true" className="size-4" />
-            </Link>
-          ) : (
-            <span />
-          )}
+          <label>
+            <span className="mb-1 block text-xs font-semibold text-slate-500">
+              Entrevistas desde
+            </span>
+            <input
+              name="desde"
+              type="date"
+              defaultValue={dateFrom ?? ""}
+              max={dateTo}
+              className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
+            />
+          </label>
+          <label>
+            <span className="mb-1 block text-xs font-semibold text-slate-500">
+              Entrevistas até
+            </span>
+            <input
+              name="ate"
+              type="date"
+              defaultValue={dateTo ?? ""}
+              min={dateFrom}
+              className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
+            />
+          </label>
+          <button type="submit" className={buttonClassName({ size: "sm" })}>
+            <Filter aria-hidden="true" className="size-4" />
+            Aplicar datas
+          </button>
         </form>
       </Card>
+
+      <ActiveFilters filters={activeFilters} clearHref="/entrevistas" />
 
       {interviews.length === 0 ? (
         <EmptyState

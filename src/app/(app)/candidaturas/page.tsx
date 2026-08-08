@@ -1,9 +1,13 @@
-import { Filter, Pencil, Plus, Search, X } from "lucide-react";
+import { Filter, Pencil, Plus, Search } from "lucide-react";
 import Link from "next/link";
 
 import { ApplicationStatusBadge } from "@/components/applications/application-status-badge";
 import { AutoSubmitSelect } from "@/components/applications/auto-submit-select";
 import { CompanyLogo } from "@/components/companies/company-logo";
+import {
+  ActiveFilters,
+  type ActiveFilter,
+} from "@/components/shared/active-filters";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { buttonClassName } from "@/components/ui/button";
@@ -16,6 +20,7 @@ import {
 import {
   getApplications,
   getCompanyOptions,
+  getRecruiterOptions,
 } from "@/features/applications/data";
 import type { ApplicationListFilters } from "@/features/applications/types";
 import type {
@@ -38,6 +43,15 @@ function singleValue(value: string | string[] | undefined) {
   return typeof value === "string" ? value : "";
 }
 
+function validDate(value: string) {
+  if (!/^\d{4}-\d{2}-\d{2}$/u.test(value)) return false;
+
+  const date = new Date(`${value}T00:00:00Z`);
+  return (
+    !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value
+  );
+}
+
 function formatDate(value: string) {
   return new Intl.DateTimeFormat("pt-PT", {
     day: "2-digit",
@@ -56,7 +70,10 @@ export default async function ApplicationsPage({
   const query = singleValue(params.q).slice(0, 100);
   const rawStatus = singleValue(params.status);
   const rawCompanyId = singleValue(params.empresa);
+  const rawRecruiterId = singleValue(params.recrutador);
   const rawWorkMode = singleValue(params.modalidade);
+  const rawDateFrom = singleValue(params.desde);
+  const rawDateTo = singleValue(params.ate);
   const rawSort = singleValue(params.ordem);
   const status = statusValues.has(rawStatus as ApplicationStatusValue)
     ? (rawStatus as ApplicationStatusValue)
@@ -71,22 +88,77 @@ export default async function ApplicationsPage({
   ].includes(rawSort)
     ? (rawSort as ApplicationListFilters["sort"])
     : "newest";
+  const dateFrom = validDate(rawDateFrom) ? rawDateFrom : undefined;
+  const dateTo = validDate(rawDateTo) ? rawDateTo : undefined;
   const filters: ApplicationListFilters = {
     query: query || undefined,
     status,
     companyId: rawCompanyId || undefined,
+    recruiterId: rawRecruiterId || undefined,
     workMode,
+    dateFrom,
+    dateTo,
     sort,
   };
-  const [applications, companies] = await Promise.all([
+  const [applications, companies, recruiters] = await Promise.all([
     getApplications(filters),
     getCompanyOptions(),
+    getRecruiterOptions(),
   ]);
   const noticeKey = singleValue(params.estado);
   const notice = notices[noticeKey];
-  const hasFilters = Boolean(
-    query || status || rawCompanyId || workMode || rawSort,
-  );
+  const activeFilters: ActiveFilter[] = [
+    ...(query ? [{ label: "Pesquisa", value: query }] : []),
+    ...(status
+      ? [
+          {
+            label: "Estado",
+            value:
+              applicationStatusOptions.find((option) => option.value === status)
+                ?.label ?? status,
+          },
+        ]
+      : []),
+    ...(rawCompanyId
+      ? [
+          {
+            label: "Empresa",
+            value:
+              companies.find((company) => company.id === rawCompanyId)?.name ??
+              "Desconhecida",
+          },
+        ]
+      : []),
+    ...(rawRecruiterId
+      ? [
+          {
+            label: "Recrutador",
+            value:
+              recruiters.find((recruiter) => recruiter.id === rawRecruiterId)
+                ?.name ?? "Desconhecido",
+          },
+        ]
+      : []),
+    ...(workMode
+      ? [{ label: "Modalidade", value: workModeLabels[workMode] }]
+      : []),
+    ...(dateFrom ? [{ label: "Desde", value: formatDate(dateFrom) }] : []),
+    ...(dateTo ? [{ label: "Até", value: formatDate(dateTo) }] : []),
+    ...(rawSort
+      ? [
+          {
+            label: "Ordem",
+            value:
+              sort === "oldest"
+                ? "Mais antigas"
+                : sort === "follow_up"
+                  ? "Próximo follow-up"
+                  : "Mais recentes",
+          },
+        ]
+      : []),
+  ];
+  const hasFilters = activeFilters.length > 0;
 
   return (
     <div className="space-y-6">
@@ -114,9 +186,9 @@ export default async function ApplicationsPage({
         <form
           action="/candidaturas"
           method="get"
-          className="grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-[minmax(15rem,1fr)_12rem_12rem_11rem_auto]"
+          className="grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-4"
         >
-          <label className="relative min-w-0">
+          <label className="relative min-w-0 md:col-span-2">
             <span className="sr-only">Pesquisar candidaturas</span>
             <Search
               aria-hidden="true"
@@ -141,6 +213,21 @@ export default async function ApplicationsPage({
               {applicationStatusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
                   {option.label}
+                </option>
+              ))}
+            </AutoSubmitSelect>
+          </label>
+          <label>
+            <span className="sr-only">Filtrar por recrutador</span>
+            <AutoSubmitSelect
+              name="recrutador"
+              defaultValue={rawRecruiterId}
+              className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
+            >
+              <option value="">Todos os recrutadores</option>
+              {recruiters.map((recruiter) => (
+                <option key={recruiter.id} value={recruiter.id}>
+                  {recruiter.name}
                 </option>
               ))}
             </AutoSubmitSelect>
@@ -175,29 +262,31 @@ export default async function ApplicationsPage({
               ))}
             </AutoSubmitSelect>
           </label>
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className={buttonClassName({ size: "sm", className: "flex-1" })}
-            >
-              <Filter aria-hidden="true" className="size-4" />
-              Aplicar
-            </button>
-            {hasFilters ? (
-              <Link
-                href="/candidaturas"
-                aria-label="Limpar filtros"
-                title="Limpar filtros"
-                className={buttonClassName({
-                  variant: "secondary",
-                  size: "icon",
-                })}
-              >
-                <X aria-hidden="true" className="size-4" />
-              </Link>
-            ) : null}
-          </div>
-          <label className="md:col-span-2 xl:col-span-1 xl:col-start-4">
+          <label>
+            <span className="mb-1 block text-xs font-semibold text-slate-500">
+              Candidaturas desde
+            </span>
+            <input
+              name="desde"
+              type="date"
+              defaultValue={dateFrom ?? ""}
+              max={dateTo}
+              className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
+            />
+          </label>
+          <label>
+            <span className="mb-1 block text-xs font-semibold text-slate-500">
+              Candidaturas até
+            </span>
+            <input
+              name="ate"
+              type="date"
+              defaultValue={dateTo ?? ""}
+              min={dateFrom}
+              className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
+            />
+          </label>
+          <label>
             <span className="sr-only">Ordenar candidaturas</span>
             <AutoSubmitSelect
               name="ordem"
@@ -209,8 +298,17 @@ export default async function ApplicationsPage({
               <option value="follow_up">Próximo follow-up</option>
             </AutoSubmitSelect>
           </label>
+          <button
+            type="submit"
+            className={buttonClassName({ size: "sm", className: "self-end" })}
+          >
+            <Filter aria-hidden="true" className="size-4" />
+            Aplicar pesquisa e datas
+          </button>
         </form>
       </Card>
+
+      <ActiveFilters filters={activeFilters} clearHref="/candidaturas" />
 
       {applications.length === 0 ? (
         <EmptyState

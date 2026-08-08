@@ -75,6 +75,8 @@ export type InterviewListItem = {
 export type InterviewListFilters = {
   status?: InterviewStatusValue;
   applicationId?: string;
+  dateFrom?: string;
+  dateTo?: string;
 };
 
 export type InterviewDetails = InterviewFormValues & {

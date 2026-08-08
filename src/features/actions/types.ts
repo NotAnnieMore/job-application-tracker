@@ -28,6 +28,7 @@ export type ActionApplicationOption = {
 };
 
 export type ActionTiming = "overdue" | "today" | "upcoming" | "no_date";
+export type ActionDueFilter = ActionTiming;
 
 export type ActionListItem = {
   id: string;
@@ -48,6 +49,9 @@ export type ActionListFilters = {
   status?: ActionStatusValue;
   priority?: ActionPriorityValue;
   applicationId?: string;
+  timing?: ActionDueFilter;
+  dueFrom?: string;
+  dueTo?: string;
 };
 
 export type ActionListData = {

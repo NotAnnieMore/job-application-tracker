@@ -79,6 +79,7 @@ export type ApplicationListItem = {
   workMode: WorkModeValue | null;
   nextActionSummary: string;
   followUpDate: string;
+  recruiterId: string;
   recruiterName: string;
 };
 
@@ -86,7 +87,10 @@ export type ApplicationListFilters = {
   query?: string;
   status?: ApplicationStatusValue;
   companyId?: string;
+  recruiterId?: string;
   workMode?: WorkModeValue;
+  dateFrom?: string;
+  dateTo?: string;
   sort?: "newest" | "oldest" | "follow_up";
 };
 

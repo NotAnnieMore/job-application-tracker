@@ -120,6 +120,7 @@ export async function getApplications(
         workMode: opportunity.work_mode,
         nextActionSummary: application.next_action_summary ?? "",
         followUpDate: application.follow_up_date ?? "",
+        recruiterId: application.primary_recruiter_id ?? "",
         recruiterName: recruiter?.name ?? "",
       },
     ];
@@ -140,8 +141,19 @@ export async function getApplications(
   if (filters.companyId) {
     items = items.filter((item) => item.companyId === filters.companyId);
   }
+  if (filters.recruiterId) {
+    items = items.filter((item) => item.recruiterId === filters.recruiterId);
+  }
   if (filters.workMode) {
     items = items.filter((item) => item.workMode === filters.workMode);
+  }
+  if (filters.dateFrom) {
+    const dateFrom = filters.dateFrom;
+    items = items.filter((item) => item.applicationDate >= dateFrom);
+  }
+  if (filters.dateTo) {
+    const dateTo = filters.dateTo;
+    items = items.filter((item) => item.applicationDate <= dateTo);
   }
 
   items.sort((left, right) => {

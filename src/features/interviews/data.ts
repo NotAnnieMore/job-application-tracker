@@ -175,45 +175,58 @@ export async function getInterviews(
   );
 
   const now = Date.now();
-  return interviewsResult.data
-    .flatMap((interview) => {
-      const application = applications.get(interview.application_id);
-      const opportunity = application
-        ? opportunities.get(application.opportunity_id)
-        : null;
-      const company = opportunity
-        ? companies.get(opportunity.company_id)
-        : null;
-      if (!application || !opportunity || !company) return [];
+  let items = interviewsResult.data.flatMap((interview) => {
+    const application = applications.get(interview.application_id);
+    const opportunity = application
+      ? opportunities.get(application.opportunity_id)
+      : null;
+    const company = opportunity ? companies.get(opportunity.company_id) : null;
+    if (!application || !opportunity || !company) return [];
 
-      return [
-        {
-          id: interview.id,
-          applicationId: application.id,
-          title: opportunity.title,
-          companyName: company.name,
-          companyLogoUrl: company.logo_url ?? "",
-          recruiterName: interview.recruiter_id
-            ? (recruiters.get(interview.recruiter_id)?.name ?? "")
-            : "",
-          interviewType: interview.interview_type,
-          scheduledAt: interview.scheduled_at,
-          status: interview.status,
-          format: interview.format,
-          durationMinutes: interview.duration_minutes,
-          locationOrUrl: interview.location_or_url ?? "",
-          isUpcoming:
-            interview.status === "scheduled" &&
-            Date.parse(interview.scheduled_at) >= now,
-        },
-      ];
-    })
-    .sort((left, right) => {
-      if (left.isUpcoming !== right.isUpcoming) return left.isUpcoming ? -1 : 1;
-      return left.isUpcoming
-        ? left.scheduledAt.localeCompare(right.scheduledAt)
-        : right.scheduledAt.localeCompare(left.scheduledAt);
-    });
+    return [
+      {
+        id: interview.id,
+        applicationId: application.id,
+        title: opportunity.title,
+        companyName: company.name,
+        companyLogoUrl: company.logo_url ?? "",
+        recruiterName: interview.recruiter_id
+          ? (recruiters.get(interview.recruiter_id)?.name ?? "")
+          : "",
+        interviewType: interview.interview_type,
+        scheduledAt: interview.scheduled_at,
+        status: interview.status,
+        format: interview.format,
+        durationMinutes: interview.duration_minutes,
+        locationOrUrl: interview.location_or_url ?? "",
+        isUpcoming:
+          interview.status === "scheduled" &&
+          Date.parse(interview.scheduled_at) >= now,
+      },
+    ];
+  });
+
+  if (filters.dateFrom) {
+    const dateFrom = filters.dateFrom;
+    items = items.filter(
+      (interview) =>
+        toLisbonLocalInput(interview.scheduledAt).slice(0, 10) >= dateFrom,
+    );
+  }
+  if (filters.dateTo) {
+    const dateTo = filters.dateTo;
+    items = items.filter(
+      (interview) =>
+        toLisbonLocalInput(interview.scheduledAt).slice(0, 10) <= dateTo,
+    );
+  }
+
+  return items.sort((left, right) => {
+    if (left.isUpcoming !== right.isUpcoming) return left.isUpcoming ? -1 : 1;
+    return left.isUpcoming
+      ? left.scheduledAt.localeCompare(right.scheduledAt)
+      : right.scheduledAt.localeCompare(left.scheduledAt);
+  });
 }
 
 export async function getInterviewById(
