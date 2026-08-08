@@ -262,6 +262,11 @@ A página calcula os indicadores de itens em atraso, previstos para hoje e para
 os sete dias seguintes. As ações pendentes sem data são contabilizadas à parte
 e encaminham para a lista de ações, onde podem ser corrigidas.
 
+Como a Agenda passou a concentrar estes compromissos, o Dashboard deixou de
+repetir uma lista dedicada de follow-ups. O espaço junto das candidaturas
+recentes apresenta agora os atalhos operacionais, incluindo a ligação para a
+Agenda.
+
 A agregação é calculada no servidor e continua limitada pelo `user_id` e pelas
 políticas RLS. Não existe duplicação de eventos nem uma nova tabela de
 calendário, pelo que esta fase também não exige uma migração.

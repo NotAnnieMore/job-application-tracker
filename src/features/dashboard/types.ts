@@ -18,16 +18,6 @@ export type DashboardApplication = {
   followUpDate: string;
 };
 
-export type DashboardFollowUp = {
-  id: string;
-  title: string;
-  companyName: string;
-  companyLogoUrl: string;
-  followUpDate: string;
-  nextActionSummary: string;
-  timing: "overdue" | "today" | "upcoming";
-};
-
 export type DashboardStatusSummary = {
   status: ApplicationStatusValue;
   label: string;
@@ -76,7 +66,6 @@ export type DashboardActivity = {
 };
 
 export type DashboardData = {
-  today: string;
   stats: {
     totalApplications: number;
     applicationsLast30Days: number;
@@ -94,7 +83,6 @@ export type DashboardData = {
     companiesWithApplications: number;
   };
   recentApplications: DashboardApplication[];
-  followUps: DashboardFollowUp[];
   pendingActions: DashboardAction[];
   upcomingInterviews: DashboardInterview[];
   statusSummary: DashboardStatusSummary[];

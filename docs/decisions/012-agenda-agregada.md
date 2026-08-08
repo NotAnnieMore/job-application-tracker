@@ -22,12 +22,15 @@ integração com calendários externos e notificações push continua fora do MV
   filtrada onde pode atribuir um prazo.
 - Encaminhar cada item para a respetiva lista ou para o detalhe da candidatura,
   sem abrir diretamente um formulário de edição.
+- Remover a lista dedicada de follow-ups do Dashboard e colocar o Acesso rápido
+  ao lado das candidaturas recentes, incluindo um atalho para a Agenda.
 
 ## Consequências
 
 - O utilizador obtém uma vista operacional única sem duplicar dados.
 - Alterações feitas nas candidaturas, entrevistas ou ações refletem-se
   automaticamente na Agenda.
+- O Dashboard fica menos repetitivo e privilegia as operações mais frequentes.
 - A solução não envia alertas fora da aplicação e não sincroniza com serviços
   externos.
 - Não é necessária uma nova tabela ou migração no Supabase.

@@ -6,7 +6,6 @@ import type {
   DashboardApplication,
   DashboardAction,
   DashboardData,
-  DashboardFollowUp,
   DashboardInterview,
   DashboardTrendPoint,
 } from "@/features/dashboard/types";
@@ -246,25 +245,6 @@ export async function getDashboardData(): Promise<DashboardData> {
     })
     .slice(0, 5);
 
-  const followUps: DashboardFollowUp[] = activeApplications
-    .filter((application) => application.followUpDate)
-    .sort((left, right) => left.followUpDate.localeCompare(right.followUpDate))
-    .slice(0, 6)
-    .map((application) => ({
-      id: application.id,
-      title: application.title,
-      companyName: application.companyName,
-      companyLogoUrl: application.companyLogoUrl,
-      followUpDate: application.followUpDate,
-      nextActionSummary: application.nextActionSummary,
-      timing:
-        application.followUpDate < today
-          ? "overdue"
-          : application.followUpDate === today
-            ? "today"
-            : "upcoming",
-    }));
-
   const pendingActions: DashboardAction[] = actionsResult.data
     .filter((action) => action.status === "pending")
     .flatMap((action) => {
@@ -478,7 +458,6 @@ export async function getDashboardData(): Promise<DashboardData> {
   );
 
   return {
-    today,
     stats: {
       totalApplications: applications.length,
       applicationsLast30Days: applications.filter(
@@ -522,7 +501,6 @@ export async function getDashboardData(): Promise<DashboardData> {
       companiesWithApplications: companyIdsWithApplications.size,
     },
     recentApplications,
-    followUps,
     pendingActions,
     upcomingInterviews,
     statusSummary,

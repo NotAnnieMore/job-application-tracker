@@ -5,7 +5,7 @@ import {
   BriefcaseBusiness,
   Building2,
   CalendarDays,
-  CalendarClock,
+  CalendarRange,
   CheckCircle2,
   ChevronRight,
   FileText,
@@ -28,10 +28,7 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { workModeLabels } from "@/features/applications/constants";
 import { formatActionDate } from "@/features/actions/date";
 import { getDashboardData } from "@/features/dashboard/data";
-import type {
-  DashboardActivityKind,
-  DashboardFollowUp,
-} from "@/features/dashboard/types";
+import type { DashboardActivityKind } from "@/features/dashboard/types";
 import { interviewFormatLabels } from "@/features/interviews/constants";
 import { formatInterviewDateTime } from "@/features/interviews/date";
 import { cn } from "@/lib/utils";
@@ -55,25 +52,6 @@ function formatDate(value: string) {
     year: "numeric",
     timeZone: "UTC",
   }).format(new Date(`${value}T00:00:00Z`));
-}
-
-function dayDifference(left: string, right: string) {
-  const leftDate = new Date(`${left}T00:00:00Z`).getTime();
-  const rightDate = new Date(`${right}T00:00:00Z`).getTime();
-  return Math.round((leftDate - rightDate) / 86_400_000);
-}
-
-function followUpLabel(followUp: DashboardFollowUp, today: string) {
-  const difference = dayDifference(followUp.followUpDate, today);
-
-  if (difference === 0) return "Hoje";
-  if (difference === 1) return "Amanhã";
-  if (difference < 0) {
-    const days = Math.abs(difference);
-    return `Em atraso há ${days} dia${days === 1 ? "" : "s"}`;
-  }
-
-  return formatDate(followUp.followUpDate);
 }
 
 function formatActivityTime(value: string) {
@@ -126,6 +104,52 @@ function SectionLink({
       {label}
       <ArrowRight aria-hidden="true" className="size-3.5" />
     </Link>
+  );
+}
+
+const quickAccessItems = [
+  {
+    label: "Registar candidatura",
+    href: "/candidaturas/nova",
+    icon: Plus,
+  },
+  { label: "Criar ação", href: "/acoes/nova", icon: ListChecks },
+  {
+    label: "Agendar entrevista",
+    href: "/entrevistas/nova",
+    icon: CalendarDays,
+  },
+  { label: "Abrir agenda", href: "/agenda", icon: CalendarRange },
+  { label: "Consultar empresas", href: "/empresas", icon: Building2 },
+] as const;
+
+function QuickAccessCard() {
+  return (
+    <Card>
+      <CardHeader>
+        <h2 className="font-bold text-slate-950">Acesso rápido</h2>
+      </CardHeader>
+      <CardContent className="space-y-2">
+        {quickAccessItems.map((item) => {
+          const Icon = item.icon;
+
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50/50 hover:text-blue-700"
+            >
+              <Icon aria-hidden="true" className="size-4" />
+              {item.label}
+              <ChevronRight
+                aria-hidden="true"
+                className="ml-auto size-4 text-slate-400"
+              />
+            </Link>
+          );
+        })}
+      </CardContent>
+    </Card>
   );
 }
 
@@ -400,64 +424,7 @@ export async function DashboardPage() {
           )}
         </Card>
 
-        <Card className="overflow-hidden">
-          <CardHeader>
-            <h2 className="font-bold text-slate-950">Follow-ups</h2>
-            <SectionLink
-              href="/candidaturas?ordem=follow_up"
-              label="Ordenar todos"
-            />
-          </CardHeader>
-          {data.followUps.length === 0 ? (
-            <div className="flex min-h-72 flex-col items-center justify-center px-6 text-center">
-              <span className="flex size-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
-                <CalendarClock aria-hidden="true" className="size-5" />
-              </span>
-              <p className="mt-3 font-semibold text-slate-900">
-                Nenhum follow-up pendente
-              </p>
-              <p className="mt-1 text-sm leading-6 text-slate-500">
-                As datas definidas nas candidaturas irão aparecer aqui.
-              </p>
-            </div>
-          ) : (
-            <div className="divide-y divide-slate-100">
-              {data.followUps.map((followUp) => (
-                <Link
-                  key={followUp.id}
-                  href="/candidaturas"
-                  className="flex items-center gap-3 px-5 py-4 transition hover:bg-slate-50"
-                >
-                  <CompanyLogo
-                    name={followUp.companyName}
-                    logoUrl={followUp.companyLogoUrl}
-                    size="md"
-                  />
-                  <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold text-slate-950">
-                      {followUp.nextActionSummary || "Rever candidatura"}
-                    </span>
-                    <span className="mt-0.5 block truncate text-xs text-slate-500">
-                      {followUp.title} · {followUp.companyName}
-                    </span>
-                  </span>
-                  <span
-                    className={cn(
-                      "shrink-0 text-xs font-semibold",
-                      followUp.timing === "overdue"
-                        ? "text-red-600"
-                        : followUp.timing === "today"
-                          ? "text-amber-600"
-                          : "text-slate-500",
-                    )}
-                  >
-                    {followUpLabel(followUp, data.today)}
-                  </span>
-                </Link>
-              ))}
-            </div>
-          )}
-        </Card>
+        <QuickAccessCard />
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)]">
@@ -695,7 +662,7 @@ export async function DashboardPage() {
           )}
         </Card>
 
-        <Card>
+        <Card className="xl:col-span-2">
           <CardHeader>
             <h2 className="font-bold text-slate-950">
               Candidaturas por estado
@@ -735,69 +702,6 @@ export async function DashboardPage() {
                 ))}
               </div>
             )}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <h2 className="font-bold text-slate-950">Acesso rápido</h2>
-          </CardHeader>
-          <CardContent className="space-y-2">
-            <Link
-              href="/candidaturas/nova"
-              className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50/50 hover:text-blue-700"
-            >
-              <Plus aria-hidden="true" className="size-4" />
-              Registar candidatura
-              <ChevronRight
-                aria-hidden="true"
-                className="ml-auto size-4 text-slate-400"
-              />
-            </Link>
-            <Link
-              href="/acoes/nova"
-              className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50/50 hover:text-blue-700"
-            >
-              <ListChecks aria-hidden="true" className="size-4" />
-              Criar ação
-              <ChevronRight
-                aria-hidden="true"
-                className="ml-auto size-4 text-slate-400"
-              />
-            </Link>
-            <Link
-              href="/entrevistas/nova"
-              className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50/50 hover:text-blue-700"
-            >
-              <CalendarDays aria-hidden="true" className="size-4" />
-              Agendar entrevista
-              <ChevronRight
-                aria-hidden="true"
-                className="ml-auto size-4 text-slate-400"
-              />
-            </Link>
-            <Link
-              href="/candidaturas?ordem=follow_up"
-              className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50/50 hover:text-blue-700"
-            >
-              <CalendarClock aria-hidden="true" className="size-4" />
-              Consultar follow-ups
-              <ChevronRight
-                aria-hidden="true"
-                className="ml-auto size-4 text-slate-400"
-              />
-            </Link>
-            <Link
-              href="/empresas"
-              className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50/50 hover:text-blue-700"
-            >
-              <Building2 aria-hidden="true" className="size-4" />
-              Consultar empresas
-              <ChevronRight
-                aria-hidden="true"
-                className="ml-auto size-4 text-slate-400"
-              />
-            </Link>
           </CardContent>
         </Card>
       </div>
