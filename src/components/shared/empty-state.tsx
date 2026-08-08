@@ -1,6 +1,7 @@
 import type { LucideIcon } from "lucide-react";
+import Link from "next/link";
 
-import { Button } from "@/components/ui/button";
+import { Button, buttonClassName } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
 export function EmptyState({
@@ -8,11 +9,13 @@ export function EmptyState({
   title,
   description,
   actionLabel,
+  actionHref,
 }: {
   icon: LucideIcon;
   title: string;
   description: string;
   actionLabel?: string;
+  actionHref?: string;
 }) {
   return (
     <Card className="flex min-h-80 flex-col items-center justify-center p-8 text-center">
@@ -23,7 +26,16 @@ export function EmptyState({
       <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
         {description}
       </p>
-      {actionLabel ? <Button className="mt-5">{actionLabel}</Button> : null}
+      {actionLabel && actionHref ? (
+        <Link
+          href={actionHref}
+          className={buttonClassName({ className: "mt-5" })}
+        >
+          {actionLabel}
+        </Link>
+      ) : actionLabel ? (
+        <Button className="mt-5">{actionLabel}</Button>
+      ) : null}
     </Card>
   );
 }

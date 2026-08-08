@@ -72,11 +72,23 @@ Os valores são guardados em inglês e traduzidos na interface:
 
 As ações usam os estados `pending`, `completed` e `cancelled`, com prioridades `low`, `medium` e `high`.
 
-## Segurança nesta fase
+## Segurança
 
-Todas as tabelas têm Row Level Security ativo. A role `anon` não recebe permissões e a role `authenticated` recebe as operações necessárias, mas ainda não existem políticas RLS. Consequentemente, o acesso através da Data API permanece fechado.
+Todas as tabelas têm Row Level Security ativo. A role `anon` não recebe permissões. As 30 políticas que usam `auth.uid()` foram criadas e testadas com duas contas na Fase 4. Cada tabela funcional permite consultar, criar, editar e eliminar apenas linhas pertencentes ao utilizador autenticado.
 
-As políticas que usam `auth.uid()` foram criadas e testadas com duas contas na Fase 4. Cada tabela funcional permite consultar, criar, editar e eliminar apenas linhas pertencentes ao utilizador autenticado.
+## Integração da tabela `companies`
+
+Na Fase 5, a página `/empresas` passou a consultar dados reais. A integração inclui:
+
+- Data Access Layer executado apenas no servidor;
+- listagem limitada ao utilizador autenticado;
+- criação, edição e eliminação através de Server Actions;
+- nova validação da sessão e dos dados em cada operação;
+- mensagens próprias para nomes duplicados e empresas com vagas associadas;
+- contagem de candidaturas derivada das relações com vagas;
+- estados de carregamento, erro e lista vazia.
+
+Os fluxos foram testados no browser com uma conta real, incluindo criação, edição, rejeição de duplicados e eliminação.
 
 ## Aplicar no Supabase
 

@@ -27,6 +27,23 @@ const sizeClasses: Record<ButtonSize, string> = {
   icon: "size-10 rounded-xl",
 };
 
+export function buttonClassName({
+  className,
+  variant = "primary",
+  size = "md",
+}: {
+  className?: string;
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+} = {}) {
+  return cn(
+    "inline-flex items-center justify-center gap-2 font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
+    variantClasses[variant],
+    sizeClasses[size],
+    className,
+  );
+}
+
 export function Button({
   className,
   type = "button",
@@ -37,12 +54,7 @@ export function Button({
   return (
     <button
       type={type}
-      className={cn(
-        "inline-flex items-center justify-center gap-2 font-semibold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50",
-        variantClasses[variant],
-        sizeClasses[size],
-        className,
-      )}
+      className={buttonClassName({ className, variant, size })}
       {...props}
     />
   );

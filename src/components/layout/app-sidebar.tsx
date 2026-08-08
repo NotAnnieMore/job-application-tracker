@@ -99,9 +99,9 @@ export function AppSidebar({
       <div className="border-t border-slate-100 p-3">
         {!compact ? (
           <div className="mb-3 rounded-xl bg-slate-50 px-3 py-3">
-            <p className="text-xs font-semibold text-slate-700">Fase 4</p>
+            <p className="text-xs font-semibold text-slate-700">Fase 5</p>
             <p className="mt-1 text-xs leading-5 text-slate-500">
-              Autenticação e dados protegidos
+              Empresas com dados reais
             </p>
           </div>
         ) : null}

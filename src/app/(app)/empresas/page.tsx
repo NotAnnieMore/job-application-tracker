@@ -1,83 +1,138 @@
-import { Building2, Globe2, MapPin, Plus } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  Building2,
+  ExternalLink,
+  Globe2,
+  MapPin,
+  Pencil,
+  Plus,
+} from "lucide-react";
+import Link from "next/link";
 
-import { DemoNotice } from "@/components/shared/demo-notice";
+import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
-import { Button } from "@/components/ui/button";
+import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
+import { getCompanies } from "@/features/companies/data";
+import type { WorkModeValue } from "@/types/database.types";
 
-const companies = [
-  {
-    name: "Coverflex",
-    sector: "Tecnologia financeira",
-    location: "Lisboa · Híbrido",
-    applications: 2,
-  },
-  {
-    name: "Feedzai",
-    sector: "Prevenção de fraude",
-    location: "Coimbra · Híbrido",
-    applications: 1,
-  },
-  {
-    name: "Sword Health",
-    sector: "Tecnologia de saúde",
-    location: "Porto · Remoto",
-    applications: 1,
-  },
-];
+const workModeLabels: Record<WorkModeValue, string> = {
+  remote: "Remoto",
+  hybrid: "Híbrido",
+  onsite: "Presencial",
+};
 
-export default function CompaniesPage() {
+const notices: Record<string, string> = {
+  "empresa-criada": "Empresa criada com sucesso.",
+  "empresa-atualizada": "Empresa atualizada com sucesso.",
+  "empresa-eliminada": "Empresa eliminada com sucesso.",
+};
+
+export default async function CompaniesPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ estado?: string | string[] }>;
+}) {
+  const companies = await getCompanies();
+  const status = (await searchParams).estado;
+  const notice = typeof status === "string" ? notices[status] : undefined;
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Empresas"
         description="Mantém o contexto das empresas associado às tuas oportunidades."
         action={
-          <Button>
+          <Link href="/empresas/nova" className={buttonClassName()}>
             <Plus aria-hidden="true" className="size-4" />
             Nova empresa
-          </Button>
+          </Link>
         }
       />
-      <DemoNotice />
-      <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-        {companies.map((company) => (
-          <Card
-            key={company.name}
-            className="transition hover:-translate-y-0.5 hover:shadow-md"
-          >
-            <CardContent>
-              <div className="flex items-start gap-3">
-                <span className="flex size-11 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                  <Building2 aria-hidden="true" className="size-5" />
-                </span>
-                <div>
-                  <h2 className="font-bold text-slate-950">{company.name}</h2>
-                  <p className="mt-1 text-sm text-slate-500">
-                    {company.sector}
-                  </p>
+
+      {notice ? (
+        <p
+          role="status"
+          className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700"
+        >
+          {notice}
+        </p>
+      ) : null}
+
+      {companies.length === 0 ? (
+        <EmptyState
+          icon={Building2}
+          title="Ainda não tens empresas"
+          description="Cria a primeira empresa para começares a associar vagas, recrutadores e candidaturas."
+          actionLabel="Criar primeira empresa"
+          actionHref="/empresas/nova"
+        />
+      ) : (
+        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          {companies.map((company) => (
+            <Card key={company.id} className="transition hover:shadow-md">
+              <CardContent>
+                <div className="flex items-start gap-3">
+                  <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
+                    <Building2 aria-hidden="true" className="size-5" />
+                  </span>
+                  <div className="min-w-0 flex-1">
+                    <h2 className="truncate font-bold text-slate-950">
+                      {company.name}
+                    </h2>
+                    <p className="mt-1 truncate text-sm text-slate-500">
+                      {company.industry || "Setor por definir"}
+                    </p>
+                  </div>
+                  <Link
+                    href={`/empresas/${company.id}/editar`}
+                    aria-label={`Editar ${company.name}`}
+                    className="flex size-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                  >
+                    <Pencil aria-hidden="true" className="size-4" />
+                  </Link>
                 </div>
-              </div>
-              <div className="mt-5 space-y-2 text-sm text-slate-600">
-                <p className="flex items-center gap-2">
-                  <MapPin
-                    aria-hidden="true"
-                    className="size-4 text-slate-400"
-                  />
-                  {company.location}
-                </p>
-                <p className="flex items-center gap-2">
-                  <Globe2
-                    aria-hidden="true"
-                    className="size-4 text-slate-400"
-                  />
-                  {company.applications} candidatura(s)
-                </p>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+                <div className="mt-5 space-y-2 text-sm text-slate-600">
+                  <p className="flex items-center gap-2">
+                    <MapPin
+                      aria-hidden="true"
+                      className="size-4 text-slate-400"
+                    />
+                    {company.location || "Localização por definir"}
+                    {company.workMode
+                      ? ` · ${workModeLabels[company.workMode]}`
+                      : ""}
+                  </p>
+                  <p className="flex items-center gap-2">
+                    <BriefcaseBusiness
+                      aria-hidden="true"
+                      className="size-4 text-slate-400"
+                    />
+                    {company.applicationCount} candidatura(s)
+                  </p>
+                  {company.website ? (
+                    <a
+                      href={company.website}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="flex items-center gap-2 font-medium text-blue-600 hover:text-blue-700"
+                    >
+                      <Globe2 aria-hidden="true" className="size-4" />
+                      Visitar website
+                      <ExternalLink aria-hidden="true" className="size-3.5" />
+                    </a>
+                  ) : null}
+                </div>
+                {company.notes ? (
+                  <p className="mt-4 border-t border-slate-100 pt-4 text-sm leading-6 text-slate-500">
+                    {company.notes}
+                  </p>
+                ) : null}
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
