@@ -2,9 +2,10 @@
 
 import { LoaderCircle, Save } from "lucide-react";
 import Link from "next/link";
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 
+import { CompanyLogoField } from "@/components/companies/company-logo-field";
 import { Button, buttonClassName } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FormField, fieldClassName } from "@/components/ui/form-field";
@@ -47,6 +48,8 @@ export function CompanyForm({
   submitLabel: string;
 }) {
   const [state, formAction] = useActionState(action, initialCompanyActionState);
+  const [companyName, setCompanyName] = useState(initialValues.name);
+  const [website, setWebsite] = useState(initialValues.website);
 
   return (
     <form action={formAction} className="space-y-6">
@@ -82,7 +85,8 @@ export function CompanyForm({
               name="name"
               type="text"
               autoComplete="organization"
-              defaultValue={initialValues.name}
+              value={companyName}
+              onChange={(event) => setCompanyName(event.target.value)}
               placeholder="Ex.: Motiva"
               className={fieldClassName}
               maxLength={160}
@@ -105,7 +109,8 @@ export function CompanyForm({
               type="text"
               inputMode="url"
               autoComplete="url"
-              defaultValue={initialValues.website}
+              value={website}
+              onChange={(event) => setWebsite(event.target.value)}
               placeholder="empresa.pt"
               className={fieldClassName}
               maxLength={500}
@@ -117,6 +122,13 @@ export function CompanyForm({
               }
             />
           </FormField>
+          <CompanyLogoField
+            companyName={companyName}
+            website={website}
+            onWebsiteChange={setWebsite}
+            initialLogoUrl={initialValues.logoUrl}
+            error={state.fieldErrors?.logoUrl}
+          />
           <FormField
             label="Localização"
             htmlFor="company-location"

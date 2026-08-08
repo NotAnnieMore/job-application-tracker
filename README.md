@@ -44,6 +44,11 @@ O Node.js disponível por defeito no computador durante a criação do projeto e
 
 2. Copiar `.env.example` para `.env.local` e preencher a URL e a publishable key do projeto Supabase.
 
+   Para ativar a pesquisa assistida de logótipos, criar uma conta gratuita no
+   Brandfetch e preencher também `BRANDFETCH_CLIENT_ID`. Sem esta variável, é
+   possível continuar a usar as iniciais ou introduzir um URL de imagem
+   manualmente.
+
 3. Iniciar o servidor de desenvolvimento:
 
    ```bash

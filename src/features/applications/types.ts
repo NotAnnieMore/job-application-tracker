@@ -64,7 +64,7 @@ export type ApplicationListItem = {
   title: string;
   companyId: string;
   companyName: string;
-  companyInitial: string;
+  companyLogoUrl: string;
   status: ApplicationStatusValue;
   applicationDate: string;
   location: string;

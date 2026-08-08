@@ -33,6 +33,7 @@ export type CompanyRow = {
   user_id: string;
   name: string;
   website: string | null;
+  logo_url: string | null;
   location: string | null;
   industry: string | null;
   work_mode: WorkModeValue | null;
@@ -46,6 +47,7 @@ export type CompanyInsert = {
   user_id: string;
   name: string;
   website?: string | null;
+  logo_url?: string | null;
   location?: string | null;
   industry?: string | null;
   work_mode?: WorkModeValue | null;

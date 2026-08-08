@@ -26,9 +26,29 @@ function normalizeWebsite(value: string) {
   }
 }
 
+function normalizeLogoUrl(value: string) {
+  if (!value) return { logoUrl: "" };
+
+  try {
+    const url = new URL(value);
+
+    if (!url.hostname || url.protocol !== "https:") {
+      return {
+        logoUrl: "",
+        error: "O endereço do logótipo tem de começar por https://.",
+      };
+    }
+
+    return { logoUrl: url.toString() };
+  } catch {
+    return { logoUrl: "", error: "Introduz um endereço de imagem válido." };
+  }
+}
+
 export function validateCompanyForm(formData: FormData) {
   const name = readText(formData, "name");
   const rawWebsite = readText(formData, "website");
+  const rawLogoUrl = readText(formData, "logoUrl");
   const location = readText(formData, "location");
   const industry = readText(formData, "industry");
   const rawWorkMode = readText(formData, "workMode");
@@ -46,6 +66,13 @@ export function validateCompanyForm(formData: FormData) {
     fieldErrors.website = "O endereço pode ter no máximo 500 caracteres.";
   } else if (websiteError) {
     fieldErrors.website = websiteError;
+  }
+
+  const { logoUrl, error: logoUrlError } = normalizeLogoUrl(rawLogoUrl);
+  if (rawLogoUrl.length > 1000) {
+    fieldErrors.logoUrl = "O endereço pode ter no máximo 1000 caracteres.";
+  } else if (logoUrlError) {
+    fieldErrors.logoUrl = logoUrlError;
   }
 
   if (location.length > 160) {
@@ -73,6 +100,7 @@ export function validateCompanyForm(formData: FormData) {
     values: {
       name,
       website: website || null,
+      logo_url: logoUrl || null,
       location: location || null,
       industry: industry || null,
       work_mode: workMode,

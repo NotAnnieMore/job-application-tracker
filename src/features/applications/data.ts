@@ -10,15 +10,6 @@ import { isValidApplicationId } from "@/features/applications/validation";
 import { requireCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 
-function companyInitial(name: string) {
-  return name
-    .split(/\s+/)
-    .filter(Boolean)
-    .slice(0, 2)
-    .map((part) => part[0]?.toUpperCase())
-    .join("");
-}
-
 function normalizeSearch(value: string) {
   return value
     .normalize("NFD")
@@ -60,7 +51,10 @@ export async function getApplications(
       .from("opportunities")
       .select("id, company_id, title, location, work_mode")
       .eq("user_id", user.id),
-    supabase.from("companies").select("id, name").eq("user_id", user.id),
+    supabase
+      .from("companies")
+      .select("id, name, logo_url")
+      .eq("user_id", user.id),
     supabase.from("recruiters").select("id, name").eq("user_id", user.id),
   ]);
 
@@ -101,7 +95,7 @@ export async function getApplications(
         title: opportunity.title,
         companyId: company.id,
         companyName: company.name,
-        companyInitial: companyInitial(company.name),
+        companyLogoUrl: company.logo_url ?? "",
         status: application.status,
         applicationDate: application.application_date,
         location: opportunity.location ?? "",

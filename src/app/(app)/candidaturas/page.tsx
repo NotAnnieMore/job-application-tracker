@@ -3,6 +3,7 @@ import Link from "next/link";
 
 import { ApplicationStatusBadge } from "@/components/applications/application-status-badge";
 import { AutoSubmitSelect } from "@/components/applications/auto-submit-select";
+import { CompanyLogo } from "@/components/companies/company-logo";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { buttonClassName } from "@/components/ui/button";
@@ -271,9 +272,11 @@ export default async function ApplicationsPage({
                     </td>
                     <td className="px-4 py-4">
                       <span className="flex items-center gap-2.5 font-medium text-slate-700">
-                        <span className="flex size-8 items-center justify-center rounded-lg bg-blue-600 text-[10px] font-bold text-white">
-                          {application.companyInitial}
-                        </span>
+                        <CompanyLogo
+                          name={application.companyName}
+                          logoUrl={application.companyLogoUrl}
+                          size="sm"
+                        />
                         <span>
                           {application.companyName}
                           {application.recruiterName ? (
@@ -319,16 +322,23 @@ export default async function ApplicationsPage({
             {applications.map((application) => (
               <article key={application.id} className="p-4">
                 <div className="flex items-start justify-between gap-3">
-                  <div className="min-w-0">
-                    <Link
-                      href={`/candidaturas/${application.id}/editar`}
-                      className="font-semibold text-slate-950 hover:text-blue-700"
-                    >
-                      {application.title}
-                    </Link>
-                    <p className="mt-1 text-sm text-slate-500">
-                      {application.companyName}
-                    </p>
+                  <div className="flex min-w-0 gap-3">
+                    <CompanyLogo
+                      name={application.companyName}
+                      logoUrl={application.companyLogoUrl}
+                      size="sm"
+                    />
+                    <div className="min-w-0">
+                      <Link
+                        href={`/candidaturas/${application.id}/editar`}
+                        className="font-semibold text-slate-950 hover:text-blue-700"
+                      >
+                        {application.title}
+                      </Link>
+                      <p className="mt-1 text-sm text-slate-500">
+                        {application.companyName}
+                      </p>
+                    </div>
                   </div>
                   <ApplicationStatusBadge status={application.status} />
                 </div>

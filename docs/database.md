@@ -90,6 +90,18 @@ Na Fase 5, a página `/empresas` passou a consultar dados reais. A integração 
 
 Os fluxos foram testados no browser com uma conta real, incluindo criação, edição, rejeição de duplicados e eliminação.
 
+### Identidade visual das empresas
+
+`companies.logo_url` guarda opcionalmente um endereço HTTPS para o logótipo. A
+interface tenta mostrar essa imagem e regressa sempre às iniciais da empresa se
+o campo estiver vazio ou se a imagem falhar. O endereço pode ser introduzido
+manualmente ou escolhido nos resultados da pesquisa assistida do Brandfetch.
+
+A pesquisa é feita por uma Route Handler autenticada, para que apenas
+utilizadores com sessão possam consultar o serviço a partir da aplicação. O
+Client ID fica configurado em `BRANDFETCH_CLIENT_ID`; sem essa variável, o URL
+manual e as iniciais continuam disponíveis.
+
 ## Integração de vagas e candidaturas
 
 Na Fase 5, `/candidaturas` e o respetivo formulário passaram a usar dados reais. O fluxo inclui:
@@ -119,6 +131,11 @@ A migração `20260808160000_add_application_transactions.sql` também garante q
 A migração inicial e estas verificações foram executadas com sucesso no projeto Supabase em 2 de agosto de 2026.
 
 A publishable key da aplicação não permite alterações de estrutura, por isso a migração deve ser executada no SQL Editor ou, futuramente, através da Supabase CLI autenticada.
+
+Depois da configuração inicial, as alterações seguintes devem ser aplicadas
+pela ordem do nome do ficheiro. Para a identidade visual das empresas, executar
+`supabase/migrations/20260808190000_add_company_logos.sql` e validar com
+`supabase/tests/company_logos_catalog_checks.sql`.
 
 ## Dados de demonstração
 

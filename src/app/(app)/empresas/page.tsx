@@ -9,6 +9,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 
+import { CompanyLogo } from "@/components/companies/company-logo";
 import { EmptyState } from "@/components/shared/empty-state";
 import { PageHeader } from "@/components/shared/page-header";
 import { buttonClassName } from "@/components/ui/button";
@@ -73,9 +74,7 @@ export default async function CompaniesPage({
             <Card key={company.id} className="transition hover:shadow-md">
               <CardContent>
                 <div className="flex items-start gap-3">
-                  <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
-                    <Building2 aria-hidden="true" className="size-5" />
-                  </span>
+                  <CompanyLogo name={company.name} logoUrl={company.logoUrl} />
                   <div className="min-w-0 flex-1">
                     <h2 className="truncate font-bold text-slate-950">
                       {company.name}

@@ -1,7 +1,13 @@
 import type { WorkModeValue } from "@/types/database.types";
 
 export type CompanyField =
-  "name" | "website" | "location" | "industry" | "workMode" | "notes";
+  | "name"
+  | "website"
+  | "logoUrl"
+  | "location"
+  | "industry"
+  | "workMode"
+  | "notes";
 
 export type CompanyActionState = {
   status: "idle" | "error";
@@ -12,6 +18,7 @@ export type CompanyActionState = {
 export type CompanyFormValues = {
   name: string;
   website: string;
+  logoUrl: string;
   location: string;
   industry: string;
   workMode: WorkModeValue | "";
@@ -34,6 +41,7 @@ export const initialCompanyActionState: CompanyActionState = {
 export const emptyCompanyFormValues: CompanyFormValues = {
   name: "",
   website: "",
+  logoUrl: "",
   location: "",
   industry: "",
   workMode: "",

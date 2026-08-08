@@ -16,6 +16,7 @@ function toCompanyValues(company: CompanyRow): CompanyFormValues {
   return {
     name: company.name,
     website: company.website ?? "",
+    logoUrl: company.logo_url ?? "",
     location: company.location ?? "",
     industry: company.industry ?? "",
     workMode: company.work_mode ?? "",
@@ -31,7 +32,7 @@ export async function getCompanies(): Promise<CompanyListItem[]> {
       supabase
         .from("companies")
         .select(
-          "id, user_id, name, website, location, industry, work_mode, notes, created_at, updated_at",
+          "id, user_id, name, website, logo_url, location, industry, work_mode, notes, created_at, updated_at",
         )
         .eq("user_id", user.id)
         .order("name", { ascending: true }),
@@ -88,7 +89,7 @@ export async function getCompanyById(
   const { data, error } = await supabase
     .from("companies")
     .select(
-      "id, user_id, name, website, location, industry, work_mode, notes, created_at, updated_at",
+      "id, user_id, name, website, logo_url, location, industry, work_mode, notes, created_at, updated_at",
     )
     .eq("id", companyId)
     .eq("user_id", user.id)
