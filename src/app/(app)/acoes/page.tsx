@@ -4,7 +4,7 @@ import { DemoNotice } from "@/components/shared/demo-notice";
 import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { nextActions } from "@/features/dashboard/mock-data";
+import { nextActions } from "@/features/actions/mock-data";
 import { cn } from "@/lib/utils";
 
 export default function ActionsPage() {

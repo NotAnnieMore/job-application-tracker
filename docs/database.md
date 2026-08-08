@@ -125,6 +125,22 @@ As operações que abrangem as duas tabelas usam funções PostgreSQL transacion
 
 A migração `20260808160000_add_application_transactions.sql` também garante que uma oportunidade só pode ter uma candidatura por utilizador. O catálogo e as permissões das três funções foram validados com `application_transactions_catalog_checks.sql`.
 
+## Dashboard com dados reais
+
+As rotas `/` e `/dashboard` usam uma camada de consulta executada apenas no
+servidor. Empresas, vagas e candidaturas são pedidas em paralelo e limitadas ao
+utilizador autenticado. A aplicação deriva desses registos:
+
+- totais de candidaturas, empresas e processos ativos;
+- candidaturas criadas nos últimos 30 dias;
+- follow-ups em atraso e previstos para os sete dias seguintes;
+- candidaturas mais recentes;
+- distribuição pelos estados do processo.
+
+As datas de referência são calculadas no fuso horário `Europe/Lisbon`. Estados
+`rejected` e `withdrawn` não contam como processos ativos, nem geram follow-ups
+pendentes no dashboard.
+
 ## Aplicar no Supabase
 
 1. Abrir o projeto no Supabase.

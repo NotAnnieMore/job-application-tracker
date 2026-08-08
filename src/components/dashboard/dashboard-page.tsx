@@ -1,64 +1,65 @@
 import {
   ArrowRight,
-  CalendarDays,
-  Check,
+  BriefcaseBusiness,
+  Building2,
+  CalendarClock,
   ChevronRight,
-  CircleDollarSign,
   Clock3,
   FileText,
-  Gift,
-  MoreHorizontal,
+  Inbox,
   Plus,
 } from "lucide-react";
 import Link from "next/link";
 
 import { ApplicationStatusBadge } from "@/components/applications/application-status-badge";
+import { CompanyLogo } from "@/components/companies/company-logo";
 import { PageHeader } from "@/components/shared/page-header";
-import { Badge } from "@/components/ui/badge";
+import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import {
-  nextActions,
-  recentActivity,
-  recentApplications,
-  statusSummary,
-  upcomingInterviews,
-} from "@/features/dashboard/mock-data";
+import { workModeLabels } from "@/features/applications/constants";
+import { getDashboardData } from "@/features/dashboard/data";
+import type { DashboardFollowUp } from "@/features/dashboard/types";
 import { cn } from "@/lib/utils";
+import type { ApplicationStatusValue } from "@/types/database.types";
 
-const stats = [
-  {
-    label: "Total de candidaturas",
-    value: "28",
-    change: "+5 desde o mês passado",
-    icon: FileText,
-    iconClass: "bg-blue-50 text-blue-600",
-    changeClass: "text-emerald-600",
-  },
-  {
-    label: "Entrevistas agendadas",
-    value: "4",
-    change: "+2 desde o mês passado",
-    icon: CalendarDays,
-    iconClass: "bg-emerald-50 text-emerald-600",
-    changeClass: "text-emerald-600",
-  },
-  {
-    label: "Follow-ups em atraso",
-    value: "3",
-    change: "+1 desde ontem",
-    icon: Clock3,
-    iconClass: "bg-amber-50 text-amber-600",
-    changeClass: "text-amber-600",
-  },
-  {
-    label: "Propostas recebidas",
-    value: "1",
-    change: "Igual ao mês passado",
-    icon: Gift,
-    iconClass: "bg-purple-50 text-purple-600",
-    changeClass: "text-slate-500",
-  },
-];
+const statusBarClasses: Record<ApplicationStatusValue, string> = {
+  interested: "bg-slate-400",
+  applied: "bg-blue-500",
+  interview_scheduled: "bg-violet-500",
+  interview_completed: "bg-purple-500",
+  awaiting_response: "bg-amber-400",
+  offer_received: "bg-emerald-500",
+  rejected: "bg-red-500",
+  withdrawn: "bg-slate-600",
+};
+
+function formatDate(value: string) {
+  return new Intl.DateTimeFormat("pt-PT", {
+    day: "2-digit",
+    month: "2-digit",
+    year: "numeric",
+    timeZone: "UTC",
+  }).format(new Date(`${value}T00:00:00Z`));
+}
+
+function dayDifference(left: string, right: string) {
+  const leftDate = new Date(`${left}T00:00:00Z`).getTime();
+  const rightDate = new Date(`${right}T00:00:00Z`).getTime();
+  return Math.round((leftDate - rightDate) / 86_400_000);
+}
+
+function followUpLabel(followUp: DashboardFollowUp, today: string) {
+  const difference = dayDifference(followUp.followUpDate, today);
+
+  if (difference === 0) return "Hoje";
+  if (difference === 1) return "Amanhã";
+  if (difference < 0) {
+    const days = Math.abs(difference);
+    return `Em atraso há ${days} dia${days === 1 ? "" : "s"}`;
+  }
+
+  return formatDate(followUp.followUpDate);
+}
 
 function SectionLink({
   href,
@@ -78,29 +79,54 @@ function SectionLink({
   );
 }
 
-export function DashboardPage() {
+export async function DashboardPage() {
+  const data = await getDashboardData();
+  const stats = [
+    {
+      label: "Total de candidaturas",
+      value: data.stats.totalApplications,
+      detail: `${data.stats.applicationsLast30Days} nos últimos 30 dias`,
+      icon: FileText,
+      iconClass: "bg-blue-50 text-blue-600",
+    },
+    {
+      label: "Candidaturas ativas",
+      value: data.stats.activeApplications,
+      detail: `${data.stats.interviewApplications} em fase de entrevista`,
+      icon: BriefcaseBusiness,
+      iconClass: "bg-violet-50 text-violet-600",
+    },
+    {
+      label: "Follow-ups em atraso",
+      value: data.stats.overdueFollowUps,
+      detail: `${data.stats.upcomingFollowUps} até aos próximos 7 dias`,
+      icon: Clock3,
+      iconClass:
+        data.stats.overdueFollowUps > 0
+          ? "bg-amber-50 text-amber-600"
+          : "bg-emerald-50 text-emerald-600",
+    },
+    {
+      label: "Empresas",
+      value: data.stats.totalCompanies,
+      detail: `${data.stats.companiesWithApplications} com candidatura`,
+      icon: Building2,
+      iconClass: "bg-cyan-50 text-cyan-700",
+    },
+  ];
+
   return (
     <div className="space-y-6">
       <PageHeader
         title="Dashboard"
         description="Acompanha o progresso e as próximas prioridades da tua procura de emprego."
         action={
-          <Link
-            href="/candidaturas/nova"
-            className="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
-          >
+          <Link href="/candidaturas/nova" className={buttonClassName()}>
             <Plus aria-hidden="true" className="size-4" />
             Nova candidatura
           </Link>
         }
       />
-
-      <div className="flex items-center gap-2">
-        <Badge variant="blue">Dados de demonstração</Badge>
-        <span className="text-xs text-slate-500">
-          Serão substituídos por dados do Supabase nas próximas fases.
-        </span>
-      </div>
 
       <section
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
@@ -125,10 +151,8 @@ export function DashboardPage() {
                   <p className="mt-1 text-3xl font-bold tracking-tight text-slate-950">
                     {stat.value}
                   </p>
-                  <p
-                    className={cn("mt-1 text-xs font-medium", stat.changeClass)}
-                  >
-                    {stat.change}
+                  <p className="mt-1 text-xs font-medium text-slate-500">
+                    {stat.detail}
                   </p>
                 </div>
               </div>
@@ -144,265 +168,288 @@ export function DashboardPage() {
             <SectionLink href="/candidaturas" />
           </CardHeader>
 
-          <div className="hidden overflow-x-auto md:block">
-            <table className="w-full border-collapse text-left text-sm">
-              <caption className="sr-only">
-                Lista das candidaturas mais recentes
-              </caption>
-              <thead>
-                <tr className="border-b border-slate-100 bg-slate-50/70 text-xs font-semibold text-slate-500">
-                  <th className="px-5 py-3">Vaga</th>
-                  <th className="px-4 py-3">Empresa</th>
-                  <th className="px-4 py-3">Estado</th>
-                  <th className="px-4 py-3">Data</th>
-                  <th className="px-4 py-3">Próxima ação</th>
-                  <th className="w-12 px-3 py-3">
-                    <span className="sr-only">Ações</span>
-                  </th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-100">
-                {recentApplications.map((application) => (
-                  <tr
-                    key={application.id}
-                    className="transition-colors hover:bg-slate-50/60"
-                  >
-                    <td className="px-5 py-3 font-semibold text-slate-900">
-                      {application.role}
-                    </td>
-                    <td className="px-4 py-3">
-                      <span className="flex items-center gap-2.5 font-medium text-slate-700">
-                        <span
-                          className={cn(
-                            "flex size-7 items-center justify-center rounded-lg text-[10px] font-bold text-white",
-                            application.companyColor,
-                          )}
-                        >
-                          {application.companyInitial}
-                        </span>
-                        {application.company}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      <ApplicationStatusBadge status={application.status} />
-                    </td>
-                    <td className="px-4 py-3 text-slate-600">
-                      {application.applicationDate}
-                    </td>
-                    <td className="px-4 py-3">
-                      <p className="font-medium text-slate-700">
-                        {application.nextAction}
-                      </p>
-                      {application.actionDate ? (
-                        <p className="mt-0.5 text-xs text-slate-500">
-                          {application.actionDate}
-                        </p>
-                      ) : null}
-                    </td>
-                    <td className="px-3 py-3">
-                      <button
-                        type="button"
-                        className="rounded-lg p-2 text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
-                        aria-label={`Ações para ${application.role}`}
+          {data.recentApplications.length === 0 ? (
+            <div className="flex min-h-72 flex-col items-center justify-center px-6 text-center">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
+                <Inbox aria-hidden="true" className="size-5" />
+              </span>
+              <p className="mt-3 font-semibold text-slate-900">
+                Ainda não existem candidaturas
+              </p>
+              <p className="mt-1 max-w-sm text-sm leading-6 text-slate-500">
+                Quando adicionares a primeira candidatura, o progresso aparece
+                aqui automaticamente.
+              </p>
+            </div>
+          ) : (
+            <>
+              <div className="hidden overflow-x-auto md:block">
+                <table className="w-full border-collapse text-left text-sm">
+                  <caption className="sr-only">
+                    Lista das candidaturas mais recentes
+                  </caption>
+                  <thead>
+                    <tr className="border-b border-slate-100 bg-slate-50/70 text-xs font-semibold text-slate-500">
+                      <th className="px-5 py-3">Vaga</th>
+                      <th className="px-4 py-3">Empresa</th>
+                      <th className="px-4 py-3">Estado</th>
+                      <th className="px-4 py-3">Data</th>
+                      <th className="px-4 py-3">Próxima ação</th>
+                      <th className="w-12 px-3 py-3">
+                        <span className="sr-only">Abrir</span>
+                      </th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-slate-100">
+                    {data.recentApplications.map((application) => (
+                      <tr
+                        key={application.id}
+                        className="transition-colors hover:bg-slate-50/60"
                       >
-                        <MoreHorizontal aria-hidden="true" className="size-4" />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                        <td className="px-5 py-4">
+                          <Link
+                            href={`/candidaturas/${application.id}/editar`}
+                            className="font-semibold text-slate-950 hover:text-blue-700"
+                          >
+                            {application.title}
+                          </Link>
+                          {application.location || application.workMode ? (
+                            <p className="mt-1 text-xs text-slate-500">
+                              {[
+                                application.location,
+                                application.workMode
+                                  ? workModeLabels[application.workMode]
+                                  : "",
+                              ]
+                                .filter(Boolean)
+                                .join(" · ")}
+                            </p>
+                          ) : null}
+                        </td>
+                        <td className="px-4 py-4">
+                          <span className="flex items-center gap-2.5 font-medium text-slate-700">
+                            <CompanyLogo
+                              name={application.companyName}
+                              logoUrl={application.companyLogoUrl}
+                              size="sm"
+                            />
+                            <span className="max-w-36 truncate">
+                              {application.companyName}
+                            </span>
+                          </span>
+                        </td>
+                        <td className="px-4 py-4">
+                          <ApplicationStatusBadge status={application.status} />
+                        </td>
+                        <td className="px-4 py-4 whitespace-nowrap text-slate-600">
+                          {formatDate(application.applicationDate)}
+                        </td>
+                        <td className="px-4 py-4">
+                          <p className="max-w-44 truncate font-medium text-slate-700">
+                            {application.nextActionSummary ||
+                              "Sem próxima ação"}
+                          </p>
+                          {application.followUpDate ? (
+                            <p className="mt-0.5 text-xs text-slate-500">
+                              {formatDate(application.followUpDate)}
+                            </p>
+                          ) : null}
+                        </td>
+                        <td className="px-3 py-4">
+                          <Link
+                            href={`/candidaturas/${application.id}/editar`}
+                            aria-label={`Abrir candidatura a ${application.title}`}
+                            className="flex size-9 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+                          >
+                            <ChevronRight
+                              aria-hidden="true"
+                              className="size-4"
+                            />
+                          </Link>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
 
-          <div className="divide-y divide-slate-100 md:hidden">
-            {recentApplications.map((application) => (
-              <article key={application.id} className="space-y-3 p-5">
-                <div className="flex items-start justify-between gap-3">
-                  <div>
-                    <h3 className="font-semibold text-slate-950">
-                      {application.role}
-                    </h3>
-                    <p className="mt-1 text-sm text-slate-500">
-                      {application.company}
-                    </p>
-                  </div>
-                  <ApplicationStatusBadge status={application.status} />
-                </div>
-                <div className="flex justify-between gap-4 text-xs text-slate-500">
-                  <span>{application.applicationDate}</span>
-                  <span>{application.nextAction}</span>
-                </div>
-              </article>
-            ))}
-          </div>
+              <div className="divide-y divide-slate-100 md:hidden">
+                {data.recentApplications.map((application) => (
+                  <article key={application.id} className="p-4">
+                    <div className="flex items-start gap-3">
+                      <CompanyLogo
+                        name={application.companyName}
+                        logoUrl={application.companyLogoUrl}
+                        size="sm"
+                      />
+                      <div className="min-w-0 flex-1">
+                        <Link
+                          href={`/candidaturas/${application.id}/editar`}
+                          className="font-semibold text-slate-950 hover:text-blue-700"
+                        >
+                          {application.title}
+                        </Link>
+                        <p className="mt-1 truncate text-sm text-slate-500">
+                          {application.companyName}
+                        </p>
+                      </div>
+                      <ApplicationStatusBadge status={application.status} />
+                    </div>
+                    <div className="mt-4 flex justify-between gap-4 text-xs text-slate-500">
+                      <span>{formatDate(application.applicationDate)}</span>
+                      <span className="truncate text-right">
+                        {application.nextActionSummary || "Sem próxima ação"}
+                      </span>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </>
+          )}
         </Card>
 
-        <Card>
+        <Card className="overflow-hidden">
           <CardHeader>
-            <h2 className="font-bold text-slate-950">Próximas entrevistas</h2>
-            <SectionLink href="/entrevistas" />
+            <h2 className="font-bold text-slate-950">Follow-ups</h2>
+            <SectionLink
+              href="/candidaturas?ordem=follow_up"
+              label="Ordenar todos"
+            />
           </CardHeader>
-          <div className="divide-y divide-slate-100">
-            {upcomingInterviews.map((interview) => (
-              <div
-                key={interview.id}
-                className="flex items-center gap-3 px-5 py-4"
-              >
-                <div className="flex size-12 shrink-0 flex-col items-center justify-center rounded-xl border border-slate-200 bg-slate-50">
-                  <span className="text-base font-bold leading-none text-slate-950">
-                    {interview.day}
-                  </span>
-                  <span className="mt-1 text-[9px] font-bold tracking-wide text-slate-500">
-                    {interview.month}
-                  </span>
-                </div>
-                <span
-                  className={cn(
-                    "flex size-9 shrink-0 items-center justify-center rounded-lg text-xs font-bold text-white",
-                    interview.companyColor,
-                  )}
+          {data.followUps.length === 0 ? (
+            <div className="flex min-h-72 flex-col items-center justify-center px-6 text-center">
+              <span className="flex size-11 items-center justify-center rounded-2xl bg-emerald-50 text-emerald-600">
+                <CalendarClock aria-hidden="true" className="size-5" />
+              </span>
+              <p className="mt-3 font-semibold text-slate-900">
+                Nenhum follow-up pendente
+              </p>
+              <p className="mt-1 text-sm leading-6 text-slate-500">
+                As datas definidas nas candidaturas irão aparecer aqui.
+              </p>
+            </div>
+          ) : (
+            <div className="divide-y divide-slate-100">
+              {data.followUps.map((followUp) => (
+                <Link
+                  key={followUp.id}
+                  href={`/candidaturas/${followUp.id}/editar`}
+                  className="flex items-center gap-3 px-5 py-4 transition hover:bg-slate-50"
                 >
-                  {interview.companyInitial}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="truncate text-sm font-semibold text-slate-950">
-                    {interview.role}
-                  </p>
-                  <p className="truncate text-xs text-slate-500">
-                    {interview.company}
-                  </p>
-                </div>
-                <span className="text-sm font-medium text-slate-600">
-                  {interview.time}
-                </span>
-                <ChevronRight
-                  aria-hidden="true"
-                  className="size-4 text-slate-400"
-                />
-              </div>
-            ))}
-          </div>
+                  <CompanyLogo
+                    name={followUp.companyName}
+                    logoUrl={followUp.companyLogoUrl}
+                    size="md"
+                  />
+                  <span className="min-w-0 flex-1">
+                    <span className="block truncate text-sm font-semibold text-slate-950">
+                      {followUp.nextActionSummary || "Rever candidatura"}
+                    </span>
+                    <span className="mt-0.5 block truncate text-xs text-slate-500">
+                      {followUp.title} · {followUp.companyName}
+                    </span>
+                  </span>
+                  <span
+                    className={cn(
+                      "shrink-0 text-xs font-semibold",
+                      followUp.timing === "overdue"
+                        ? "text-red-600"
+                        : followUp.timing === "today"
+                          ? "text-amber-600"
+                          : "text-slate-500",
+                    )}
+                  >
+                    {followUpLabel(followUp, data.today)}
+                  </span>
+                </Link>
+              ))}
+            </div>
+          )}
         </Card>
       </div>
 
-      <div className="grid gap-6 xl:grid-cols-3">
+      <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)]">
         <Card>
           <CardHeader>
             <h2 className="font-bold text-slate-950">
               Candidaturas por estado
             </h2>
-            <SectionLink href="/dashboard" label="Ver relatório" />
+            <SectionLink href="/candidaturas" label="Abrir candidaturas" />
           </CardHeader>
-          <CardContent className="space-y-4">
-            {statusSummary.map((status) => (
-              <div key={status.label}>
-                <div className="mb-2 flex items-center justify-between text-sm">
-                  <span className="font-medium text-slate-600">
-                    {status.label}
-                  </span>
-                  <span className="font-bold text-slate-900">
-                    {status.value}
-                  </span>
-                </div>
-                <div className="h-2 overflow-hidden rounded-full bg-slate-100">
-                  <div
-                    className={cn("h-full rounded-full", status.color)}
-                    style={{ width: `${status.percentage}%` }}
-                  />
-                </div>
+          <CardContent>
+            {data.statusSummary.length === 0 ? (
+              <p className="py-8 text-center text-sm text-slate-500">
+                A distribuição aparece depois da primeira candidatura.
+              </p>
+            ) : (
+              <div className="grid gap-x-8 gap-y-5 md:grid-cols-2">
+                {data.statusSummary.map((status) => (
+                  <div key={status.status}>
+                    <div className="mb-2 flex items-center justify-between gap-3 text-sm">
+                      <span className="font-medium text-slate-600">
+                        {status.label}
+                      </span>
+                      <span className="font-bold text-slate-900">
+                        {status.value}
+                        <span className="ml-1 font-normal text-slate-400">
+                          ({status.percentage}%)
+                        </span>
+                      </span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-slate-100">
+                      <div
+                        className={cn(
+                          "h-full rounded-full",
+                          statusBarClasses[status.status],
+                        )}
+                        style={{ width: `${status.percentage}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            )}
           </CardContent>
         </Card>
 
         <Card>
           <CardHeader>
-            <h2 className="font-bold text-slate-950">Próximas ações</h2>
-            <SectionLink href="/acoes" />
+            <h2 className="font-bold text-slate-950">Acesso rápido</h2>
           </CardHeader>
-          <CardContent className="space-y-1 p-3">
-            {nextActions.map((action) => (
-              <div
-                key={action.id}
-                className="flex items-start gap-3 rounded-xl px-2 py-3 hover:bg-slate-50"
-              >
-                <span
-                  className={cn(
-                    "mt-0.5 flex size-5 shrink-0 items-center justify-center rounded-md border",
-                    action.completed
-                      ? "border-emerald-500 bg-emerald-500 text-white"
-                      : "border-slate-300 bg-white",
-                  )}
-                >
-                  {action.completed ? (
-                    <Check aria-hidden="true" className="size-3" />
-                  ) : null}
-                </span>
-                <p
-                  className={cn(
-                    "min-w-0 flex-1 text-sm font-medium",
-                    action.completed
-                      ? "text-slate-400 line-through"
-                      : "text-slate-700",
-                  )}
-                >
-                  {action.label}
-                </p>
-                <span
-                  className={cn(
-                    "shrink-0 text-xs font-semibold",
-                    action.urgent
-                      ? "text-red-600"
-                      : action.completed
-                        ? "text-emerald-600"
-                        : "text-slate-500",
-                  )}
-                >
-                  {action.date}
-                </span>
-              </div>
-            ))}
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardHeader>
-            <h2 className="font-bold text-slate-950">Atividade recente</h2>
-          </CardHeader>
-          <CardContent className="space-y-5">
-            {recentActivity.map((activity) => (
-              <div key={activity.id} className="flex gap-3">
-                <span
-                  className={cn(
-                    "flex size-9 shrink-0 items-center justify-center rounded-xl",
-                    activity.type === "interview"
-                      ? "bg-emerald-50 text-emerald-600"
-                      : activity.type === "follow-up"
-                        ? "bg-amber-50 text-amber-600"
-                        : "bg-blue-50 text-blue-600",
-                  )}
-                >
-                  {activity.type === "interview" ? (
-                    <CalendarDays aria-hidden="true" className="size-4" />
-                  ) : activity.type === "follow-up" ? (
-                    <CircleDollarSign aria-hidden="true" className="size-4" />
-                  ) : (
-                    <FileText aria-hidden="true" className="size-4" />
-                  )}
-                </span>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-semibold text-slate-800">
-                    {activity.title}
-                  </p>
-                  <p className="mt-0.5 text-xs text-slate-500">
-                    {activity.detail}
-                  </p>
-                </div>
-                <span className="shrink-0 text-xs text-slate-400">
-                  {activity.relativeTime}
-                </span>
-              </div>
-            ))}
+          <CardContent className="space-y-2">
+            <Link
+              href="/candidaturas/nova"
+              className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50/50 hover:text-blue-700"
+            >
+              <Plus aria-hidden="true" className="size-4" />
+              Registar candidatura
+              <ChevronRight
+                aria-hidden="true"
+                className="ml-auto size-4 text-slate-400"
+              />
+            </Link>
+            <Link
+              href="/candidaturas?ordem=follow_up"
+              className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50/50 hover:text-blue-700"
+            >
+              <CalendarClock aria-hidden="true" className="size-4" />
+              Consultar follow-ups
+              <ChevronRight
+                aria-hidden="true"
+                className="ml-auto size-4 text-slate-400"
+              />
+            </Link>
+            <Link
+              href="/empresas"
+              className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50/50 hover:text-blue-700"
+            >
+              <Building2 aria-hidden="true" className="size-4" />
+              Consultar empresas
+              <ChevronRight
+                aria-hidden="true"
+                className="ml-auto size-4 text-slate-400"
+              />
+            </Link>
           </CardContent>
         </Card>
       </div>

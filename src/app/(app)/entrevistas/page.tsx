@@ -5,7 +5,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
-import { upcomingInterviews } from "@/features/dashboard/mock-data";
+import { upcomingInterviews } from "@/features/interviews/mock-data";
 
 export default function InterviewsPage() {
   return (
