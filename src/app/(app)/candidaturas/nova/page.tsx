@@ -35,6 +35,7 @@ export default async function NewApplicationPage() {
         recruiters={recruiters}
         initialValues={createEmptyApplicationFormValues()}
         submitLabel="Guardar candidatura"
+        useBrowserDateDefault
       />
     </div>
   );

@@ -2,7 +2,7 @@
 
 import { ExternalLink, LoaderCircle, Plus, Save } from "lucide-react";
 import Link from "next/link";
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { QuickCompanyModal } from "@/components/companies/quick-company-modal";
@@ -29,6 +29,14 @@ type ApplicationFormAction = (
 const textareaClassName =
   "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-3 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-50";
 
+function formatLocalDateForInput(date: Date) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  const day = String(date.getDate()).padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+}
+
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
 
@@ -51,6 +59,7 @@ export function ApplicationForm({
   initialValues,
   submitLabel,
   cancelHref = "/candidaturas",
+  useBrowserDateDefault = false,
 }: {
   action: ApplicationFormAction;
   companies: CompanyOption[];
@@ -58,6 +67,7 @@ export function ApplicationForm({
   initialValues: ApplicationFormValues;
   submitLabel: string;
   cancelHref?: string;
+  useBrowserDateDefault?: boolean;
 }) {
   const [state, formAction] = useActionState(
     action,
@@ -71,6 +81,14 @@ export function ApplicationForm({
   const [selectedRecruiterId, setSelectedRecruiterId] = useState(
     initialValues.primaryRecruiterId,
   );
+  const applicationDateRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (useBrowserDateDefault && applicationDateRef.current) {
+      applicationDateRef.current.value = formatLocalDateForInput(new Date());
+    }
+  }, [useBrowserDateDefault]);
+
   const availableRecruiters = recruiters.filter(
     (recruiter) =>
       !recruiter.companyId || recruiter.companyId === selectedCompanyId,
@@ -449,6 +467,7 @@ export function ApplicationForm({
               id="application-date"
               name="applicationDate"
               type="date"
+              ref={applicationDateRef}
               defaultValue={initialValues.applicationDate}
               className={fieldClassName}
               aria-invalid={Boolean(state.fieldErrors?.applicationDate)}
