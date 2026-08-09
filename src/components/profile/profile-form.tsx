@@ -101,11 +101,7 @@ export function ProfileForm({
   const avatarError = clientAvatarError || state.fieldErrors?.avatar;
 
   return (
-    <form
-      action={formAction}
-      encType="multipart/form-data"
-      className="space-y-6"
-    >
+    <form action={formAction} className="space-y-6">
       {state.message ? (
         <p
           role="alert"
