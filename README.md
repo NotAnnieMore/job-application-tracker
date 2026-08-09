@@ -5,7 +5,7 @@
 <h1 align="center">Job Application Tracker</h1>
 
 <p align="center">
-  Uma aplicação web para centralizar candidaturas, empresas, recrutadores, entrevistas e próximas ações durante a procura de emprego.
+  Uma aplicação web para centralizar candidaturas, empresas, recrutadores, entrevistas e próximas tarefas durante a procura de emprego.
 </p>
 
 <p align="center">
@@ -36,14 +36,17 @@ A aplicação encontra-se publicada na Vercel e utiliza o Supabase para autentic
 - Dashboard com métricas, taxa de resposta, candidaturas recentes e atalhos rápidos.
 - Registo e gestão completa de candidaturas, empresas e oportunidades.
 - Pesquisa, ordenação e filtros combináveis guardados no URL.
+- Alteração rápida do estado diretamente na lista e no detalhe da candidatura.
 - Página de detalhe com o contexto completo de cada candidatura.
 - Gestão de recrutadores e respetivos contactos.
 - Preparação, acompanhamento e registo do resultado de entrevistas.
-- Ações com prioridade, prazo e estado, associadas a candidaturas.
+- Tarefas com prioridade, prazo e estado, associadas a candidaturas.
 - Agenda agregada com entrevistas, follow-ups e tarefas numa cronologia única.
 - Gestão de logótipos de empresas, com pesquisa assistida e edição manual.
+- Criação rápida de uma empresa durante o registo de uma candidatura, sem abandonar o formulário.
 - Perfil com nome e avatar guardado no Supabase Storage.
 - Interface responsiva para computador e telemóvel.
+- Estados de carregamento com títulos reais e feedback imediato durante a navegação.
 - Registo, login, logout e recuperação de palavra-passe.
 
 ## Galeria
@@ -56,7 +59,7 @@ As candidaturas podem ser pesquisadas, filtradas por vários critérios e ordena
 
 ### Contexto completo de cada candidatura
 
-O detalhe reúne os dados da vaga, a empresa, o contacto principal, o estado atual, notas, preparação para entrevista e próximas ações.
+O detalhe reúne os dados da vaga, a empresa, o contacto principal, o estado atual, notas, preparação para entrevista e próximas tarefas.
 
 ![Detalhe de uma candidatura](docs/screenshots/application-detail.png)
 

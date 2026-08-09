@@ -1,8 +1,9 @@
 import { Filter, Pencil, Plus, Search } from "lucide-react";
 import Link from "next/link";
 
-import { ApplicationStatusBadge } from "@/components/applications/application-status-badge";
+import { ApplicationQuickStatusForm } from "@/components/applications/application-quick-status-form";
 import { AutoSubmitSelect } from "@/components/applications/auto-submit-select";
+import { ApplicationLinkFeedback } from "@/components/applications/application-link-feedback";
 import { CompanyLogo } from "@/components/companies/company-logo";
 import {
   ActiveFilters,
@@ -336,21 +337,25 @@ export default async function ApplicationsPage({
                   <th className="px-4 py-3">Empresa</th>
                   <th className="px-4 py-3">Estado</th>
                   <th className="px-4 py-3">Data</th>
-                  <th className="px-4 py-3">Próxima ação</th>
+                  <th className="px-4 py-3">Próxima tarefa</th>
                   <th className="w-12 px-3 py-3">
-                    <span className="sr-only">Ações</span>
+                    <span className="sr-only">Opções</span>
                   </th>
                 </tr>
               </thead>
               <tbody className="divide-y divide-slate-100">
                 {applications.map((application) => (
-                  <tr key={application.id} className="hover:bg-slate-50/60">
+                  <tr
+                    key={application.id}
+                    className="group transition-colors hover:bg-blue-50/60"
+                  >
                     <td className="px-5 py-4">
                       <Link
                         href={`/candidaturas/${application.id}`}
-                        className="font-semibold text-slate-950 hover:text-blue-700"
+                        className="inline-flex max-w-full items-center gap-1.5 rounded-md font-semibold text-slate-950 transition group-hover:text-blue-700 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 active:translate-y-px"
                       >
-                        {application.title}
+                        <span className="truncate">{application.title}</span>
+                        <ApplicationLinkFeedback />
                       </Link>
                       {application.location || application.workMode ? (
                         <p className="mt-1 text-xs text-slate-500">
@@ -383,14 +388,18 @@ export default async function ApplicationsPage({
                       </span>
                     </td>
                     <td className="px-4 py-4">
-                      <ApplicationStatusBadge status={application.status} />
+                      <ApplicationQuickStatusForm
+                        applicationId={application.id}
+                        status={application.status}
+                        className="max-w-48"
+                      />
                     </td>
                     <td className="px-4 py-4 text-slate-600">
                       {formatDate(application.applicationDate)}
                     </td>
                     <td className="px-4 py-4">
                       <p className="font-medium text-slate-700">
-                        {application.nextActionSummary || "Sem próxima ação"}
+                        {application.nextActionSummary || "Sem próxima tarefa"}
                       </p>
                       {application.followUpDate ? (
                         <p className="mt-0.5 text-xs text-slate-500">
@@ -415,34 +424,49 @@ export default async function ApplicationsPage({
 
           <div className="divide-y divide-slate-100 md:hidden">
             {applications.map((application) => (
-              <article key={application.id} className="p-4">
+              <article
+                key={application.id}
+                className="p-4 transition-colors hover:bg-blue-50/60"
+              >
                 <div className="flex items-start justify-between gap-3">
-                  <div className="flex min-w-0 gap-3">
-                    <CompanyLogo
-                      name={application.companyName}
-                      logoUrl={application.companyLogoUrl}
-                      size="sm"
-                    />
-                    <div className="min-w-0">
-                      <Link
-                        href={`/candidaturas/${application.id}`}
-                        className="font-semibold text-slate-950 hover:text-blue-700"
-                      >
-                        {application.title}
-                      </Link>
-                      <p className="mt-1 text-sm text-slate-500">
+                  <Link
+                    href={`/candidaturas/${application.id}`}
+                    aria-label={`Abrir candidatura a ${application.title}`}
+                    className="group flex min-w-0 flex-1 gap-3 rounded-lg focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 active:translate-y-px"
+                  >
+                    <span className="shrink-0">
+                      <CompanyLogo
+                        name={application.companyName}
+                        logoUrl={application.companyLogoUrl}
+                        size="sm"
+                      />
+                    </span>
+                    <span className="min-w-0">
+                      <span className="flex items-center gap-1.5 font-semibold text-slate-950 transition-colors group-hover:text-blue-700">
+                        <span className="truncate">{application.title}</span>
+                        <ApplicationLinkFeedback />
+                      </span>
+                      <span className="mt-1 block text-sm text-slate-500">
                         {application.companyName}
-                      </p>
-                    </div>
-                  </div>
-                  <ApplicationStatusBadge status={application.status} />
+                      </span>
+                    </span>
+                  </Link>
+                  <ApplicationQuickStatusForm
+                    applicationId={application.id}
+                    status={application.status}
+                    className="max-w-40 shrink-0"
+                  />
                 </div>
-                <div className="mt-4 flex items-end justify-between gap-3 text-xs text-slate-500">
+                <Link
+                  href={`/candidaturas/${application.id}`}
+                  aria-label={`Consultar detalhes da candidatura a ${application.title}`}
+                  className="mt-4 flex items-end justify-between gap-3 rounded-lg text-xs text-slate-500 transition hover:text-blue-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 active:translate-y-px"
+                >
                   <span>{formatDate(application.applicationDate)}</span>
                   <span className="text-right">
-                    {application.nextActionSummary || "Sem próxima ação"}
+                    {application.nextActionSummary || "Sem próxima tarefa"}
                   </span>
-                </div>
+                </Link>
               </article>
             ))}
           </div>

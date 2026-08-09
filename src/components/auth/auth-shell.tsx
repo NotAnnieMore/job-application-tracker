@@ -25,7 +25,8 @@ export function AuthShell({
             A tua procura, organizada
           </p>
           <p className="mt-5 text-4xl leading-tight font-bold tracking-tight">
-            Mantém cada oportunidade, entrevista e próxima ação num único lugar.
+            Mantém cada oportunidade, entrevista e próxima tarefa num único
+            lugar.
           </p>
           <p className="mt-5 max-w-lg text-base leading-7 text-slate-300">
             Uma visão simples do teu progresso, criada para reduzir tarefas

@@ -115,7 +115,7 @@ export async function getActions(
     opportunitiesResult.error ||
     companiesResult.error
   ) {
-    throw new Error("Não foi possível consultar as ações.");
+    throw new Error("Não foi possível consultar as tarefas.");
   }
 
   const applications = new Map(
@@ -232,7 +232,7 @@ export async function getActionById(
     .eq("user_id", user.id)
     .maybeSingle();
 
-  if (error) throw new Error("Não foi possível consultar a ação.");
+  if (error) throw new Error("Não foi possível consultar a tarefa.");
   if (!data) return null;
 
   return {

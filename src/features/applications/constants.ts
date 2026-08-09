@@ -7,19 +7,32 @@ export const applicationStatusOptions: Array<{
   value: ApplicationStatusValue;
   label: string;
 }> = [
-  { value: "interested", label: "Interessado" },
   { value: "applied", label: "Candidatura enviada" },
   { value: "interview_scheduled", label: "Entrevista agendada" },
-  { value: "interview_completed", label: "Entrevista concluída" },
   { value: "awaiting_response", label: "A aguardar resposta" },
   { value: "offer_received", label: "Proposta recebida" },
   { value: "rejected", label: "Rejeitada" },
   { value: "withdrawn", label: "Retirada" },
 ];
 
-export const applicationStatusLabels = Object.fromEntries(
-  applicationStatusOptions.map(({ value, label }) => [value, label]),
-) as Record<ApplicationStatusValue, string>;
+export const applicationStatusLabels: Record<ApplicationStatusValue, string> = {
+  interested: "Candidatura enviada",
+  applied: "Candidatura enviada",
+  interview_scheduled: "Entrevista agendada",
+  interview_completed: "A aguardar resposta",
+  awaiting_response: "A aguardar resposta",
+  offer_received: "Proposta recebida",
+  rejected: "Rejeitada",
+  withdrawn: "Retirada",
+};
+
+export function normalizeApplicationStatus(
+  status: ApplicationStatusValue,
+): ApplicationStatusValue {
+  if (status === "interested") return "applied";
+  if (status === "interview_completed") return "awaiting_response";
+  return status;
+}
 
 export const workModeOptions: Array<{
   value: WorkModeValue;

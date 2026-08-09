@@ -15,6 +15,16 @@ export type CompanyActionState = {
   fieldErrors?: Partial<Record<CompanyField, string>>;
 };
 
+export type QuickCompanyActionState = {
+  status: "idle" | "error" | "success";
+  message?: string;
+  fieldErrors?: Partial<Record<CompanyField, string>>;
+  company?: {
+    id: string;
+    name: string;
+  };
+};
+
 export type CompanyFormValues = {
   name: string;
   website: string;
@@ -54,6 +64,10 @@ export type BulkCompanyLogoActionResult = {
 };
 
 export const initialCompanyActionState: CompanyActionState = {
+  status: "idle",
+};
+
+export const initialQuickCompanyActionState: QuickCompanyActionState = {
   status: "idle",
 };
 

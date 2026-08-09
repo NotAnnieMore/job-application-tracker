@@ -23,6 +23,6 @@ export const mainNavigation: NavigationItem[] = [
   { label: "Empresas", href: "/empresas", icon: Building2 },
   { label: "Recrutadores", href: "/recrutadores", icon: Users },
   { label: "Entrevistas", href: "/entrevistas", icon: CalendarDays },
-  { label: "Ações", href: "/acoes", icon: ListChecks },
+  { label: "Tarefas", href: "/acoes", icon: ListChecks },
   { label: "Definições", href: "/definicoes", icon: Settings },
 ];

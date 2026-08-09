@@ -38,7 +38,7 @@ export function DeleteApplicationForm({
         onClick={(event) => {
           if (
             !window.confirm(
-              `Eliminar a candidatura a ${title}? Entrevistas, notas e ações associadas também serão eliminadas.`,
+              `Eliminar a candidatura a ${title}? Entrevistas, notas e tarefas associadas também serão eliminadas.`,
             )
           ) {
             event.preventDefault();

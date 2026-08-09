@@ -1,6 +1,9 @@
 import "server-only";
 
-import { applicationStatusOptions } from "@/features/applications/constants";
+import {
+  applicationStatusOptions,
+  normalizeApplicationStatus,
+} from "@/features/applications/constants";
 import type {
   DashboardActivity,
   DashboardApplication,
@@ -19,11 +22,11 @@ const inactiveStatuses = new Set<ApplicationStatusValue>([
 ]);
 const interviewStatuses = new Set<ApplicationStatusValue>([
   "interview_scheduled",
-  "interview_completed",
+  "awaiting_response",
 ]);
 const responseStatuses = new Set<ApplicationStatusValue>([
   "interview_scheduled",
-  "interview_completed",
+  "awaiting_response",
   "offer_received",
   "rejected",
 ]);
@@ -131,7 +134,7 @@ function toDashboardApplication(
     title: opportunity.title,
     companyName: company.name,
     companyLogoUrl: company.logo_url ?? "",
-    status: application.status,
+    status: normalizeApplicationStatus(application.status),
     applicationDate: application.application_date,
     location: opportunity.location ?? "",
     workMode: opportunity.work_mode,
@@ -426,8 +429,8 @@ export async function getDashboardData(): Promise<DashboardData> {
           id: `action-${action.id}`,
           kind: "action",
           label: activityLabel(action.created_at, action.updated_at, {
-            created: "Ação criada",
-            updated: "Ação atualizada",
+            created: "Tarefa criada",
+            updated: "Tarefa atualizada",
           }),
           description: `${action.description} · ${context.company.name}`,
           occurredAt: action.updated_at,

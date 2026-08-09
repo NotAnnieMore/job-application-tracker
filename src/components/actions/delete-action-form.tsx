@@ -48,7 +48,7 @@ export function DeleteActionForm({
         ) : (
           <Trash2 aria-hidden="true" className="size-4" />
         )}
-        {pending ? "A eliminar..." : "Eliminar ação"}
+        {pending ? "A eliminar..." : "Eliminar tarefa"}
       </Button>
     </form>
   );

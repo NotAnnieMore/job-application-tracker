@@ -113,7 +113,7 @@ const quickAccessItems = [
     href: "/candidaturas/nova",
     icon: Plus,
   },
-  { label: "Criar ação", href: "/acoes/nova", icon: ListChecks },
+  { label: "Criar tarefa", href: "/acoes/nova", icon: ListChecks },
   {
     label: "Agendar entrevista",
     href: "/entrevistas/nova",
@@ -181,7 +181,7 @@ export async function DashboardPage() {
       href: "/entrevistas?estado=scheduled",
     },
     {
-      label: "Ações em atraso",
+      label: "Tarefas em atraso",
       value: data.stats.overdueActions,
       detail: `${data.stats.upcomingActions} até aos próximos 7 dias`,
       icon: ListChecks,
@@ -310,7 +310,7 @@ export async function DashboardPage() {
                       <th className="px-4 py-3">Empresa</th>
                       <th className="px-4 py-3">Estado</th>
                       <th className="px-4 py-3">Data</th>
-                      <th className="px-4 py-3">Próxima ação</th>
+                      <th className="px-4 py-3">Próxima tarefa</th>
                       <th className="w-12 px-3 py-3">
                         <span className="sr-only">Abrir</span>
                       </th>
@@ -363,7 +363,7 @@ export async function DashboardPage() {
                         <td className="px-4 py-4">
                           <p className="max-w-44 truncate font-medium text-slate-700">
                             {application.nextActionSummary ||
-                              "Sem próxima ação"}
+                              "Sem próxima tarefa"}
                           </p>
                           {application.followUpDate ? (
                             <p className="mt-0.5 text-xs text-slate-500">
@@ -414,7 +414,7 @@ export async function DashboardPage() {
                     <div className="mt-4 flex justify-between gap-4 text-xs text-slate-500">
                       <span>{formatDate(application.applicationDate)}</span>
                       <span className="truncate text-right">
-                        {application.nextActionSummary || "Sem próxima ação"}
+                        {application.nextActionSummary || "Sem próxima tarefa"}
                       </span>
                     </div>
                   </article>
@@ -430,7 +430,7 @@ export async function DashboardPage() {
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)]">
         <Card className="overflow-hidden xl:col-span-2">
           <CardHeader>
-            <h2 className="font-bold text-slate-950">Ações pendentes</h2>
+            <h2 className="font-bold text-slate-950">Tarefas pendentes</h2>
             <SectionLink href="/acoes" />
           </CardHeader>
           {data.pendingActions.length === 0 ? (
@@ -439,7 +439,7 @@ export async function DashboardPage() {
                 <ListChecks aria-hidden="true" className="size-5" />
               </span>
               <p className="mt-3 font-semibold text-slate-900">
-                Nenhuma ação pendente
+                Nenhuma tarefa pendente
               </p>
               <p className="mt-1 text-sm leading-6 text-slate-500">
                 As tarefas das candidaturas irão aparecer aqui.
@@ -451,7 +451,7 @@ export async function DashboardPage() {
                 <Link
                   key={action.id}
                   href="/acoes"
-                  className="flex items-center gap-3 p-5 transition hover:bg-slate-50"
+                  className="flex items-start gap-3 p-4 transition hover:bg-slate-50 sm:p-5"
                 >
                   <CompanyLogo
                     name={action.companyName}
@@ -459,7 +459,7 @@ export async function DashboardPage() {
                     size="md"
                   />
                   <span className="min-w-0 flex-1">
-                    <span className="block truncate text-sm font-semibold text-slate-950">
+                    <span className="block break-words text-sm leading-5 font-semibold text-slate-950">
                       {action.description}
                     </span>
                     <span className="mt-0.5 block truncate text-xs text-slate-500">
@@ -489,7 +489,7 @@ export async function DashboardPage() {
                   </span>
                   <ChevronRight
                     aria-hidden="true"
-                    className="size-4 text-slate-400"
+                    className="mt-0.5 size-4 shrink-0 text-slate-400"
                   />
                 </Link>
               ))}

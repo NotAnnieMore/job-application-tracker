@@ -1,6 +1,6 @@
 # Testes e refinamento
 
-Estado: Fase 11 em validação final
+Estado: validação contínua após publicação
 
 Data: 9 de agosto de 2026
 
@@ -49,7 +49,10 @@ recuperação de palavra-passe apresentaram:
 
 - [ ] criar, editar e eliminar uma empresa sem vagas;
 - [ ] confirmar que uma empresa com vagas não é eliminada;
+- [ ] criar uma empresa dentro do formulário de candidatura e confirmar a seleção automática;
 - [ ] criar, editar, consultar e eliminar uma candidatura de teste;
+- [ ] alterar rapidamente o estado da candidatura na lista e no detalhe;
+- [ ] confirmar o fluxo candidatura enviada, entrevista agendada, a aguardar resposta e resultado final;
 - [ ] criar, editar e eliminar um recrutador;
 - [ ] criar, editar e eliminar uma entrevista;
 - [ ] criar, concluir, reabrir e eliminar uma ação;
@@ -58,9 +61,13 @@ recuperação de palavra-passe apresentaram:
 ### Pesquisa e navegação
 
 - [ ] pesquisar pelo cabeçalho e confirmar a abertura de `/candidaturas`;
+- [ ] clicar no nome ou avatar do cabeçalho e confirmar a abertura de `/definicoes`;
+- [ ] confirmar que o email não é apresentado no cabeçalho;
 - [ ] combinar filtros e limpar todos;
 - [ ] testar filtros de datas válidos e uma pesquisa sem resultados;
 - [ ] confirmar os toasts de sucesso e que não reaparecem ao atualizar;
+- [ ] confirmar que o título da secção permanece visível durante o carregamento;
+- [ ] confirmar o feedback visual ao abrir uma candidatura;
 - [ ] confirmar que IDs inválidos no URL são ignorados sem erro.
 
 ### Telemóvel e teclado

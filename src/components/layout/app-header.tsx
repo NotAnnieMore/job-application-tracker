@@ -62,9 +62,6 @@ export function AppHeader({
             <span className="block text-sm font-semibold text-slate-900">
               {user.fullName}
             </span>
-            <span className="block max-w-48 truncate text-xs text-slate-500">
-              {user.email}
-            </span>
           </span>
         </Link>
         <form action={logoutAction}>

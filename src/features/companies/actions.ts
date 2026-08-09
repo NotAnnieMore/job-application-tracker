@@ -7,6 +7,7 @@ import type {
   BulkCompanyLogoActionResult,
   CompanyActionState,
   CompanyLogoSelection,
+  QuickCompanyActionState,
 } from "@/features/companies/types";
 import {
   hasCompanyFieldErrors,
@@ -66,6 +67,38 @@ export async function createCompanyAction(
 
   revalidatePath(companiesPath);
   redirect(`${companiesPath}?estado=empresa-criada`);
+}
+
+export async function createQuickCompanyAction(
+  _previousState: QuickCompanyActionState,
+  formData: FormData,
+): Promise<QuickCompanyActionState> {
+  const { values, fieldErrors } = validateCompanyForm(formData);
+
+  if (hasCompanyFieldErrors(fieldErrors)) {
+    return validationError(fieldErrors);
+  }
+
+  const user = await requireCurrentUser();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("companies")
+    .insert({
+      user_id: user.id,
+      ...values,
+    })
+    .select("id, name")
+    .single();
+
+  if (error || !data) return databaseError(error?.code);
+
+  revalidatePath(companiesPath);
+  revalidatePath("/candidaturas");
+
+  return {
+    status: "success",
+    company: data,
+  };
 }
 
 export async function updateCompanyAction(

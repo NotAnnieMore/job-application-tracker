@@ -6,7 +6,7 @@ const statusVariants = {
   interested: "neutral",
   applied: "blue",
   interview_scheduled: "purple",
-  interview_completed: "purple",
+  interview_completed: "amber",
   awaiting_response: "amber",
   offer_received: "green",
   rejected: "red",

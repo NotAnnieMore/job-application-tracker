@@ -41,9 +41,9 @@ import type {
 } from "@/types/database.types";
 
 const notices: Record<string, string> = {
-  "acao-criada": "Ação criada com sucesso.",
-  "acao-atualizada": "Ação atualizada com sucesso.",
-  "acao-eliminada": "Ação eliminada com sucesso.",
+  "acao-criada": "Tarefa criada com sucesso.",
+  "acao-atualizada": "Tarefa atualizada com sucesso.",
+  "acao-eliminada": "Tarefa eliminada com sucesso.",
 };
 
 const dueFilterOptions: Array<{ value: ActionDueFilter; label: string }> = [
@@ -158,12 +158,12 @@ export default async function ActionsPage({
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Ações"
+        title="Tarefas"
         description="Organiza as tarefas concretas que mantêm cada candidatura em movimento."
         action={
           <Link href="/acoes/nova" className={buttonClassName()}>
             <Plus aria-hidden="true" className="size-4" />
-            Nova ação
+            Nova tarefa
           </Link>
         }
       />
@@ -296,14 +296,16 @@ export default async function ActionsPage({
         <EmptyState
           icon={hasFilters ? CircleAlert : ListChecks}
           title={
-            hasFilters ? "Nenhuma ação encontrada" : "Ainda não existem ações"
+            hasFilters
+              ? "Nenhuma tarefa encontrada"
+              : "Ainda não existem tarefas"
           }
           description={
             hasFilters
-              ? "Altera ou limpa os filtros para voltares a ver todas as ações."
+              ? "Altera ou limpa os filtros para voltares a ver todas as tarefas."
               : "Cria uma tarefa concreta para manteres o próximo passo visível."
           }
-          actionLabel={hasFilters ? "Limpar filtros" : "Criar ação"}
+          actionLabel={hasFilters ? "Limpar filtros" : "Criar tarefa"}
           actionHref={hasFilters ? "/acoes" : "/acoes/nova"}
         />
       ) : (

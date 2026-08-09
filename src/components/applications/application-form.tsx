@@ -1,10 +1,11 @@
 "use client";
 
-import { ExternalLink, LoaderCircle, Save } from "lucide-react";
+import { ExternalLink, LoaderCircle, Plus, Save } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useState } from "react";
 import { useFormStatus } from "react-dom";
 
+import { QuickCompanyModal } from "@/components/companies/quick-company-modal";
 import { Button, buttonClassName } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FormField, fieldClassName } from "@/components/ui/form-field";
@@ -65,6 +66,8 @@ export function ApplicationForm({
   const [selectedCompanyId, setSelectedCompanyId] = useState(
     initialValues.companyId,
   );
+  const [companyOptions, setCompanyOptions] = useState(companies);
+  const [companyModalOpen, setCompanyModalOpen] = useState(false);
   const [selectedRecruiterId, setSelectedRecruiterId] = useState(
     initialValues.primaryRecruiterId,
   );
@@ -87,8 +90,24 @@ export function ApplicationForm({
     }
   }
 
+  function addCompany(company: CompanyOption) {
+    setCompanyOptions((current) =>
+      [...current.filter((option) => option.id !== company.id), company].sort(
+        (left, right) => left.name.localeCompare(right.name, "pt-PT"),
+      ),
+    );
+    changeCompany(company.id);
+    setCompanyModalOpen(false);
+  }
+
   return (
     <form action={formAction} className="space-y-6">
+      {companyModalOpen ? (
+        <QuickCompanyModal
+          onClose={() => setCompanyModalOpen(false)}
+          onCreated={addCompany}
+        />
+      ) : null}
       {state.message ? (
         <p
           role="alert"
@@ -134,10 +153,10 @@ export function ApplicationForm({
             label="Empresa"
             htmlFor="application-company"
             required
-            hint="Se não aparecer, cria a empresa primeiro e regressa a este formulário."
+            hint="Se não aparecer, cria-a aqui sem perder os dados da candidatura."
             error={state.fieldErrors?.companyId}
           >
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <select
                 id="application-company"
                 name="companyId"
@@ -155,24 +174,21 @@ export function ApplicationForm({
                 <option value="" disabled>
                   Selecionar empresa
                 </option>
-                {companies.map((company) => (
+                {companyOptions.map((company) => (
                   <option key={company.id} value={company.id}>
                     {company.name}
                   </option>
                 ))}
               </select>
-              <Link
-                href="/empresas/nova"
-                target="_blank"
-                aria-label="Criar empresa num novo separador"
-                title="Criar empresa num novo separador"
-                className={buttonClassName({
-                  variant: "secondary",
-                  size: "icon",
-                })}
+              <Button
+                type="button"
+                variant="secondary"
+                className="shrink-0"
+                onClick={() => setCompanyModalOpen(true)}
               >
-                <ExternalLink aria-hidden="true" className="size-4" />
-              </Link>
+                <Plus aria-hidden="true" className="size-4" />
+                Criar empresa
+              </Button>
             </div>
           </FormField>
           <FormField
@@ -535,7 +551,7 @@ export function ApplicationForm({
             </div>
           </FormField>
           <FormField
-            label="Próxima ação"
+            label="Próxima tarefa"
             htmlFor="application-next-action"
             error={state.fieldErrors?.nextActionSummary}
           >

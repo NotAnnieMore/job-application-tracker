@@ -21,7 +21,7 @@ import {
   ActionStatusBadge,
 } from "@/components/actions/action-badges";
 import { ActionQuickStatusForm } from "@/components/actions/action-quick-status-form";
-import { ApplicationStatusBadge } from "@/components/applications/application-status-badge";
+import { ApplicationQuickStatusForm } from "@/components/applications/application-quick-status-form";
 import { CompanyLogo } from "@/components/companies/company-logo";
 import { InterviewStatusBadge } from "@/components/interviews/interview-status-badge";
 import { NoteCreateForm } from "@/components/notes/note-create-form";
@@ -44,8 +44,8 @@ const notices: Record<string, string> = {
   "candidatura-atualizada": "Candidatura atualizada com sucesso.",
   "entrevista-atualizada": "Entrevista atualizada com sucesso.",
   "entrevista-eliminada": "Entrevista eliminada com sucesso.",
-  "acao-atualizada": "Ação atualizada com sucesso.",
-  "acao-eliminada": "Ação eliminada com sucesso.",
+  "acao-atualizada": "Tarefa atualizada com sucesso.",
+  "acao-eliminada": "Tarefa eliminada com sucesso.",
   "nota-criada": "Nota adicionada com sucesso.",
   "nota-atualizada": "Nota atualizada com sucesso.",
   "nota-eliminada": "Nota eliminada com sucesso.",
@@ -167,7 +167,7 @@ export default async function ApplicationDetailPage({
               className={buttonClassName({ variant: "secondary" })}
             >
               <ListPlus aria-hidden="true" className="size-4" />
-              Nova ação
+              Nova tarefa
             </Link>
             <Link
               href={`/entrevistas/nova?candidatura=${application.id}`}
@@ -200,7 +200,11 @@ export default async function ApplicationDetailPage({
                 </p>
               </div>
             </div>
-            <ApplicationStatusBadge status={application.status} />
+            <ApplicationQuickStatusForm
+              applicationId={application.id}
+              status={application.status}
+              className="max-w-48"
+            />
           </CardHeader>
           <CardContent className="grid gap-5 sm:grid-cols-2">
             <DetailItem
@@ -261,7 +265,7 @@ export default async function ApplicationDetailPage({
             {application.nextActionSummary ? (
               <DetailItem
                 icon={ListPlus}
-                label="Próxima ação"
+                label="Próxima tarefa"
                 value={application.nextActionSummary}
               />
             ) : null}
@@ -521,7 +525,7 @@ export default async function ApplicationDetailPage({
         <Card>
           <CardHeader>
             <div>
-              <h2 className="font-bold text-slate-950">Ações</h2>
+              <h2 className="font-bold text-slate-950">Tarefas</h2>
               <p className="mt-1 text-sm text-slate-500">
                 {actionsData.items.length} tarefa(s) associada(s)
               </p>
@@ -571,12 +575,12 @@ export default async function ApplicationDetailPage({
                   href={`/acoes?candidatura=${application.id}`}
                   className="inline-flex text-sm font-semibold text-blue-600 hover:text-blue-800"
                 >
-                  Ver na página de ações
+                  Ver na página de tarefas
                 </Link>
               </div>
             ) : (
               <p className="py-6 text-center text-sm text-slate-500">
-                Ainda não existem ações associadas.
+                Ainda não existem tarefas associadas.
               </p>
             )}
           </CardContent>

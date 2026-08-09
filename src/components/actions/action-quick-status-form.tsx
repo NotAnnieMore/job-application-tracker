@@ -36,8 +36,8 @@ export function ActionQuickStatusForm({
         variant={completed ? "secondary" : "primary"}
         size="sm"
         disabled={pending}
-        title={completed ? "Reabrir ação" : "Marcar como concluída"}
-        aria-label={completed ? "Reabrir ação" : "Marcar como concluída"}
+        title={completed ? "Reabrir tarefa" : "Marcar como concluída"}
+        aria-label={completed ? "Reabrir tarefa" : "Marcar como concluída"}
       >
         {pending ? (
           <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />

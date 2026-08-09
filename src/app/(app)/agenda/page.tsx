@@ -32,7 +32,7 @@ import { formatInterviewTime } from "@/features/interviews/date";
 const kindOptions: Array<{ value: AgendaItemKind; label: string }> = [
   { value: "interview", label: "Entrevistas" },
   { value: "follow_up", label: "Follow-ups" },
-  { value: "action", label: "Ações" },
+  { value: "action", label: "Tarefas" },
 ];
 
 const periodOptions: Array<{ value: AgendaPeriod; label: string }> = [
@@ -57,7 +57,7 @@ const itemPresentation = {
     iconBox: "bg-amber-50 text-amber-600",
   },
   action: {
-    label: "Ação",
+    label: "Tarefa",
     icon: ListChecks,
     badge: "border-blue-200 bg-blue-50 text-blue-700",
     iconBox: "bg-blue-50 text-blue-600",
@@ -144,11 +144,11 @@ export default async function AgendaPage({
     <div className="space-y-6">
       <PageHeader
         title="Agenda"
-        description="Entrevistas, follow-ups e ações reunidos numa vista cronológica."
+        description="Entrevistas, follow-ups e tarefas reunidos numa vista cronológica."
         action={
           <Link href="/acoes/nova" className={buttonClassName()}>
             <Plus aria-hidden="true" className="size-4" />
-            Nova ação
+            Nova tarefa
           </Link>
         }
       />
@@ -180,7 +180,7 @@ export default async function AgendaPage({
             background: "bg-blue-50",
           },
           {
-            label: "Ações sem data",
+            label: "Tarefas sem data",
             value: data.summary.unscheduledActions,
             href: "/acoes?estado=pending&prazo=no_date",
             icon: ListChecks,
@@ -262,9 +262,9 @@ export default async function AgendaPage({
           description={
             hasFilters
               ? "Altera ou limpa os filtros para consultar outros compromissos."
-              : "As entrevistas, os follow-ups e as ações com data aparecem aqui automaticamente."
+              : "As entrevistas, os follow-ups e as tarefas com data aparecem aqui automaticamente."
           }
-          actionLabel={hasFilters ? "Limpar filtros" : "Criar ação"}
+          actionLabel={hasFilters ? "Limpar filtros" : "Criar tarefa"}
           actionHref={hasFilters ? "/agenda" : "/acoes/nova"}
         />
       ) : (

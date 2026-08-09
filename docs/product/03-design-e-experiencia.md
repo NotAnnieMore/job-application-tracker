@@ -21,16 +21,14 @@ Data: 2 de agosto de 2026
 
 ### Cores semânticas dos estados
 
-| Estado               | Cor indicativa |
-| -------------------- | -------------- |
-| Interessado          | Cinzento       |
-| Candidatura enviada  | Azul           |
-| Entrevista agendada  | Roxo           |
-| Entrevista concluída | Roxo escuro    |
-| A aguardar resposta  | Amarelo/âmbar  |
-| Proposta recebida    | Verde          |
-| Rejeitada            | Vermelho       |
-| Retirada             | Neutro         |
+| Estado              | Cor indicativa |
+| ------------------- | -------------- |
+| Candidatura enviada | Azul           |
+| Entrevista agendada | Roxo           |
+| A aguardar resposta | Amarelo/âmbar  |
+| Proposta recebida   | Verde          |
+| Rejeitada           | Vermelho       |
+| Retirada            | Neutro         |
 
 As tonalidades finais serão validadas por contraste durante a implementação.
 
@@ -46,7 +44,7 @@ As tonalidades finais serão validadas por contraste durante a implementação.
 - Organização em cartões e listas, seguindo a imagem de referência.
 - Primeira área: indicadores principais.
 - Segunda área: candidaturas recentes e próximas entrevistas.
-- Terceira área: candidaturas por estado, próximas ações e atividade recente.
+- Terceira área: candidaturas por estado, próximas tarefas e atividade recente.
 - O layout reduz o número de colunas progressivamente em ecrãs menores.
 - O gráfico será introduzido na fase do dashboard, depois de os cálculos estarem validados.
 
@@ -56,8 +54,9 @@ As tonalidades finais serão validadas por contraste durante a implementação.
 - Candidaturas em cartões no telemóvel.
 - Sem vista Kanban no MVP.
 - Badges coloridos identificam os estados.
-- A lista principal mostra: vaga, empresa, estado, data, próxima ação, follow-up e recrutador.
-- As ações rápidas não devem tornar a tabela visualmente pesada; o detalhe continua a ser o ponto principal de gestão.
+- A lista principal mostra: vaga, empresa, estado, data, próxima tarefa, follow-up e recrutador.
+- O estado pode ser alterado diretamente sem abrir o formulário completo.
+- As tarefas rápidas não devem tornar a tabela visualmente pesada; o detalhe continua a ser o ponto principal de gestão.
 
 ## Formulários
 
@@ -78,7 +77,7 @@ A página inclui:
 - recrutador principal;
 - entrevistas;
 - notas;
-- próximas ações;
+- próximas tarefas;
 - histórico.
 
 No computador, as secções podem ser organizadas em separadores e cartões. No telemóvel, devem formar um percurso vertical simples.

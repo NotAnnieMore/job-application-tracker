@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { applicationStatusOptions } from "@/features/applications/constants";
 import type { ApplicationActionState } from "@/features/applications/types";
 import {
   hasApplicationFieldErrors,
@@ -11,8 +12,12 @@ import {
 } from "@/features/applications/validation";
 import { requireCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import type { ApplicationStatusValue } from "@/types/database.types";
 
 const applicationsPath = "/candidaturas";
+const quickStatusValues = new Set(
+  applicationStatusOptions.map((option) => option.value),
+);
 
 function validationError(
   fieldErrors: NonNullable<ApplicationActionState["fieldErrors"]>,
@@ -192,4 +197,38 @@ export async function deleteApplicationAction(
 
   revalidateApplicationPages();
   redirect(`${applicationsPath}?estado=candidatura-eliminada`);
+}
+
+export async function updateApplicationStatusAction(
+  applicationId: string,
+  rawStatus: ApplicationStatusValue,
+): Promise<ApplicationActionState> {
+  if (!isValidApplicationId(applicationId)) {
+    return { status: "error", message: "A candidatura indicada não é válida." };
+  }
+
+  if (!quickStatusValues.has(rawStatus)) {
+    return { status: "error", message: "Seleciona um estado válido." };
+  }
+
+  const user = await requireCurrentUser();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("applications")
+    .update({ status: rawStatus })
+    .eq("id", applicationId)
+    .eq("user_id", user.id)
+    .select("id")
+    .maybeSingle();
+
+  if (error || !data) {
+    return {
+      status: "error",
+      message: "Não foi possível atualizar o estado. Tenta novamente.",
+    };
+  }
+
+  revalidateApplicationPages();
+  revalidatePath(`${applicationsPath}/${applicationId}`);
+  return { status: "idle" };
 }

@@ -7,6 +7,7 @@ import type {
   CompanyOption,
   RecruiterOption,
 } from "@/features/applications/types";
+import { normalizeApplicationStatus } from "@/features/applications/constants";
 import { isValidApplicationId } from "@/features/applications/validation";
 import { requireCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
@@ -114,7 +115,7 @@ export async function getApplications(
         companyId: company.id,
         companyName: company.name,
         companyLogoUrl: company.logo_url ?? "",
-        status: application.status,
+        status: normalizeApplicationStatus(application.status),
         applicationDate: application.application_date,
         location: opportunity.location ?? "",
         workMode: opportunity.work_mode,
@@ -258,7 +259,7 @@ export async function getApplicationById(
     jobUrl: opportunity.job_url ?? "",
     skills: opportunity.skills.join(", "),
     opportunitySummary: opportunity.summary ?? "",
-    status: application.status,
+    status: normalizeApplicationStatus(application.status),
     applicationDate: application.application_date,
     source: application.source ?? "",
     expectedSalary: application.expected_salary?.toString() ?? "",

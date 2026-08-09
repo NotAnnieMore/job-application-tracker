@@ -43,10 +43,10 @@ export default async function EditActionPage({
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        {returnToApplication ? "Voltar à candidatura" : "Voltar às ações"}
+        {returnToApplication ? "Voltar à candidatura" : "Voltar às tarefas"}
       </Link>
       <PageHeader
-        title="Editar ação"
+        title="Editar tarefa"
         description="Atualiza a tarefa, o prazo, a prioridade ou o estado."
       />
       <ActionForm
@@ -60,7 +60,7 @@ export default async function EditActionPage({
       <Card className="border-red-200">
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Eliminar ação</h2>
+            <h2 className="font-bold text-slate-950">Eliminar tarefa</h2>
             <p className="mt-1 text-sm text-slate-500">
               A candidatura e os restantes dados do processo serão mantidos.
             </p>

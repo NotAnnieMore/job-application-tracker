@@ -50,7 +50,7 @@ export default async function EditApplicationPage({
               className={buttonClassName({ variant: "secondary" })}
             >
               <ListPlus aria-hidden="true" className="size-4" />
-              Nova ação
+              Nova tarefa
             </Link>
             <Link
               href={`/entrevistas/nova?candidatura=${application.id}`}

@@ -27,7 +27,7 @@ function validationError(
 function saveError(): ActionActionState {
   return {
     status: "error",
-    message: "Não foi possível guardar a ação. Tenta novamente.",
+    message: "Não foi possível guardar a tarefa. Tenta novamente.",
   };
 }
 
@@ -82,7 +82,7 @@ export async function updateActionAction(
   formData: FormData,
 ): Promise<ActionActionState> {
   if (!isValidActionId(actionId)) {
-    return { status: "error", message: "A ação indicada não é válida." };
+    return { status: "error", message: "A tarefa indicada não é válida." };
   }
 
   const { values, fieldErrors } = validateActionForm(formData);
@@ -105,7 +105,7 @@ export async function updateActionAction(
       .maybeSingle();
 
     if (existingActionError || !existingAction) {
-      return { status: "error", message: "A ação já não está disponível." };
+      return { status: "error", message: "A tarefa já não está disponível." };
     }
     values.completed_at = existingAction.completed_at ?? values.completed_at;
   }
@@ -120,7 +120,7 @@ export async function updateActionAction(
 
   if (error) return saveError();
   if (!data) {
-    return { status: "error", message: "A ação já não está disponível." };
+    return { status: "error", message: "A tarefa já não está disponível." };
   }
 
   revalidateActionPages();
@@ -141,7 +141,7 @@ export async function deleteActionAction(
   void _formData;
 
   if (!isValidActionId(actionId)) {
-    return { status: "error", message: "A ação indicada não é válida." };
+    return { status: "error", message: "A tarefa indicada não é válida." };
   }
 
   const user = await requireCurrentUser();
@@ -157,11 +157,11 @@ export async function deleteActionAction(
   if (error) {
     return {
       status: "error",
-      message: "Não foi possível eliminar a ação. Tenta novamente.",
+      message: "Não foi possível eliminar a tarefa. Tenta novamente.",
     };
   }
   if (!data) {
-    return { status: "error", message: "A ação já não está disponível." };
+    return { status: "error", message: "A tarefa já não está disponível." };
   }
 
   revalidateActionPages();
@@ -177,7 +177,7 @@ async function setActionCompletion(
   completed: boolean,
 ): Promise<ActionActionState> {
   if (!isValidActionId(actionId)) {
-    return { status: "error", message: "A ação indicada não é válida." };
+    return { status: "error", message: "A tarefa indicada não é válida." };
   }
 
   const user = await requireCurrentUser();
@@ -196,7 +196,7 @@ async function setActionCompletion(
   if (error || !data) {
     return {
       status: "error",
-      message: "Não foi possível atualizar a ação. Tenta novamente.",
+      message: "Não foi possível atualizar a tarefa. Tenta novamente.",
     };
   }
 

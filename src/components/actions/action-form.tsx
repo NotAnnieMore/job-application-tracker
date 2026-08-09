@@ -72,7 +72,7 @@ export function ActionForm({
       <Card>
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Detalhes da ação</h2>
+            <h2 className="font-bold text-slate-950">Detalhes da tarefa</h2>
             <p className="mt-1 text-sm text-slate-500">
               Define uma tarefa concreta ligada a uma candidatura.
             </p>
@@ -163,7 +163,7 @@ export function ActionForm({
           <FormField
             label="Estado"
             htmlFor="action-status"
-            hint="Também podes concluir rapidamente a tarefa na lista de ações."
+            hint="Também podes concluir rapidamente a tarefa na lista de tarefas."
             error={state.fieldErrors?.status}
           >
             <select

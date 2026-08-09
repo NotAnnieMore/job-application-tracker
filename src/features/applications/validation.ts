@@ -2,6 +2,7 @@ import type {
   ApplicationActionState,
   ApplicationField,
 } from "@/features/applications/types";
+import { applicationStatusOptions } from "@/features/applications/constants";
 import type {
   ApplicationStatusValue,
   ApplicationTransactionArgs,
@@ -10,16 +11,9 @@ import type {
 import { isValidUuid } from "@/lib/validation";
 
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
-const statusValues = new Set<ApplicationStatusValue>([
-  "interested",
-  "applied",
-  "interview_scheduled",
-  "interview_completed",
-  "awaiting_response",
-  "offer_received",
-  "rejected",
-  "withdrawn",
-]);
+const statusValues = new Set<ApplicationStatusValue>(
+  applicationStatusOptions.map((option) => option.value),
+);
 const workModeValues = new Set<WorkModeValue>(["onsite", "hybrid", "remote"]);
 
 function readText(formData: FormData, field: ApplicationField) {
@@ -239,7 +233,7 @@ export function validateApplicationForm(formData: FormData) {
       nextActionSummary,
       240,
       "nextActionSummary",
-      "A próxima ação",
+      "A próxima tarefa",
       fieldErrors,
     ),
     p_follow_up_date: followUpDate || null,

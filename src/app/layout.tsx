@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  description: "Organiza candidaturas, entrevistas e próximas ações.",
+  description: "Organiza candidaturas, entrevistas e próximas tarefas.",
 };
 
 export default function RootLayout({
