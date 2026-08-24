@@ -32,7 +32,7 @@ Data: 2 de agosto de 2026
 | Tarefas                | `/acoes`                    | Consultar tarefas pendentes, concluídas e em atraso.                            |
 | Nova tarefa            | `/acoes/nova`               | Criar uma tarefa associada a uma candidatura.                                   |
 | Editar tarefa          | `/acoes/[id]/editar`        | Atualizar, concluir, cancelar ou eliminar uma tarefa.                           |
-| Definições             | `/definicoes`               | Gerir o perfil e opções essenciais da conta.                                    |
+| Definições             | `/definicoes`               | Gerir o perfil, avatar e preferência de tema da conta.                          |
 
 ## Navegação principal
 

@@ -56,7 +56,7 @@ function CompanyLogoImage({
     <img
       src={logoUrl}
       alt={`Logótipo de ${name}`}
-      className="absolute inset-0 size-full bg-white object-contain p-1"
+      className="company-logo-surface absolute inset-0 size-full bg-white object-contain p-1"
       onError={() => setFailed(true)}
     />
   );
@@ -79,7 +79,7 @@ export function CompanyLogo({
         "relative flex shrink-0 items-center justify-center overflow-hidden font-bold ring-1",
         sizeClasses[size],
         logoUrl
-          ? "bg-white text-slate-700 ring-slate-200"
+          ? "company-logo-surface bg-white text-slate-700 ring-slate-200"
           : `${getColorClass(name)} ring-black/5`,
         className,
       )}

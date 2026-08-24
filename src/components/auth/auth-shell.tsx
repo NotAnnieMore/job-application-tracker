@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { AppLogo } from "@/components/shared/app-logo";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Badge } from "@/components/ui/badge";
 
 export function AuthShell({
@@ -13,8 +14,11 @@ export function AuthShell({
   children: React.ReactNode;
 }) {
   return (
-    <main className="grid min-h-screen bg-slate-50 lg:grid-cols-[minmax(0,1fr)_minmax(520px,0.85fr)]">
+    <main className="relative grid min-h-screen bg-slate-50 lg:grid-cols-[minmax(0,1fr)_minmax(520px,0.85fr)]">
       <title>{`${title} | Job Application Tracker`}</title>
+      <div className="absolute top-4 right-4 z-10">
+        <ThemeToggle />
+      </div>
       <section className="hidden bg-slate-950 p-12 text-white lg:flex lg:flex-col lg:justify-between">
         <Link href="/" className="flex items-center gap-3 text-sm font-bold">
           <AppLogo />

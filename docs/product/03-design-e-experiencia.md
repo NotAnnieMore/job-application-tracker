@@ -13,9 +13,9 @@ Data: 2 de agosto de 2026
 
 ## Cores e tema
 
-- Apenas modo claro no MVP.
+- Modos claro e escuro, com preferência persistente no browser e troca imediata pelo cabeçalho ou pelas Definições.
 - Azul como cor principal para navegação, ligações e ações primárias.
-- Fundos brancos ou cinzento muito claro.
+- No modo claro, fundos brancos ou cinzento muito claro; no modo escuro, superfícies azul-acinzentadas com contraste equivalente.
 - Texto principal escuro e texto secundário cinzento.
 - Contraste e significado nunca devem depender apenas da cor.
 

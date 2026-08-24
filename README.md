@@ -49,6 +49,7 @@ A aplicação encontra-se publicada na Vercel e utiliza o Supabase para autentic
 - Gestão de logótipos de empresas, com pesquisa assistida e edição manual.
 - Criação rápida de uma empresa durante o registo de uma candidatura, sem abandonar o formulário.
 - Perfil com nome e avatar guardado no Supabase Storage.
+- Modo claro e escuro com preferência persistente por browser.
 - Interface responsiva para computador e telemóvel.
 - Estados de carregamento com títulos reais e feedback imediato durante a navegação.
 - Registo, login, logout e recuperação de palavra-passe.

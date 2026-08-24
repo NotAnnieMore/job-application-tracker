@@ -20,6 +20,7 @@ O registo manual de uma candidatura repete informação já presente na página 
 - Como a página normal do Indeed bloqueia consultas feitas pelo servidor, a aplicação consulta a representação móvel incorporada da mesma vaga e preserva o endereço normalizado para utilização pelo utilizador. O texto continua disponível como fallback caso esse endpoint também não responda.
 - O texto colado permanece como fallback para vagas removidas, privadas ou páginas cuja estrutura deixou de ser reconhecida.
 - A extração preenche título, empresa, localização, modalidade, descrição, link e fonte.
+- Descrições acima do limite da candidatura são truncadas para 5 000 caracteres durante a análise e produzem um aviso visível antes da confirmação.
 - Uma empresa existente é reutilizada por comparação de nome sem distinção de maiúsculas ou acentos.
 - Uma empresa nova só é criada depois da confirmação do utilizador no formulário rápido, onde o logótipo pode ser revisto ou pesquisado.
 

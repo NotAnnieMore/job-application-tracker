@@ -4,6 +4,7 @@ import { LogOut, Menu, Search } from "lucide-react";
 import Link from "next/link";
 
 import { UserAvatar } from "@/components/profile/user-avatar";
+import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
 import { logoutAction } from "@/features/auth/actions";
 import type { CurrentUser } from "@/features/auth/types";
@@ -51,6 +52,7 @@ export function AppHeader({
       </form>
 
       <div className="ml-auto flex items-center gap-2">
+        <ThemeToggle />
         <div className="hidden h-8 w-px bg-slate-200 sm:block" />
         <Link
           href="/definicoes"

@@ -43,7 +43,10 @@ recuperação de palavra-passe apresentaram:
 - [ ] iniciar e terminar sessão;
 - [ ] pedir recuperação de palavra-passe;
 - [ ] alterar o nome do perfil;
-- [ ] carregar, substituir e remover o avatar.
+- [ ] carregar, substituir e remover o avatar;
+- [ ] alternar entre modo claro e escuro pelo cabeçalho e pelas Definições;
+- [ ] atualizar a página e terminar/iniciar sessão, confirmando que a preferência visual permanece neste browser.
+- [ ] atualizar com `F5` em modo escuro e confirmar que não existe um frame branco antes do conteúdo.
 
 ### Dados principais
 
@@ -51,6 +54,7 @@ recuperação de palavra-passe apresentaram:
 - [ ] confirmar que uma empresa com vagas não é eliminada;
 - [ ] criar uma empresa dentro do formulário de candidatura e confirmar a seleção automática;
 - [ ] importar uma vaga de um site com dados estruturados e rever todos os campos antes de aplicar;
+- [ ] importar uma descrição com mais de 5 000 caracteres, confirmar o aviso de truncagem antes de preencher e validar que o resumo não fica vazio;
 - [ ] importar uma vaga pública do LinkedIn usando apenas o link e confirmar título, empresa, localização, descrição e logótipo;
 - [ ] importar uma vaga a partir de um link de resultados do LinkedIn com `currentJobId` e confirmar que o link guardado fica no formato `/jobs/view/ID/`;
 - [ ] importar um link do Indeed com `jk` ou `vjk`, confirmar a leitura pelo endpoint incorporado e a normalização do link guardado para `/viewjob?jk=...`;
@@ -61,6 +65,7 @@ recuperação de palavra-passe apresentaram:
 - [ ] confirmar a sugestão ou edição manual do logótipo durante a criação da empresa importada;
 - [ ] criar, editar, consultar e eliminar uma candidatura de teste;
 - [ ] alterar rapidamente o estado da candidatura na lista e no detalhe;
+- [ ] no modo escuro, percorrer todos os estados rápidos e confirmar o contraste do texto, fundo, borda e opções do menu;
 - [ ] confirmar o fluxo candidatura enviada, entrevista agendada, a aguardar resposta e resultado final;
 - [ ] criar, editar e eliminar um recrutador;
 - [ ] criar, editar e eliminar uma entrevista;

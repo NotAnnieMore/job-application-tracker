@@ -21,6 +21,7 @@ export const dynamic = "force-dynamic";
 
 const maxTextLength = 20_000;
 const maxHtmlBytes = 1_500_000;
+const maxDescriptionLength = 5_000;
 
 function jobImportResponse(payload: JobImportResponse, init?: ResponseInit) {
   return Response.json(payload, init);
@@ -261,7 +262,27 @@ export async function POST(request: Request) {
       }
     }
 
-    const data = mergeImportedJobData(pageData, textData, normalizedUrl);
+    const importedData = mergeImportedJobData(
+      pageData,
+      textData,
+      normalizedUrl,
+    );
+    const descriptionLength = importedData.description.length;
+    const data =
+      descriptionLength > maxDescriptionLength
+        ? {
+            ...importedData,
+            description: importedData.description.slice(
+              0,
+              maxDescriptionLength,
+            ),
+          }
+        : importedData;
+    if (descriptionLength > maxDescriptionLength) {
+      warnings.push(
+        `A descrição original tinha ${descriptionLength.toLocaleString("pt-PT")} caracteres. Foram mantidos os primeiros ${maxDescriptionLength.toLocaleString("pt-PT")} para respeitar o limite da candidatura.`,
+      );
+    }
     if (!data.title && !data.companyName && !data.description) {
       return jobImportResponse(
         {

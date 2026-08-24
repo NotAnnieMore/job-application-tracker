@@ -71,7 +71,8 @@ export function ApplicationQuickStatusForm({
             changeStatus(event.currentTarget.value as ApplicationStatusValue)
           }
           className={cn(
-            "h-8 w-full max-w-full appearance-none rounded-lg border py-1 pr-8 pl-2.5 text-xs font-semibold outline-none transition hover:brightness-95 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-70",
+            "application-quick-status h-8 w-full max-w-full appearance-none rounded-lg border py-1 pr-8 pl-2.5 text-xs font-semibold outline-none transition hover:brightness-95 focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2 disabled:cursor-wait disabled:opacity-70",
+            `application-status-${selectedStatus}`,
             statusClasses[selectedStatus],
           )}
           aria-describedby={message ? statusErrorId : undefined}

@@ -14,6 +14,7 @@ import type {
 
 const textareaClassName =
   "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-3 focus:ring-blue-100";
+const maxDescriptionLength = 5_000;
 
 type Phase = "input" | "review";
 
@@ -111,7 +112,7 @@ export function JobImportModal({
       title: data.title.trim(),
       companyName: data.companyName.trim(),
       location: data.location.trim(),
-      description: data.description.trim(),
+      description: data.description.trim().slice(0, maxDescriptionLength),
     });
   }
 
@@ -288,9 +289,12 @@ export function JobImportModal({
                         update("description", event.target.value)
                       }
                       rows={12}
-                      maxLength={5000}
+                      maxLength={maxDescriptionLength}
                       className={textareaClassName}
                     />
+                    <p className="mt-1.5 text-right text-xs text-slate-500">
+                      {data.description.length.toLocaleString("pt-PT")}/5 000
+                    </p>
                   </FormField>
                 </div>
               </div>

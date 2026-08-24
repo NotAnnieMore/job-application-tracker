@@ -14,12 +14,21 @@ export default function GlobalError({
   }, [error]);
 
   return (
-    <html lang="pt-PT">
+    <html lang="pt-PT" data-theme="light" suppressHydrationWarning>
+      <head>
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              'try{var theme=localStorage.getItem("job-tracker-theme")==="dark"?"dark":"light";document.documentElement.dataset.theme=theme}catch(e){}',
+          }}
+        />
+        <style>{`:root{--error-background:#f7f9fc;--error-foreground:#172033;--error-surface:#fff;--error-border:#e5eaf1;--error-muted:#64748b}[data-theme="dark"]{color-scheme:dark;--error-background:#080d17;--error-foreground:#e7edf6;--error-surface:#111927;--error-border:#2a3548;--error-muted:#94a3b8}`}</style>
+      </head>
       <body
         style={{
           alignItems: "center",
-          background: "#f7f9fc",
-          color: "#172033",
+          background: "var(--error-background)",
+          color: "var(--error-foreground)",
           display: "flex",
           fontFamily: "Arial, Helvetica, sans-serif",
           justifyContent: "center",
@@ -30,8 +39,8 @@ export default function GlobalError({
       >
         <main
           style={{
-            background: "#ffffff",
-            border: "1px solid #e5eaf1",
+            background: "var(--error-surface)",
+            border: "1px solid var(--error-border)",
             borderRadius: "16px",
             boxShadow: "0 1px 2px rgba(15, 23, 42, 0.03)",
             maxWidth: "480px",
@@ -44,7 +53,13 @@ export default function GlobalError({
           <h1 style={{ fontSize: "24px", margin: 0 }}>
             Não foi possível abrir a aplicação
           </h1>
-          <p style={{ color: "#64748b", lineHeight: 1.6, margin: "12px 0 0" }}>
+          <p
+            style={{
+              color: "var(--error-muted)",
+              lineHeight: 1.6,
+              margin: "12px 0 0",
+            }}
+          >
             Ocorreu um erro inesperado. Tenta carregar novamente.
           </p>
           <button
