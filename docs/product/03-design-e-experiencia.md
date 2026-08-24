@@ -38,6 +38,7 @@ As tonalidades finais serão validadas por contraste durante a implementação.
 - Telemóvel: menu no cabeçalho.
 - O item da página atual deve estar claramente identificado.
 - A ação “Nova candidatura” deve estar facilmente acessível.
+- O dashboard apresenta “Importar vaga” junto de “Nova candidatura”, reduzindo um passo no fluxo mais frequente.
 
 ## Dashboard
 
@@ -62,6 +63,8 @@ As tonalidades finais serão validadas por contraste durante a implementação.
 
 - Formulário de candidatura numa página própria e dividido por secções.
 - Um único fluxo permite escolher ou criar os dados relacionados.
+- O importador nunca guarda dados antes da revisão do utilizador.
+- Sites com dados estruturados e páginas públicas do LinkedIn podem ser analisados pelo link; o texto colado é usado como fallback.
 - Formulários simples podem usar modais ou painéis laterais quando isso não dificultar a utilização em telemóvel.
 - Campos obrigatórios claramente assinalados.
 - Validação junto ao campo e resumo útil para erros gerais.
@@ -81,6 +84,14 @@ A página inclui:
 - histórico.
 
 No computador, as secções podem ser organizadas em separadores e cartões. No telemóvel, devem formar um percurso vertical simples.
+
+## Detalhe da entrevista
+
+- O cartão ou nome da entrevista abre primeiro uma página de consulta.
+- O modo de edição é uma ação explícita e separada.
+- O resumo reúne agendamento, candidatura, empresa, recrutador, participantes, guião, perguntas, feedback e resultado.
+- Depois de guardar alterações, o utilizador regressa ao resumo da mesma entrevista.
+- O guião específico pode ser alterado num modal sem abrir o formulário completo.
 
 ## Linguagem
 

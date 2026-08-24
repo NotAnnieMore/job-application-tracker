@@ -78,8 +78,15 @@ function isExternalLocation(value: string) {
 
 function InterviewCard({ interview }: { interview: InterviewListItem }) {
   return (
-    <Card className="transition hover:shadow-md">
-      <CardContent className="flex flex-col gap-5 sm:flex-row sm:items-start">
+    <Card className="group relative transition hover:border-blue-200 hover:shadow-md">
+      <Link
+        href={`/entrevistas/${interview.id}`}
+        className="absolute inset-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
+        aria-label={`Ver resumo de ${interview.interviewType}`}
+      >
+        <span className="sr-only">Ver resumo da entrevista</span>
+      </Link>
+      <CardContent className="pointer-events-none flex flex-col gap-5 sm:flex-row sm:items-start">
         <div className="flex size-16 shrink-0 flex-col items-center justify-center rounded-2xl border border-slate-200 bg-slate-50">
           <span className="text-xl leading-none font-bold text-slate-950">
             {formatInterviewDay(interview.scheduledAt)}
@@ -91,7 +98,7 @@ function InterviewCard({ interview }: { interview: InterviewListItem }) {
 
         <div className="min-w-0 flex-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="font-bold text-slate-950">
+            <h2 className="font-bold text-slate-950 transition group-hover:text-blue-700">
               {interview.interviewType}
             </h2>
             <InterviewStatusBadge status={interview.status} />
@@ -131,7 +138,7 @@ function InterviewCard({ interview }: { interview: InterviewListItem }) {
                   href={interview.locationOrUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex items-center gap-2 font-medium text-blue-600 hover:text-blue-700"
+                  className="pointer-events-auto relative z-10 flex items-center gap-2 font-medium text-blue-600 hover:text-blue-700"
                 >
                   <ExternalLink aria-hidden="true" className="size-4" />
                   Abrir ligação
@@ -148,10 +155,14 @@ function InterviewCard({ interview }: { interview: InterviewListItem }) {
 
         <Link
           href={`/entrevistas/${interview.id}/editar`}
-          className={buttonClassName({ variant: "secondary", size: "sm" })}
+          className={buttonClassName({
+            variant: "secondary",
+            size: "sm",
+            className: "pointer-events-auto relative z-10",
+          })}
         >
           <Pencil aria-hidden="true" className="size-4" />
-          Preparar
+          Editar
         </Link>
       </CardContent>
     </Card>

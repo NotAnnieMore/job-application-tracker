@@ -1,11 +1,18 @@
 "use client";
 
-import { ExternalLink, LoaderCircle, Plus, Save } from "lucide-react";
+import {
+  ExternalLink,
+  FileSearch,
+  LoaderCircle,
+  Plus,
+  Save,
+} from "lucide-react";
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { QuickCompanyModal } from "@/components/companies/quick-company-modal";
+import { JobImportModal } from "@/components/applications/job-import-modal";
 import { Button, buttonClassName } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FormField, fieldClassName } from "@/components/ui/form-field";
@@ -20,6 +27,8 @@ import type {
   RecruiterOption,
 } from "@/features/applications/types";
 import { initialApplicationActionState } from "@/features/applications/types";
+import type { ImportedJobData } from "@/features/job-import/types";
+import type { WorkModeValue } from "@/types/database.types";
 
 type ApplicationFormAction = (
   state: ApplicationActionState,
@@ -60,6 +69,7 @@ export function ApplicationForm({
   submitLabel,
   cancelHref = "/candidaturas",
   useBrowserDateDefault = false,
+  startWithJobImport = false,
 }: {
   action: ApplicationFormAction;
   companies: CompanyOption[];
@@ -68,6 +78,7 @@ export function ApplicationForm({
   submitLabel: string;
   cancelHref?: string;
   useBrowserDateDefault?: boolean;
+  startWithJobImport?: boolean;
 }) {
   const [state, formAction] = useActionState(
     action,
@@ -78,16 +89,40 @@ export function ApplicationForm({
   );
   const [companyOptions, setCompanyOptions] = useState(companies);
   const [companyModalOpen, setCompanyModalOpen] = useState(false);
+  const [jobImportOpen, setJobImportOpen] = useState(false);
+  const [jobImportInitialUrl, setJobImportInitialUrl] = useState(
+    initialValues.jobUrl,
+  );
+  const [companyInitialValues, setCompanyInitialValues] = useState<{
+    name?: string;
+    website?: string;
+    logoUrl?: string;
+    location?: string;
+    workMode?: WorkModeValue | "";
+  }>();
   const [selectedRecruiterId, setSelectedRecruiterId] = useState(
     initialValues.primaryRecruiterId,
   );
   const applicationDateRef = useRef<HTMLInputElement>(null);
+  const titleRef = useRef<HTMLInputElement>(null);
+  const locationRef = useRef<HTMLInputElement>(null);
+  const workModeRef = useRef<HTMLSelectElement>(null);
+  const jobUrlRef = useRef<HTMLInputElement>(null);
+  const employmentTypeRef = useRef<HTMLSelectElement>(null);
+  const opportunitySummaryRef = useRef<HTMLTextAreaElement>(null);
+  const sourceRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (useBrowserDateDefault && applicationDateRef.current) {
       applicationDateRef.current.value = formatLocalDateForInput(new Date());
     }
   }, [useBrowserDateDefault]);
+
+  useEffect(() => {
+    if (!startWithJobImport) return;
+    const timeout = window.setTimeout(() => setJobImportOpen(true), 0);
+    return () => window.clearTimeout(timeout);
+  }, [startWithJobImport]);
 
   const availableRecruiters = recruiters.filter(
     (recruiter) =>
@@ -116,16 +151,70 @@ export function ApplicationForm({
     );
     changeCompany(company.id);
     setCompanyModalOpen(false);
+    setCompanyInitialValues(undefined);
+  }
+
+  function applyImportedJob(data: ImportedJobData) {
+    if (titleRef.current) titleRef.current.value = data.title;
+    if (locationRef.current) locationRef.current.value = data.location;
+    if (workModeRef.current) workModeRef.current.value = data.workMode;
+    if (jobUrlRef.current) jobUrlRef.current.value = data.jobUrl;
+    if (employmentTypeRef.current) {
+      const hasOption = Array.from(employmentTypeRef.current.options).some(
+        (option) => option.value === data.employmentType,
+      );
+      employmentTypeRef.current.value = hasOption ? data.employmentType : "";
+    }
+    if (opportunitySummaryRef.current) {
+      opportunitySummaryRef.current.value = data.description;
+    }
+    if (sourceRef.current && data.source) sourceRef.current.value = data.source;
+
+    const existingCompany = companyOptions.find(
+      (company) =>
+        company.name.localeCompare(data.companyName, "pt-PT", {
+          sensitivity: "base",
+        }) === 0,
+    );
+    if (existingCompany) {
+      changeCompany(existingCompany.id);
+    } else {
+      setCompanyInitialValues({
+        name: data.companyName,
+        website: data.companyWebsite,
+        logoUrl: data.companyLogoUrl,
+        location: data.location,
+        workMode: data.workMode,
+      });
+      setCompanyModalOpen(true);
+    }
+    setJobImportOpen(false);
   }
 
   return (
     <form action={formAction} className="space-y-6">
       {companyModalOpen ? (
         <QuickCompanyModal
-          onClose={() => setCompanyModalOpen(false)}
+          initialValues={companyInitialValues}
+          onClose={() => {
+            setCompanyModalOpen(false);
+            setCompanyInitialValues(undefined);
+          }}
           onCreated={addCompany}
         />
       ) : null}
+      {jobImportOpen ? (
+        <JobImportModal
+          initialUrl={jobImportInitialUrl}
+          onApply={applyImportedJob}
+          onClose={() => setJobImportOpen(false)}
+        />
+      ) : null}
+
+      <div className="flex justify-end">
+        <SubmitButton label={submitLabel} />
+      </div>
+
       {state.message ? (
         <p
           role="alert"
@@ -144,6 +233,20 @@ export function ApplicationForm({
               Informação principal sobre a vaga.
             </p>
           </div>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            onClick={() => {
+              setJobImportInitialUrl(
+                jobUrlRef.current?.value ?? initialValues.jobUrl,
+              );
+              setJobImportOpen(true);
+            }}
+          >
+            <FileSearch aria-hidden="true" className="size-4" />
+            Importar vaga
+          </Button>
         </CardHeader>
         <CardContent className="grid gap-5 md:grid-cols-2">
           <FormField
@@ -156,6 +259,7 @@ export function ApplicationForm({
               id="application-title"
               name="title"
               type="text"
+              ref={titleRef}
               defaultValue={initialValues.title}
               placeholder="Ex.: Application Support Engineer"
               className={fieldClassName}
@@ -218,6 +322,7 @@ export function ApplicationForm({
               id="application-location"
               name="location"
               type="text"
+              ref={locationRef}
               defaultValue={initialValues.location}
               placeholder="Ex.: Lisboa e Região"
               className={fieldClassName}
@@ -238,6 +343,7 @@ export function ApplicationForm({
             <select
               id="application-work-mode"
               name="workMode"
+              ref={workModeRef}
               defaultValue={initialValues.workMode}
               className={fieldClassName}
               aria-invalid={Boolean(state.fieldErrors?.workMode)}
@@ -264,6 +370,7 @@ export function ApplicationForm({
               id="application-job-url"
               name="jobUrl"
               type="text"
+              ref={jobUrlRef}
               inputMode="url"
               defaultValue={initialValues.jobUrl}
               placeholder="linkedin.com/jobs/view/..."
@@ -285,6 +392,7 @@ export function ApplicationForm({
             <select
               id="application-employment-type"
               name="employmentType"
+              ref={employmentTypeRef}
               defaultValue={initialValues.employmentType}
               className={fieldClassName}
               aria-invalid={Boolean(state.fieldErrors?.employmentType)}
@@ -404,6 +512,7 @@ export function ApplicationForm({
               <textarea
                 id="application-opportunity-summary"
                 name="opportunitySummary"
+                ref={opportunitySummaryRef}
                 rows={4}
                 defaultValue={initialValues.opportunitySummary}
                 placeholder="Responsabilidades, requisitos ou condições importantes..."
@@ -488,6 +597,7 @@ export function ApplicationForm({
               id="application-source"
               name="source"
               type="text"
+              ref={sourceRef}
               defaultValue={initialValues.source}
               placeholder="Ex.: LinkedIn"
               className={fieldClassName}

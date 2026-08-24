@@ -7,8 +7,10 @@ import { createPortal } from "react-dom";
 import { CompanyLogoField } from "@/components/companies/company-logo-field";
 import { Button } from "@/components/ui/button";
 import { FormField, fieldClassName } from "@/components/ui/form-field";
+import { workModeOptions } from "@/features/applications/constants";
 import { createQuickCompanyAction } from "@/features/companies/actions";
 import { initialQuickCompanyActionState } from "@/features/companies/types";
+import type { WorkModeValue } from "@/types/database.types";
 
 type CreatedCompany = {
   id: string;
@@ -16,9 +18,17 @@ type CreatedCompany = {
 };
 
 export function QuickCompanyModal({
+  initialValues,
   onClose,
   onCreated,
 }: {
+  initialValues?: {
+    name?: string;
+    website?: string;
+    logoUrl?: string;
+    location?: string;
+    workMode?: WorkModeValue | "";
+  };
   onClose: () => void;
   onCreated: (company: CreatedCompany) => void;
 }) {
@@ -26,8 +36,8 @@ export function QuickCompanyModal({
     createQuickCompanyAction,
     initialQuickCompanyActionState,
   );
-  const [companyName, setCompanyName] = useState("");
-  const [website, setWebsite] = useState("");
+  const [companyName, setCompanyName] = useState(initialValues?.name ?? "");
+  const [website, setWebsite] = useState(initialValues?.website ?? "");
   const dialogRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -175,9 +185,43 @@ export function QuickCompanyModal({
               companyName={companyName}
               website={website}
               onWebsiteChange={setWebsite}
-              initialLogoUrl=""
+              initialLogoUrl={initialValues?.logoUrl ?? ""}
               error={state.fieldErrors?.logoUrl}
             />
+            <FormField
+              label="Localização"
+              htmlFor="quick-company-location"
+              error={state.fieldErrors?.location}
+            >
+              <input
+                id="quick-company-location"
+                name="location"
+                type="text"
+                defaultValue={initialValues?.location ?? ""}
+                placeholder="Ex.: Lisboa"
+                className={fieldClassName}
+                maxLength={160}
+              />
+            </FormField>
+            <FormField
+              label="Modalidade habitual"
+              htmlFor="quick-company-work-mode"
+              error={state.fieldErrors?.workMode}
+            >
+              <select
+                id="quick-company-work-mode"
+                name="workMode"
+                defaultValue={initialValues?.workMode ?? ""}
+                className={fieldClassName}
+              >
+                <option value="">Sem modalidade definida</option>
+                {workModeOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </FormField>
           </div>
 
           <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">

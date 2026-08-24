@@ -2,7 +2,7 @@
 
 Estado: validação contínua após publicação
 
-Data: 9 de agosto de 2026
+Data: 24 de agosto de 2026
 
 ## Verificações automáticas
 
@@ -50,11 +50,24 @@ recuperação de palavra-passe apresentaram:
 - [ ] criar, editar e eliminar uma empresa sem vagas;
 - [ ] confirmar que uma empresa com vagas não é eliminada;
 - [ ] criar uma empresa dentro do formulário de candidatura e confirmar a seleção automática;
+- [ ] importar uma vaga de um site com dados estruturados e rever todos os campos antes de aplicar;
+- [ ] importar uma vaga pública do LinkedIn usando apenas o link e confirmar título, empresa, localização, descrição e logótipo;
+- [ ] importar uma vaga a partir de um link de resultados do LinkedIn com `currentJobId` e confirmar que o link guardado fica no formato `/jobs/view/ID/`;
+- [ ] importar um link do Indeed com `jk` ou `vjk`, confirmar a leitura pelo endpoint incorporado e a normalização do link guardado para `/viewjob?jk=...`;
+- [ ] abrir “Importar vaga” diretamente pelo dashboard e confirmar que o modal aparece sem outro clique;
+- [ ] guardar uma candidatura através do botão no topo do formulário e confirmar que o botão inferior continua disponível;
+- [ ] confirmar que o fallback de texto continua disponível quando a vaga já não está pública;
+- [ ] confirmar que uma empresa existente é reutilizada e que uma empresa nova só é criada após confirmação;
+- [ ] confirmar a sugestão ou edição manual do logótipo durante a criação da empresa importada;
 - [ ] criar, editar, consultar e eliminar uma candidatura de teste;
 - [ ] alterar rapidamente o estado da candidatura na lista e no detalhe;
 - [ ] confirmar o fluxo candidatura enviada, entrevista agendada, a aguardar resposta e resultado final;
 - [ ] criar, editar e eliminar um recrutador;
 - [ ] criar, editar e eliminar uma entrevista;
+- [ ] abrir uma entrevista pelo cartão, consultar o resumo e só depois entrar no modo de edição;
+- [ ] editar o “Guião pessoal e CV” e as “Perguntas para a empresa” através do modal e confirmar que a página de resumo permanece aberta;
+- [ ] editar “Feedback e notas” e “Resultado” através do modal e confirmar a atualização imediata do resumo;
+- [ ] guardar uma entrevista e confirmar o regresso ao respetivo resumo;
 - [ ] criar, concluir, reabrir e eliminar uma ação;
 - [ ] criar, editar e eliminar uma nota no detalhe da candidatura.
 

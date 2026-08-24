@@ -35,11 +35,15 @@ A aplicação encontra-se publicada na Vercel e utiliza o Supabase para autentic
 
 - Dashboard com métricas, taxa de resposta, candidaturas recentes e atalhos rápidos.
 - Registo e gestão completa de candidaturas, empresas e oportunidades.
+- Importação assistida de vagas através de dados estruturados ou texto colado pelo utilizador, com normalização de links do LinkedIn e Indeed.
+- Atalho de importação no dashboard, abrindo diretamente o importador da nova candidatura.
 - Pesquisa, ordenação e filtros combináveis guardados no URL.
 - Alteração rápida do estado diretamente na lista e no detalhe da candidatura.
 - Página de detalhe com o contexto completo de cada candidatura.
 - Gestão de recrutadores e respetivos contactos.
-- Preparação, acompanhamento e registo do resultado de entrevistas.
+- Página de resumo para preparar, acompanhar e registar o resultado de entrevistas.
+- Edição rápida do guião pessoal/CV e das perguntas para a empresa num modal, sem abandonar o resumo da entrevista.
+- Registo rápido de feedback, notas e resultado num modal durante ou depois da entrevista.
 - Tarefas com prioridade, prazo e estado, associadas a candidaturas.
 - Agenda agregada com entrevistas, follow-ups e tarefas numa cronologia única.
 - Gestão de logótipos de empresas, com pesquisa assistida e edição manual.
@@ -112,6 +116,8 @@ flowchart LR
 - Todas as páginas da aplicação exigem uma sessão válida.
 - Cada tabela privada inclui políticas RLS que isolam os dados por `user_id`.
 - Os filtros e identificadores recebidos pelo URL são validados antes das consultas.
+- O importador de vagas exige autenticação, limita o tamanho das respostas e bloqueia endereços locais ou privados.
+- O LinkedIn é consultado apenas através da página pública da vaga, sem cookies ou credenciais da conta; o texto colado permanece disponível como fallback.
 - Os avatares aceitam apenas JPEG, PNG ou WebP até 2 MB e são validados antes do upload.
 - As credenciais do Supabase permanecem em variáveis de ambiente e não são incluídas no repositório.
 

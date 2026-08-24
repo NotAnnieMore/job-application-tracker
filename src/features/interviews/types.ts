@@ -23,6 +23,11 @@ export type InterviewActionState = {
   fieldErrors?: Partial<Record<InterviewField, string>>;
 };
 
+export type InterviewPreparationActionState = {
+  status: "idle" | "error" | "success";
+  message?: string;
+};
+
 export type InterviewFormValues = {
   applicationId: string;
   recruiterId: string;
@@ -81,6 +86,15 @@ export type InterviewListFilters = {
 
 export type InterviewDetails = InterviewFormValues & {
   id: string;
+  scheduledAt: string;
+  applicationTitle: string;
+  companyName: string;
+  companyLogoUrl: string;
+  recruiterName: string;
+  recruiterEmail: string;
+  recruiterPhone: string;
+  applicationPreparation: string;
+  questionsForCompany: string;
 };
 
 export const initialInterviewActionState: InterviewActionState = {

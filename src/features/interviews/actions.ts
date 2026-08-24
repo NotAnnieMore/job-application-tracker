@@ -3,7 +3,10 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
-import type { InterviewActionState } from "@/features/interviews/types";
+import type {
+  InterviewActionState,
+  InterviewPreparationActionState,
+} from "@/features/interviews/types";
 import {
   hasInterviewFieldErrors,
   isValidInterviewId,
@@ -33,6 +36,7 @@ function saveError(): InterviewActionState {
 
 function revalidateInterviewPages() {
   revalidatePath(interviewsPath);
+  revalidatePath("/entrevistas/[interviewId]", "page");
   revalidatePath("/dashboard");
   revalidatePath("/candidaturas");
   revalidatePath("/candidaturas/[applicationId]", "page");
@@ -151,11 +155,123 @@ export async function updateInterviewAction(
   }
 
   revalidateInterviewPages();
+  const returnQuery = returnToApplication ? "&regressar=candidatura" : "";
   redirect(
-    returnToApplication
-      ? `/candidaturas/${values.application_id}?aviso=entrevista-atualizada`
-      : `${interviewsPath}?aviso=entrevista-atualizada`,
+    `${interviewsPath}/${interviewId}?aviso=entrevista-atualizada${returnQuery}`,
   );
+}
+
+export async function updateInterviewApplicationPreparationAction(
+  interviewId: string,
+  rawApplicationPreparation: string,
+  rawQuestionsForCompany: string,
+): Promise<InterviewPreparationActionState> {
+  if (!isValidInterviewId(interviewId)) {
+    return { status: "error", message: "A entrevista indicada não é válida." };
+  }
+  const applicationPreparation =
+    typeof rawApplicationPreparation === "string"
+      ? rawApplicationPreparation.trim()
+      : "";
+  const questionsForCompany =
+    typeof rawQuestionsForCompany === "string"
+      ? rawQuestionsForCompany.trim()
+      : "";
+  if (applicationPreparation.length > 10_000) {
+    return {
+      status: "error",
+      message: "O guião pode ter no máximo 10 000 caracteres.",
+    };
+  }
+  if (questionsForCompany.length > 10_000) {
+    return {
+      status: "error",
+      message: "As perguntas podem ter no máximo 10 000 caracteres.",
+    };
+  }
+
+  const user = await requireCurrentUser();
+  const supabase = await createClient();
+  const { data: interview, error: interviewError } = await supabase
+    .from("interviews")
+    .select("application_id")
+    .eq("id", interviewId)
+    .eq("user_id", user.id)
+    .maybeSingle();
+
+  if (interviewError || !interview) {
+    return {
+      status: "error",
+      message: "Não foi possível guardar o guião. Tenta novamente.",
+    };
+  }
+
+  const { data: application, error: applicationError } = await supabase
+    .from("applications")
+    .update({
+      interview_preparation: applicationPreparation || null,
+      questions_for_company: questionsForCompany || null,
+    })
+    .eq("id", interview.application_id)
+    .eq("user_id", user.id)
+    .select("id")
+    .maybeSingle();
+
+  if (applicationError || !application) {
+    return {
+      status: "error",
+      message: "Não foi possível guardar o guião. Tenta novamente.",
+    };
+  }
+
+  revalidatePath(`${interviewsPath}/${interviewId}`);
+  revalidatePath(`/candidaturas/${application.id}`);
+  return { status: "success" };
+}
+
+export async function updateInterviewOutcomeAction(
+  interviewId: string,
+  rawFeedback: string,
+  rawResult: string,
+): Promise<InterviewPreparationActionState> {
+  if (!isValidInterviewId(interviewId)) {
+    return { status: "error", message: "A entrevista indicada não é válida." };
+  }
+  const feedback = typeof rawFeedback === "string" ? rawFeedback.trim() : "";
+  const result = typeof rawResult === "string" ? rawResult.trim() : "";
+  if (feedback.length > 10_000) {
+    return {
+      status: "error",
+      message: "O feedback pode ter no máximo 10 000 caracteres.",
+    };
+  }
+  if (result.length > 4_000) {
+    return {
+      status: "error",
+      message: "O resultado pode ter no máximo 4 000 caracteres.",
+    };
+  }
+
+  const user = await requireCurrentUser();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("interviews")
+    .update({ feedback: feedback || null, result: result || null })
+    .eq("id", interviewId)
+    .eq("user_id", user.id)
+    .select("id")
+    .maybeSingle();
+
+  if (error || !data) {
+    return {
+      status: "error",
+      message: "Não foi possível guardar as notas. Tenta novamente.",
+    };
+  }
+
+  revalidatePath(`${interviewsPath}/${interviewId}`);
+  revalidatePath(interviewsPath);
+  return { status: "success" };
 }
 
 export async function deleteInterviewAction(

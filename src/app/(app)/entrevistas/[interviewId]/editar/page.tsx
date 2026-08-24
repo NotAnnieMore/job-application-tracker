@@ -30,8 +30,8 @@ export default async function EditInterviewPage({
   if (!interview) notFound();
   const returnToApplication = query.regressar === "candidatura";
   const returnHref = returnToApplication
-    ? `/candidaturas/${interview.applicationId}`
-    : "/entrevistas";
+    ? `/entrevistas/${interview.id}?regressar=candidatura`
+    : `/entrevistas/${interview.id}`;
   const action = updateInterviewAction.bind(
     null,
     interview.id,
@@ -45,7 +45,7 @@ export default async function EditInterviewPage({
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        {returnToApplication ? "Voltar à candidatura" : "Voltar às entrevistas"}
+        Voltar ao resumo da entrevista
       </Link>
       <PageHeader
         title={`Preparar ${interview.interviewType}`}

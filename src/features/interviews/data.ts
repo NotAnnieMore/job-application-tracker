@@ -248,8 +248,49 @@ export async function getInterviewById(
   if (error) throw new Error("Não foi possível consultar a entrevista.");
   if (!data) return null;
 
+  const { data: application, error: applicationError } = await supabase
+    .from("applications")
+    .select("opportunity_id, interview_preparation, questions_for_company")
+    .eq("id", data.application_id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (applicationError)
+    throw new Error("Não foi possível consultar a candidatura.");
+  if (!application) return null;
+
+  const [opportunityResult, recruiterResult] = await Promise.all([
+    supabase
+      .from("opportunities")
+      .select("company_id, title")
+      .eq("id", application.opportunity_id)
+      .eq("user_id", user.id)
+      .maybeSingle(),
+    data.recruiter_id
+      ? supabase
+          .from("recruiters")
+          .select("name, email, phone")
+          .eq("id", data.recruiter_id)
+          .eq("user_id", user.id)
+          .maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+  ]);
+  if (opportunityResult.error || recruiterResult.error) {
+    throw new Error("Não foi possível consultar o contexto da entrevista.");
+  }
+  if (!opportunityResult.data) return null;
+
+  const { data: company, error: companyError } = await supabase
+    .from("companies")
+    .select("name, logo_url")
+    .eq("id", opportunityResult.data.company_id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (companyError) throw new Error("Não foi possível consultar a empresa.");
+  if (!company) return null;
+
   return {
     id: data.id,
+    scheduledAt: data.scheduled_at,
     applicationId: data.application_id,
     recruiterId: data.recruiter_id ?? "",
     interviewType: data.interview_type,
@@ -263,5 +304,13 @@ export async function getInterviewById(
     preparation: data.preparation ?? "",
     feedback: data.feedback ?? "",
     result: data.result ?? "",
+    applicationTitle: opportunityResult.data.title,
+    companyName: company.name,
+    companyLogoUrl: company.logo_url ?? "",
+    recruiterName: recruiterResult.data?.name ?? "",
+    recruiterEmail: recruiterResult.data?.email ?? "",
+    recruiterPhone: recruiterResult.data?.phone ?? "",
+    applicationPreparation: application.interview_preparation ?? "",
+    questionsForCompany: application.questions_for_company ?? "",
   };
 }

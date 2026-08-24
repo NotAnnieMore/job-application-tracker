@@ -10,7 +10,13 @@ import {
 } from "@/features/applications/data";
 import { createEmptyApplicationFormValues } from "@/features/applications/types";
 
-export default async function NewApplicationPage() {
+export default async function NewApplicationPage({
+  searchParams,
+}: {
+  searchParams: Promise<Record<string, string | string[] | undefined>>;
+}) {
+  const query = await searchParams;
+  const startWithJobImport = query.importar === "vaga";
   const [companies, recruiters] = await Promise.all([
     getCompanyOptions(),
     getRecruiterOptions(),
@@ -36,6 +42,7 @@ export default async function NewApplicationPage() {
         initialValues={createEmptyApplicationFormValues()}
         submitLabel="Guardar candidatura"
         useBrowserDateDefault
+        startWithJobImport={startWithJobImport}
       />
     </div>
   );

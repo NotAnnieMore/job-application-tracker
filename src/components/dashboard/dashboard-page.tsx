@@ -9,6 +9,7 @@ import {
   CheckCircle2,
   ChevronRight,
   FileText,
+  FileSearch,
   Inbox,
   ListChecks,
   MessageSquare,
@@ -231,10 +232,19 @@ export async function DashboardPage() {
         title="Dashboard"
         description="Acompanha o progresso e as próximas prioridades da tua procura de emprego."
         action={
-          <Link href="/candidaturas/nova" className={buttonClassName()}>
-            <Plus aria-hidden="true" className="size-4" />
-            Nova candidatura
-          </Link>
+          <div className="flex flex-wrap gap-2">
+            <Link
+              href="/candidaturas/nova?importar=vaga"
+              className={buttonClassName({ variant: "secondary" })}
+            >
+              <FileSearch aria-hidden="true" className="size-4" />
+              Importar vaga
+            </Link>
+            <Link href="/candidaturas/nova" className={buttonClassName()}>
+              <Plus aria-hidden="true" className="size-4" />
+              Nova candidatura
+            </Link>
+          </div>
         }
       />
 

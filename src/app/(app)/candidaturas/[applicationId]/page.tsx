@@ -493,7 +493,7 @@ export default async function ApplicationDetailPage({
                     <div className="flex flex-wrap items-start justify-between gap-3">
                       <div>
                         <Link
-                          href={`/entrevistas/${interview.id}/editar?regressar=candidatura`}
+                          href={`/entrevistas/${interview.id}?regressar=candidatura`}
                           className="font-semibold text-slate-950 hover:text-blue-700"
                         >
                           {interview.interviewType}

@@ -27,6 +27,8 @@ Data: 2 de agosto de 2026
 | Recrutadores           | `/recrutadores`             | Listar, pesquisar e gerir recrutadores.                                         |
 | Detalhe do recrutador  | `/recrutadores/[id]`        | Consultar contactos e candidaturas relacionadas.                                |
 | Entrevistas            | `/entrevistas`              | Consultar entrevistas futuras e passadas.                                       |
+| Detalhe da entrevista  | `/entrevistas/[id]`         | Consultar contexto, participantes, guião, perguntas, feedback e resultado.      |
+| Editar entrevista      | `/entrevistas/[id]/editar`  | Atualizar o agendamento, preparação, feedback e resultado.                      |
 | Tarefas                | `/acoes`                    | Consultar tarefas pendentes, concluídas e em atraso.                            |
 | Nova tarefa            | `/acoes/nova`               | Criar uma tarefa associada a uma candidatura.                                   |
 | Editar tarefa          | `/acoes/[id]/editar`        | Atualizar, concluir, cancelar ou eliminar uma tarefa.                           |
@@ -53,7 +55,8 @@ As estatísticas ficam integradas no dashboard durante o MVP e não terão uma p
 
 1. O utilizador entra na página de candidaturas.
 2. Seleciona “Nova candidatura”.
-3. Introduz o título da vaga, empresa, estado e data.
-4. Pode selecionar dados existentes ou criar uma empresa, oportunidade e recrutador sem abandonar o fluxo.
-5. Guarda a candidatura.
-6. Consulta o detalhe e acrescenta entrevistas, notas ou tarefas ao longo do processo.
+3. Pode importar dados estruturados de um site compatível ou colar o texto de uma vaga do LinkedIn.
+4. Revê o título, empresa, localização, modalidade e descrição antes de preencher o formulário.
+5. Pode selecionar dados existentes ou criar uma empresa, oportunidade e recrutador sem abandonar o fluxo.
+6. Guarda a candidatura.
+7. Consulta o detalhe e acrescenta entrevistas, notas ou tarefas ao longo do processo.
