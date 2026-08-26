@@ -10,14 +10,14 @@ export function PageHeader({
   action?: ReactNode;
 }) {
   return (
-    <header className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+    <header className="flex min-w-0 flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
       <title>{`${title} | Job Application Tracker`}</title>
-      <div>
-        <h1 className="text-2xl font-bold tracking-tight text-slate-950 sm:text-3xl">
+      <div className="min-w-0">
+        <h1 className="break-words text-2xl font-bold tracking-tight text-slate-950 [overflow-wrap:anywhere] sm:text-3xl">
           {title}
         </h1>
         {description ? (
-          <p className="mt-1.5 text-sm leading-6 text-slate-500 sm:text-base">
+          <p className="mt-1.5 break-words text-sm leading-6 text-slate-500 [overflow-wrap:anywhere] sm:text-base">
             {description}
           </p>
         ) : null}

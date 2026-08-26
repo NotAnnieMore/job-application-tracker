@@ -45,10 +45,10 @@ function TextSection({
   emptyText: string;
 }) {
   return (
-    <section>
+    <section className="min-w-0">
       <h3 className="text-sm font-bold text-slate-950">{title}</h3>
       {value ? (
-        <div className="mt-3 whitespace-pre-wrap text-sm leading-7 text-slate-700">
+        <div className="mt-3 break-words whitespace-pre-wrap text-sm leading-7 text-slate-700 [overflow-wrap:anywhere]">
           {value}
         </div>
       ) : (
@@ -82,7 +82,7 @@ export default async function InterviewDetailsPage({
       : undefined;
 
   return (
-    <div className="space-y-6">
+    <div className="min-w-0 space-y-6">
       <Link
         href={backHref}
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
@@ -103,23 +103,23 @@ export default async function InterviewDetailsPage({
       />
       <SuccessToast message={notice} queryParam="aviso" />
 
-      <div className="grid gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
-        <div className="space-y-6">
-          <Card>
-            <CardHeader>
-              <div className="flex min-w-0 items-center gap-3">
+      <div className="grid min-w-0 grid-cols-[minmax(0,1fr)] gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        <div className="min-w-0 space-y-6">
+          <Card className="min-w-0">
+            <CardHeader className="flex-wrap items-start">
+              <div className="flex max-w-full min-w-0 items-center gap-3">
                 <CompanyLogo
                   name={interview.companyName}
                   logoUrl={interview.companyLogoUrl}
                   size="lg"
                 />
                 <div className="min-w-0">
-                  <h2 className="truncate font-bold text-slate-950">
+                  <h2 className="break-words font-bold text-slate-950 [overflow-wrap:anywhere] sm:truncate">
                     {interview.companyName}
                   </h2>
                   <Link
                     href={`/candidaturas/${interview.applicationId}`}
-                    className="mt-1 block truncate text-sm font-medium text-blue-600 hover:text-blue-700"
+                    className="mt-1 block break-words text-sm font-medium text-blue-600 [overflow-wrap:anywhere] hover:text-blue-700 sm:truncate"
                   >
                     {interview.applicationTitle}
                   </Link>
@@ -133,11 +133,11 @@ export default async function InterviewDetailsPage({
                   className="mt-0.5 size-5 text-slate-400"
                   aria-hidden="true"
                 />
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs font-bold tracking-wide text-slate-400 uppercase">
                     Data e hora
                   </p>
-                  <p className="mt-1 text-sm font-medium text-slate-800">
+                  <p className="mt-1 break-words text-sm font-medium text-slate-800 [overflow-wrap:anywhere]">
                     {formatInterviewDateTime(interview.scheduledAt)}
                   </p>
                 </div>
@@ -147,7 +147,7 @@ export default async function InterviewDetailsPage({
                   className="mt-0.5 size-5 text-slate-400"
                   aria-hidden="true"
                 />
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs font-bold tracking-wide text-slate-400 uppercase">
                     Duração
                   </p>
@@ -161,7 +161,7 @@ export default async function InterviewDetailsPage({
                   className="mt-0.5 size-5 text-slate-400"
                   aria-hidden="true"
                 />
-                <div>
+                <div className="min-w-0">
                   <p className="text-xs font-bold tracking-wide text-slate-400 uppercase">
                     Formato
                   </p>
@@ -191,7 +191,7 @@ export default async function InterviewDetailsPage({
                         <ExternalLink aria-hidden="true" className="size-3.5" />
                       </a>
                     ) : (
-                      <p className="mt-1 text-sm font-medium text-slate-800">
+                      <p className="mt-1 break-words text-sm font-medium text-slate-800 [overflow-wrap:anywhere]">
                         {interview.locationOrUrl}
                       </p>
                     )
@@ -203,9 +203,9 @@ export default async function InterviewDetailsPage({
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <div>
+          <Card className="min-w-0">
+            <CardHeader className="flex-wrap items-start">
+              <div className="min-w-0">
                 <h2 className="font-bold text-slate-950">Preparação</h2>
                 <p className="mt-1 text-sm text-slate-500">
                   Guião e perguntas para levares para a conversa.
@@ -236,9 +236,9 @@ export default async function InterviewDetailsPage({
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <div>
+          <Card className="min-w-0">
+            <CardHeader className="flex-wrap items-start">
+              <div className="min-w-0">
                 <h2 className="font-bold text-slate-950">Resultado e notas</h2>
                 <p className="mt-1 text-sm text-slate-500">
                   Registo feito depois da entrevista.
@@ -265,8 +265,8 @@ export default async function InterviewDetailsPage({
           </Card>
         </div>
 
-        <aside className="space-y-6">
-          <Card>
+        <aside className="min-w-0 space-y-6">
+          <Card className="min-w-0">
             <CardHeader>
               <h2 className="font-bold text-slate-950">Pessoas</h2>
             </CardHeader>
@@ -280,7 +280,7 @@ export default async function InterviewDetailsPage({
                   <p className="text-xs font-bold tracking-wide text-slate-400 uppercase">
                     Recrutador
                   </p>
-                  <p className="mt-1 text-sm font-medium text-slate-800">
+                  <p className="mt-1 break-words text-sm font-medium text-slate-800 [overflow-wrap:anywhere]">
                     {interview.recruiterName || "Por definir"}
                   </p>
                 </div>
@@ -291,7 +291,9 @@ export default async function InterviewDetailsPage({
                   className="flex items-center gap-3 text-sm text-blue-600 hover:text-blue-700"
                 >
                   <Mail aria-hidden="true" className="size-5 text-slate-400" />
-                  <span className="truncate">{interview.recruiterEmail}</span>
+                  <span className="min-w-0 break-all">
+                    {interview.recruiterEmail}
+                  </span>
                 </a>
               ) : null}
               {interview.recruiterPhone ? (
@@ -300,7 +302,9 @@ export default async function InterviewDetailsPage({
                   className="flex items-center gap-3 text-sm text-blue-600 hover:text-blue-700"
                 >
                   <Phone aria-hidden="true" className="size-5 text-slate-400" />
-                  {interview.recruiterPhone}
+                  <span className="min-w-0 break-all">
+                    {interview.recruiterPhone}
+                  </span>
                 </a>
               ) : null}
               <div className="flex gap-3">
@@ -312,7 +316,7 @@ export default async function InterviewDetailsPage({
                   <p className="text-xs font-bold tracking-wide text-slate-400 uppercase">
                     Participantes
                   </p>
-                  <p className="mt-1 whitespace-pre-wrap text-sm text-slate-700">
+                  <p className="mt-1 break-words whitespace-pre-wrap text-sm text-slate-700 [overflow-wrap:anywhere]">
                     {interview.participants || "Por definir"}
                   </p>
                 </div>
@@ -320,7 +324,7 @@ export default async function InterviewDetailsPage({
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="min-w-0">
             <CardContent className="space-y-3">
               <Link
                 href={`/candidaturas/${interview.applicationId}`}

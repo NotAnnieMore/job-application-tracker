@@ -91,10 +91,12 @@ recuperação de palavra-passe apresentaram:
 ### Telemóvel e teclado
 
 - [ ] abrir e fechar o menu móvel pelo botão, pelo fundo e pela tecla Escape;
+- [ ] num ecrã tátil, deslizar a partir da margem esquerda para abrir o menu e deslizar da direita para a esquerda para o fechar, confirmando que o scroll vertical não é acionado por engano;
 - [ ] confirmar que Tab não sai do menu enquanto está aberto;
 - [ ] usar “Saltar para o conteúdo” com a tecla Tab;
 - [ ] percorrer formulários e ações sem usar o rato;
-- [ ] confirmar legibilidade e ausência de scroll horizontal a 375 px.
+- [ ] abrir o detalhe de uma entrevista com títulos, guiões, perguntas, participantes e contactos longos a 375 px;
+- [ ] confirmar que todo o conteúdo da entrevista quebra dentro dos cartões, sem scroll horizontal nem elementos cortados à direita.
 
 Os testes que eliminam dados devem usar registos temporários criados para esse
 fim, evitando alterar candidaturas reais.
