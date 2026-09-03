@@ -135,6 +135,15 @@ export function InterviewForm({
   return (
     <form action={formAction} className="space-y-6">
       <input type="hidden" name="timezoneOffset" value={timezoneOffset} />
+      <input
+        type="hidden"
+        name="preparation"
+        value={initialValues.preparation}
+      />
+
+      <div className="flex justify-end">
+        <SubmitButton label={submitLabel} />
+      </div>
 
       {state.message ? (
         <p
@@ -356,8 +365,7 @@ export function InterviewForm({
           <div>
             <h2 className="font-bold text-slate-950">Preparação</h2>
             <p className="mt-1 text-sm text-slate-500">
-              Consulta o guião geral da candidatura e acrescenta notas
-              específicas desta conversa.
+              Consulta o guião pessoal e as perguntas guardadas na candidatura.
             </p>
           </div>
           {selectedApplication ? (
@@ -401,22 +409,6 @@ export function InterviewForm({
               emptyText="Ainda não adicionaste perguntas para esta empresa."
             />
           </div>
-          <FormField
-            label="Preparação específica desta entrevista"
-            htmlFor="interview-preparation"
-            hint="Tópicos técnicos, exemplos, nomes ou pontos a confirmar nesta etapa."
-            error={state.fieldErrors?.preparation}
-          >
-            <textarea
-              id="interview-preparation"
-              name="preparation"
-              rows={7}
-              defaultValue={initialValues.preparation}
-              placeholder="Pontos específicos a preparar..."
-              className={textareaClassName}
-              maxLength={10000}
-            />
-          </FormField>
         </CardContent>
       </Card>
 

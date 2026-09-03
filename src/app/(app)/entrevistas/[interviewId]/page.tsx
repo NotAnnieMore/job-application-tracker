@@ -17,8 +17,8 @@ import { notFound } from "next/navigation";
 
 import { CompanyLogo } from "@/components/companies/company-logo";
 import { InterviewOutcomeEditor } from "@/components/interviews/interview-outcome-editor";
-import { InterviewStatusBadge } from "@/components/interviews/interview-status-badge";
 import { InterviewPreparationEditor } from "@/components/interviews/interview-preparation-editor";
+import { InterviewQuickStatusForm } from "@/components/interviews/interview-quick-status-form";
 import { PageHeader } from "@/components/shared/page-header";
 import { SuccessToast } from "@/components/shared/success-toast";
 import { buttonClassName } from "@/components/ui/button";
@@ -125,7 +125,11 @@ export default async function InterviewDetailsPage({
                   </Link>
                 </div>
               </div>
-              <InterviewStatusBadge status={interview.status} />
+              <InterviewQuickStatusForm
+                interviewId={interview.id}
+                status={interview.status}
+                className="w-32"
+              />
             </CardHeader>
             <CardContent className="grid gap-5 sm:grid-cols-2">
               <div className="flex gap-3">
@@ -218,11 +222,6 @@ export default async function InterviewDetailsPage({
               />
             </CardHeader>
             <CardContent className="space-y-7">
-              <TextSection
-                title="Guião desta entrevista"
-                value={interview.preparation}
-                emptyText="Ainda não existe um guião específico para esta entrevista."
-              />
               <TextSection
                 title="Guião pessoal e CV"
                 value={interview.applicationPreparation}

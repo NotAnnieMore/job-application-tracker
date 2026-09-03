@@ -28,6 +28,11 @@ export type InterviewPreparationActionState = {
   message?: string;
 };
 
+export type InterviewStatusActionState = {
+  status: "success" | "warning" | "error";
+  message?: string;
+};
+
 export type InterviewFormValues = {
   applicationId: string;
   recruiterId: string;

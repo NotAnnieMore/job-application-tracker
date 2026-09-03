@@ -70,9 +70,12 @@ recuperação de palavra-passe apresentaram:
 - [ ] criar, editar e eliminar um recrutador;
 - [ ] criar, editar e eliminar uma entrevista;
 - [ ] abrir uma entrevista pelo cartão, consultar o resumo e só depois entrar no modo de edição;
+- [ ] alterar o estado diretamente num cartão da lista e no resumo da entrevista, confirmando a atualização sem abrir o formulário completo;
+- [ ] marcar uma entrevista como “Concluída” pela alteração rápida e pelo formulário completo e confirmar que a candidatura passa automaticamente para “A aguardar resposta”, sem substituir estados finais como proposta, rejeitada ou retirada;
 - [ ] editar o “Guião pessoal e CV” e as “Perguntas para a empresa” através do modal e confirmar que a página de resumo permanece aberta;
+- [ ] confirmar que o resumo e o formulário apresentam apenas o guião pessoal e CV e as perguntas para a empresa, sem o bloco de guião específico da entrevista;
 - [ ] editar “Feedback e notas” e “Resultado” através do modal e confirmar a atualização imediata do resumo;
-- [ ] guardar uma entrevista e confirmar o regresso ao respetivo resumo;
+- [ ] guardar uma entrevista pelos botões superior e inferior e confirmar o regresso ao respetivo resumo;
 - [ ] criar, concluir, reabrir e eliminar uma ação;
 - [ ] criar, editar e eliminar uma nota no detalhe da candidatura.
 
@@ -95,6 +98,7 @@ recuperação de palavra-passe apresentaram:
 - [ ] confirmar que Tab não sai do menu enquanto está aberto;
 - [ ] usar “Saltar para o conteúdo” com a tecla Tab;
 - [ ] percorrer formulários e ações sem usar o rato;
+- [ ] no formulário de candidatura, confirmar que “Importar vaga” é apresentado como um botão quadrado com ícone a 375 px e recupera o texto em ecrãs maiores;
 - [ ] abrir o detalhe de uma entrevista com títulos, guiões, perguntas, participantes e contactos longos a 375 px;
 - [ ] confirmar que todo o conteúdo da entrevista quebra dentro dos cartões, sem scroll horizontal nem elementos cortados à direita.
 

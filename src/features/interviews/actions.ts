@@ -3,9 +3,11 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
+import { interviewStatusOptions } from "@/features/interviews/constants";
 import type {
   InterviewActionState,
   InterviewPreparationActionState,
+  InterviewStatusActionState,
 } from "@/features/interviews/types";
 import {
   hasInterviewFieldErrors,
@@ -14,8 +16,22 @@ import {
 } from "@/features/interviews/validation";
 import { requireCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
+import type {
+  ApplicationStatusValue,
+  InterviewStatusValue,
+} from "@/types/database.types";
 
 const interviewsPath = "/entrevistas";
+const quickStatusValues = new Set(
+  interviewStatusOptions.map((option) => option.value),
+);
+const applicationStatusesAwaitingInterviewResult: ApplicationStatusValue[] = [
+  "interested",
+  "applied",
+  "interview_scheduled",
+  "interview_completed",
+  "awaiting_response",
+];
 
 function validationError(
   fieldErrors: NonNullable<InterviewActionState["fieldErrors"]>,
@@ -40,6 +56,21 @@ function revalidateInterviewPages() {
   revalidatePath("/dashboard");
   revalidatePath("/candidaturas");
   revalidatePath("/candidaturas/[applicationId]", "page");
+}
+
+async function markApplicationAsAwaitingResponse(
+  applicationId: string,
+  userId: string,
+) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("applications")
+    .update({ status: "awaiting_response" })
+    .eq("id", applicationId)
+    .eq("user_id", userId)
+    .in("status", applicationStatusesAwaitingInterviewResult);
+
+  return !error;
 }
 
 async function getApplicationCompany(applicationId: string, userId: string) {
@@ -154,11 +185,68 @@ export async function updateInterviewAction(
     return { status: "error", message: "A entrevista já não está disponível." };
   }
 
+  if (
+    values.status === "completed" &&
+    !(await markApplicationAsAwaitingResponse(values.application_id, user.id))
+  ) {
+    revalidateInterviewPages();
+    return {
+      status: "error",
+      message:
+        "A entrevista ficou concluída, mas não foi possível atualizar a candidatura. Tenta guardar novamente.",
+    };
+  }
+
   revalidateInterviewPages();
   const returnQuery = returnToApplication ? "&regressar=candidatura" : "";
   redirect(
     `${interviewsPath}/${interviewId}?aviso=entrevista-atualizada${returnQuery}`,
   );
+}
+
+export async function updateInterviewStatusAction(
+  interviewId: string,
+  rawStatus: InterviewStatusValue,
+): Promise<InterviewStatusActionState> {
+  if (!isValidInterviewId(interviewId)) {
+    return { status: "error", message: "A entrevista indicada não é válida." };
+  }
+  if (!quickStatusValues.has(rawStatus)) {
+    return { status: "error", message: "Seleciona um estado válido." };
+  }
+
+  const user = await requireCurrentUser();
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("interviews")
+    .update({ status: rawStatus })
+    .eq("id", interviewId)
+    .eq("user_id", user.id)
+    .select("id, application_id")
+    .maybeSingle();
+
+  if (error || !data) {
+    return {
+      status: "error",
+      message: "Não foi possível atualizar o estado. Tenta novamente.",
+    };
+  }
+
+  if (
+    rawStatus === "completed" &&
+    !(await markApplicationAsAwaitingResponse(data.application_id, user.id))
+  ) {
+    revalidateInterviewPages();
+    return {
+      status: "warning",
+      message:
+        "A entrevista ficou concluída, mas não foi possível atualizar a candidatura. Altera-a manualmente para “A aguardar resposta” ou tenta novamente.",
+    };
+  }
+
+  revalidateInterviewPages();
+  revalidatePath(`${interviewsPath}/${interviewId}`);
+  return { status: "success" };
 }
 
 export async function updateInterviewApplicationPreparationAction(

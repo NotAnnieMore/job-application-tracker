@@ -318,7 +318,9 @@ html[data-theme="dark"] .application-status-rejected {
   color: #fecaca;
 }
 
-html[data-theme="dark"] .application-quick-status option {
+html[data-theme="dark"]
+  :is(.application-quick-status, .interview-quick-status)
+  option {
   background-color: #111927;
   color: #e7edf6;
 }

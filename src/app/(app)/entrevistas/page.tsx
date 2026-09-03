@@ -13,7 +13,7 @@ import Link from "next/link";
 
 import { AutoSubmitSelect } from "@/components/applications/auto-submit-select";
 import { CompanyLogo } from "@/components/companies/company-logo";
-import { InterviewStatusBadge } from "@/components/interviews/interview-status-badge";
+import { InterviewQuickStatusForm } from "@/components/interviews/interview-quick-status-form";
 import {
   ActiveFilters,
   type ActiveFilter,
@@ -101,7 +101,11 @@ function InterviewCard({ interview }: { interview: InterviewListItem }) {
             <h2 className="font-bold text-slate-950 transition group-hover:text-blue-700">
               {interview.interviewType}
             </h2>
-            <InterviewStatusBadge status={interview.status} />
+            <InterviewQuickStatusForm
+              interviewId={interview.id}
+              status={interview.status}
+              className="pointer-events-auto relative z-10 w-32"
+            />
           </div>
           <div className="mt-2 flex items-center gap-2.5">
             <CompanyLogo

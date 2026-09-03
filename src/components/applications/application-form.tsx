@@ -236,7 +236,10 @@ export function ApplicationForm({
           <Button
             type="button"
             variant="secondary"
-            size="sm"
+            size="icon"
+            className="shrink-0 sm:h-9 sm:w-auto sm:rounded-lg sm:px-3 sm:text-sm"
+            aria-label="Importar vaga"
+            title="Importar vaga"
             onClick={() => {
               setJobImportInitialUrl(
                 jobUrlRef.current?.value ?? initialValues.jobUrl,
@@ -245,7 +248,7 @@ export function ApplicationForm({
             }}
           >
             <FileSearch aria-hidden="true" className="size-4" />
-            Importar vaga
+            <span className="sr-only sm:not-sr-only">Importar vaga</span>
           </Button>
         </CardHeader>
         <CardContent className="grid gap-5 md:grid-cols-2">

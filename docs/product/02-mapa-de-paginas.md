@@ -14,25 +14,25 @@ Data: 2 de agosto de 2026
 
 ## Área privada
 
-| Página                 | Caminho proposto            | Objetivo                                                                        |
-| ---------------------- | --------------------------- | ------------------------------------------------------------------------------- |
-| Dashboard              | `/dashboard`                | Mostrar indicadores, prioridades e atividade recente.                           |
-| Agenda                 | `/agenda`                   | Reunir entrevistas, follow-ups e tarefas numa cronologia.                       |
-| Candidaturas           | `/candidaturas`             | Pesquisar, filtrar, ordenar e consultar candidaturas.                           |
-| Nova candidatura       | `/candidaturas/nova`        | Criar a oportunidade e a candidatura num fluxo único.                           |
-| Detalhe da candidatura | `/candidaturas/[id]`        | Consultar resumo, empresa, recrutador, entrevistas, notas, tarefas e histórico. |
-| Editar candidatura     | `/candidaturas/[id]/editar` | Alterar os dados da candidatura e oportunidade.                                 |
-| Empresas               | `/empresas`                 | Listar, pesquisar e gerir empresas.                                             |
-| Detalhe da empresa     | `/empresas/[id]`            | Consultar dados, recrutadores, oportunidades e candidaturas relacionadas.       |
-| Recrutadores           | `/recrutadores`             | Listar, pesquisar e gerir recrutadores.                                         |
-| Detalhe do recrutador  | `/recrutadores/[id]`        | Consultar contactos e candidaturas relacionadas.                                |
-| Entrevistas            | `/entrevistas`              | Consultar entrevistas futuras e passadas.                                       |
-| Detalhe da entrevista  | `/entrevistas/[id]`         | Consultar contexto, participantes, guião, perguntas, feedback e resultado.      |
-| Editar entrevista      | `/entrevistas/[id]/editar`  | Atualizar o agendamento, preparação, feedback e resultado.                      |
-| Tarefas                | `/acoes`                    | Consultar tarefas pendentes, concluídas e em atraso.                            |
-| Nova tarefa            | `/acoes/nova`               | Criar uma tarefa associada a uma candidatura.                                   |
-| Editar tarefa          | `/acoes/[id]/editar`        | Atualizar, concluir, cancelar ou eliminar uma tarefa.                           |
-| Definições             | `/definicoes`               | Gerir o perfil, avatar e preferência de tema da conta.                          |
+| Página                 | Caminho proposto            | Objetivo                                                                                                |
+| ---------------------- | --------------------------- | ------------------------------------------------------------------------------------------------------- |
+| Dashboard              | `/dashboard`                | Mostrar indicadores, prioridades e atividade recente.                                                   |
+| Agenda                 | `/agenda`                   | Reunir entrevistas, follow-ups e tarefas numa cronologia.                                               |
+| Candidaturas           | `/candidaturas`             | Pesquisar, filtrar, ordenar e consultar candidaturas.                                                   |
+| Nova candidatura       | `/candidaturas/nova`        | Criar a oportunidade e a candidatura num fluxo único.                                                   |
+| Detalhe da candidatura | `/candidaturas/[id]`        | Consultar resumo, empresa, recrutador, entrevistas, notas, tarefas e histórico.                         |
+| Editar candidatura     | `/candidaturas/[id]/editar` | Alterar os dados da candidatura e oportunidade.                                                         |
+| Empresas               | `/empresas`                 | Listar, pesquisar e gerir empresas.                                                                     |
+| Detalhe da empresa     | `/empresas/[id]`            | Consultar dados, recrutadores, oportunidades e candidaturas relacionadas.                               |
+| Recrutadores           | `/recrutadores`             | Listar, pesquisar e gerir recrutadores.                                                                 |
+| Detalhe do recrutador  | `/recrutadores/[id]`        | Consultar contactos e candidaturas relacionadas.                                                        |
+| Entrevistas            | `/entrevistas`              | Consultar entrevistas futuras e passadas e atualizar rapidamente o estado.                              |
+| Detalhe da entrevista  | `/entrevistas/[id]`         | Consultar contexto, participantes, guião pessoal, perguntas, feedback e resultado e atualizar o estado. |
+| Editar entrevista      | `/entrevistas/[id]/editar`  | Atualizar o agendamento, preparação, feedback e resultado.                                              |
+| Tarefas                | `/acoes`                    | Consultar tarefas pendentes, concluídas e em atraso.                                                    |
+| Nova tarefa            | `/acoes/nova`               | Criar uma tarefa associada a uma candidatura.                                                           |
+| Editar tarefa          | `/acoes/[id]/editar`        | Atualizar, concluir, cancelar ou eliminar uma tarefa.                                                   |
+| Definições             | `/definicoes`               | Gerir o perfil, avatar e preferência de tema da conta.                                                  |
 
 ## Navegação principal
 
