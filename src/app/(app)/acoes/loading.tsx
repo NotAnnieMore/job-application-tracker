@@ -1,10 +1,7 @@
+import { getTranslations } from "next-intl/server";
 import { PageSkeleton } from "@/components/shared/page-skeleton";
 
-export default function ActionsLoading() {
-  return (
-    <PageSkeleton
-      title="Tarefas"
-      description="Organiza as tarefas concretas que mantêm cada candidatura em movimento."
-    />
-  );
+export default async function ActionsLoading() {
+  const t = await getTranslations("Tasks");
+  return <PageSkeleton title={t("title")} description={t("description")} />;
 }

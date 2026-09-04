@@ -1,8 +1,8 @@
+"use client";
+
+import { useLocale, useTranslations } from "next-intl";
+
 import { Badge } from "@/components/ui/badge";
-import {
-  actionPriorityLabels,
-  actionStatusLabels,
-} from "@/features/actions/constants";
 import type {
   ActionPriorityValue,
   ActionStatusValue,
@@ -25,9 +25,9 @@ const priorityVariants: Record<
 };
 
 export function ActionStatusBadge({ status }: { status: ActionStatusValue }) {
-  return (
-    <Badge variant={statusVariants[status]}>{actionStatusLabels[status]}</Badge>
-  );
+  const t = useTranslations("Enums.taskStatus");
+
+  return <Badge variant={statusVariants[status]}>{t(status)}</Badge>;
 }
 
 export function ActionPriorityBadge({
@@ -35,9 +35,14 @@ export function ActionPriorityBadge({
 }: {
   priority: ActionPriorityValue;
 }) {
+  const locale = useLocale();
+  const t = useTranslations("Enums");
+
   return (
     <Badge variant={priorityVariants[priority]}>
-      Prioridade {actionPriorityLabels[priority].toLocaleLowerCase("pt-PT")}
+      {t("taskPriorityLabel", {
+        priority: t(`taskPriority.${priority}`).toLocaleLowerCase(locale),
+      })}
     </Badge>
   );
 }

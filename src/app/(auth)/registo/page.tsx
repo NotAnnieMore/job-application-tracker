@@ -1,22 +1,23 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import { AuthShell } from "@/components/auth/auth-shell";
 import { RegisterForm } from "@/components/auth/register-form";
 
-export default function RegisterPage() {
+export default async function RegisterPage() {
+  const t = await getTranslations("Auth.registerPage");
+  const auth = await getTranslations("Auth");
+
   return (
-    <AuthShell
-      title="Criar a tua conta"
-      description="Começa a organizar oportunidades e próximos passos num único lugar."
-    >
+    <AuthShell title={t("title")} description={t("description")}>
       <RegisterForm />
       <p className="mt-6 text-center text-sm text-slate-500">
-        Já tens conta?{" "}
+        {t("hasAccount")}{" "}
         <Link
           href="/login"
           className="font-semibold text-blue-600 hover:text-blue-700"
         >
-          Iniciar sessão
+          {auth("login")}
         </Link>
       </p>
     </AuthShell>

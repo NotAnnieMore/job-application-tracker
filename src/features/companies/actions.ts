@@ -1,5 +1,7 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -19,30 +21,32 @@ import { isValidUuid } from "@/lib/validation";
 
 const companiesPath = "/empresas";
 
-function validationError(
+async function validationError(
   fieldErrors: NonNullable<CompanyActionState["fieldErrors"]>,
-): CompanyActionState {
+): Promise<CompanyActionState> {
+  const t = await getTranslations("CompanyActions");
   return {
     status: "error",
-    message: "Revê os campos assinalados.",
+    message: t("reviewFields"),
     fieldErrors,
   };
 }
 
-function databaseError(code?: string): CompanyActionState {
+async function databaseError(code?: string): Promise<CompanyActionState> {
+  const t = await getTranslations("CompanyActions");
   if (code === "23505") {
     return {
       status: "error",
-      message: "Já existe uma empresa com esse nome.",
+      message: t("duplicateName"),
       fieldErrors: {
-        name: "Usa um nome diferente ou edita a empresa existente.",
+        name: t("differentName"),
       },
     };
   }
 
   return {
     status: "error",
-    message: "Não foi possível guardar a empresa. Tenta novamente.",
+    message: t("saveFailed"),
   };
 }
 
@@ -50,7 +54,10 @@ export async function createCompanyAction(
   _previousState: CompanyActionState,
   formData: FormData,
 ): Promise<CompanyActionState> {
-  const { values, fieldErrors } = validateCompanyForm(formData);
+  const { values, fieldErrors } = validateCompanyForm(
+    formData,
+    await getTranslations("CompanyValidation"),
+  );
 
   if (hasCompanyFieldErrors(fieldErrors)) {
     return validationError(fieldErrors);
@@ -73,7 +80,10 @@ export async function createQuickCompanyAction(
   _previousState: QuickCompanyActionState,
   formData: FormData,
 ): Promise<QuickCompanyActionState> {
-  const { values, fieldErrors } = validateCompanyForm(formData);
+  const { values, fieldErrors } = validateCompanyForm(
+    formData,
+    await getTranslations("CompanyValidation"),
+  );
 
   if (hasCompanyFieldErrors(fieldErrors)) {
     return validationError(fieldErrors);
@@ -106,11 +116,15 @@ export async function updateCompanyAction(
   _previousState: CompanyActionState,
   formData: FormData,
 ): Promise<CompanyActionState> {
+  const t = await getTranslations("CompanyActions");
   if (!isValidUuid(companyId)) {
-    return { status: "error", message: "A empresa indicada não é válida." };
+    return { status: "error", message: t("invalidCompany") };
   }
 
-  const { values, fieldErrors } = validateCompanyForm(formData);
+  const { values, fieldErrors } = validateCompanyForm(
+    formData,
+    await getTranslations("CompanyValidation"),
+  );
 
   if (hasCompanyFieldErrors(fieldErrors)) {
     return validationError(fieldErrors);
@@ -128,7 +142,7 @@ export async function updateCompanyAction(
 
   if (error) return databaseError(error.code);
   if (!data) {
-    return { status: "error", message: "A empresa já não está disponível." };
+    return { status: "error", message: t("unavailable") };
   }
 
   revalidatePath(companiesPath);
@@ -140,11 +154,12 @@ export async function deleteCompanyAction(
   _previousState: CompanyActionState,
   _formData: FormData,
 ): Promise<CompanyActionState> {
+  const t = await getTranslations("CompanyActions");
   void _previousState;
   void _formData;
 
   if (!isValidUuid(companyId)) {
-    return { status: "error", message: "A empresa indicada não é válida." };
+    return { status: "error", message: t("invalidCompany") };
   }
 
   const user = await requireCurrentUser();
@@ -160,20 +175,19 @@ export async function deleteCompanyAction(
   if (error?.code === "23503") {
     return {
       status: "error",
-      message:
-        "Esta empresa tem vagas associadas. Remove ou transfere essas vagas antes de a eliminar.",
+      message: t("hasJobs"),
     };
   }
 
   if (error) {
     return {
       status: "error",
-      message: "Não foi possível eliminar a empresa. Tenta novamente.",
+      message: t("deleteFailed"),
     };
   }
 
   if (!data) {
-    return { status: "error", message: "A empresa já não está disponível." };
+    return { status: "error", message: t("unavailable") };
   }
 
   revalidatePath(companiesPath);
@@ -195,10 +209,11 @@ function normalizeHttpsUrl(value: string, maxLength: number) {
 export async function updateCompanyLogosAction(
   selections: CompanyLogoSelection[],
 ): Promise<BulkCompanyLogoActionResult> {
+  const t = await getTranslations("CompanyActions");
   if (!Array.isArray(selections) || selections.length === 0) {
     return {
       status: "error",
-      message: "Seleciona pelo menos um logótipo para guardar.",
+      message: t("selectLogo"),
       updatedIds: [],
     };
   }
@@ -206,7 +221,7 @@ export async function updateCompanyLogosAction(
   if (selections.length > 50) {
     return {
       status: "error",
-      message: "Só é possível guardar 50 logótipos de cada vez.",
+      message: t("batchLimit"),
       updatedIds: [],
     };
   }
@@ -230,7 +245,7 @@ export async function updateCompanyLogosAction(
   ) {
     return {
       status: "error",
-      message: "Uma das sugestões recebidas não é válida. Volta a pesquisá-la.",
+      message: t("invalidSuggestion"),
       updatedIds: [],
     };
   }
@@ -246,7 +261,7 @@ export async function updateCompanyLogosAction(
   if (lookupError || ownedCompanies.length !== selections.length) {
     return {
       status: "error",
-      message: "Não foi possível confirmar todas as empresas selecionadas.",
+      message: t("confirmCompaniesFailed"),
       updatedIds: [],
     };
   }
@@ -286,15 +301,15 @@ export async function updateCompanyLogosAction(
       status: "error",
       message:
         updatedIds.length > 0
-          ? `${updatedIds.length} logótipo(s) guardado(s), mas alguns falharam. Tenta novamente.`
-          : "Não foi possível guardar os logótipos. Tenta novamente.",
+          ? t("partialSave", { count: updatedIds.length })
+          : t("saveLogosFailed"),
       updatedIds,
     };
   }
 
   return {
     status: "success",
-    message: `${updatedIds.length} logótipo(s) guardado(s) com sucesso.`,
+    message: t("logosSaved", { count: updatedIds.length }),
     updatedIds,
   };
 }

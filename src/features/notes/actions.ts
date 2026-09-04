@@ -1,4 +1,5 @@
 "use server";
+import { getTranslations } from "next-intl/server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -13,18 +14,20 @@ function detailPath(applicationId: string) {
   return `/candidaturas/${applicationId}`;
 }
 
-function validationError(message: string): NoteActionState {
+async function validationError(message: string): Promise<NoteActionState> {
+  const t = await getTranslations("NoteActions");
   return {
     status: "error",
-    message: "Revê o campo assinalado.",
+    message: t("reviewField"),
     fieldErrors: { content: message },
   };
 }
 
-function saveError(): NoteActionState {
+async function saveError(): Promise<NoteActionState> {
+  const t = await getTranslations("NoteActions");
   return {
     status: "error",
-    message: "Não foi possível guardar a nota. Tenta novamente.",
+    message: t("saveFailed"),
   };
 }
 
@@ -45,20 +48,24 @@ export async function createNoteAction(
   _previousState: NoteActionState,
   formData: FormData,
 ): Promise<NoteActionState> {
+  const t = await getTranslations("NoteActions");
   void _previousState;
 
   if (!isValidApplicationId(applicationId)) {
-    return { status: "error", message: "A candidatura indicada não é válida." };
+    return { status: "error", message: t("invalidApplication") };
   }
 
-  const { content, error: contentError } = validateNoteForm(formData);
+  const { content, error: contentError } = validateNoteForm(
+    formData,
+    await getTranslations("NoteValidation"),
+  );
   if (contentError) return validationError(contentError);
 
   const user = await requireCurrentUser();
   if (!(await applicationBelongsToUser(applicationId, user.id))) {
     return {
       status: "error",
-      message: "A candidatura já não está disponível.",
+      message: t("applicationUnavailable"),
     };
   }
 
@@ -80,13 +87,17 @@ export async function updateNoteAction(
   _previousState: NoteActionState,
   formData: FormData,
 ): Promise<NoteActionState> {
+  const t = await getTranslations("NoteActions");
   void _previousState;
 
   if (!isValidApplicationId(applicationId) || !isValidNoteId(noteId)) {
-    return { status: "error", message: "A nota indicada não é válida." };
+    return { status: "error", message: t("invalidNote") };
   }
 
-  const { content, error: contentError } = validateNoteForm(formData);
+  const { content, error: contentError } = validateNoteForm(
+    formData,
+    await getTranslations("NoteValidation"),
+  );
   if (contentError) return validationError(contentError);
 
   const user = await requireCurrentUser();
@@ -102,7 +113,7 @@ export async function updateNoteAction(
 
   if (error) return saveError();
   if (!data) {
-    return { status: "error", message: "A nota já não está disponível." };
+    return { status: "error", message: t("unavailable") };
   }
 
   revalidatePath(detailPath(applicationId));
@@ -115,11 +126,12 @@ export async function deleteNoteAction(
   _previousState: NoteActionState,
   _formData: FormData,
 ): Promise<NoteActionState> {
+  const t = await getTranslations("NoteActions");
   void _previousState;
   void _formData;
 
   if (!isValidApplicationId(applicationId) || !isValidNoteId(noteId)) {
-    return { status: "error", message: "A nota indicada não é válida." };
+    return { status: "error", message: t("invalidNote") };
   }
 
   const user = await requireCurrentUser();
@@ -136,11 +148,11 @@ export async function deleteNoteAction(
   if (error) {
     return {
       status: "error",
-      message: "Não foi possível eliminar a nota. Tenta novamente.",
+      message: t("deleteFailed"),
     };
   }
   if (!data) {
-    return { status: "error", message: "A nota já não está disponível." };
+    return { status: "error", message: t("unavailable") };
   }
 
   revalidatePath(detailPath(applicationId));

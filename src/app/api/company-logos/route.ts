@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 
 type BrandfetchResult = {
@@ -27,23 +28,18 @@ function logoUrl(domain: string, clientId: string) {
 export const dynamic = "force-dynamic";
 
 export async function GET(request: Request) {
+  const t = await getTranslations("CompanyLogoApi");
   const supabase = await createClient();
   const { data, error } = await supabase.auth.getClaims();
 
   if (error || !data?.claims?.sub) {
-    return Response.json(
-      { message: "A tua sessão expirou. Volta a iniciar sessão." },
-      { status: 401 },
-    );
+    return Response.json({ message: t("sessionExpired") }, { status: 401 });
   }
 
   const query = new URL(request.url).searchParams.get("q")?.trim() ?? "";
 
   if (query.length < 2 || query.length > 120) {
-    return Response.json(
-      { message: "Pesquisa por um nome entre 2 e 120 caracteres." },
-      { status: 400 },
-    );
+    return Response.json({ message: t("queryLength") }, { status: 400 });
   }
 
   const clientId = process.env.BRANDFETCH_CLIENT_ID?.trim();
@@ -51,8 +47,7 @@ export async function GET(request: Request) {
   if (!clientId) {
     return Response.json(
       {
-        message:
-          "A pesquisa automática ainda não está configurada. Adiciona o Client ID do Brandfetch ao ficheiro .env.local.",
+        message: t("notConfigured"),
       },
       { status: 503 },
     );
@@ -69,18 +64,14 @@ export async function GET(request: Request) {
     if (response.status === 429) {
       return Response.json(
         {
-          message:
-            "O limite temporário da pesquisa foi atingido. Tenta mais tarde.",
+          message: t("rateLimited"),
         },
         { status: 429 },
       );
     }
 
     if (!response.ok) {
-      return Response.json(
-        { message: "O serviço de logótipos não respondeu corretamente." },
-        { status: 502 },
-      );
+      return Response.json({ message: t("serviceFailed") }, { status: 502 });
     }
 
     const payload = (await response.json()) as unknown;
@@ -112,9 +103,6 @@ export async function GET(request: Request) {
 
     return Response.json({ results: results.slice(0, 6) });
   } catch {
-    return Response.json(
-      { message: "Não foi possível contactar o serviço de logótipos." },
-      { status: 502 },
-    );
+    return Response.json({ message: t("connectionFailed") }, { status: 502 });
   }
 }

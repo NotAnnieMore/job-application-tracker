@@ -1,6 +1,7 @@
 "use client";
 
 import { LoaderCircle, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -16,6 +17,7 @@ export function DeleteInterviewForm({
   interviewType: string;
   returnToApplication?: boolean;
 }) {
+  const t = useTranslations("Interviews");
   const action = deleteInterviewAction.bind(
     null,
     interviewId,
@@ -42,7 +44,7 @@ export function DeleteInterviewForm({
         variant="danger"
         disabled={pending}
         onClick={(event) => {
-          if (!window.confirm(`Eliminar “${interviewType}”?`)) {
+          if (!window.confirm(t("deleteConfirm", { type: interviewType }))) {
             event.preventDefault();
           }
         }}
@@ -52,7 +54,7 @@ export function DeleteInterviewForm({
         ) : (
           <Trash2 aria-hidden="true" className="size-4" />
         )}
-        {pending ? "A eliminar..." : "Eliminar entrevista"}
+        {pending ? t("deleting") : t("deleteInterview")}
       </Button>
     </form>
   );

@@ -1,3 +1,4 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   CalendarClock,
   CircleAlert,
@@ -40,17 +41,11 @@ import type {
   ActionStatusValue,
 } from "@/types/database.types";
 
-const notices: Record<string, string> = {
-  "acao-criada": "Tarefa criada com sucesso.",
-  "acao-atualizada": "Tarefa atualizada com sucesso.",
-  "acao-eliminada": "Tarefa eliminada com sucesso.",
-};
-
-const dueFilterOptions: Array<{ value: ActionDueFilter; label: string }> = [
-  { value: "overdue", label: "Em atraso" },
-  { value: "today", label: "Para hoje" },
-  { value: "upcoming", label: "Futuras" },
-  { value: "no_date", label: "Sem prazo" },
+const dueFilterOptions: Array<{ value: ActionDueFilter }> = [
+  { value: "overdue" },
+  { value: "today" },
+  { value: "upcoming" },
+  { value: "no_date" },
 ];
 
 function singleValue(value: string | string[] | undefined) {
@@ -83,6 +78,15 @@ export default async function ActionsPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const locale = await getLocale();
+  const t = await getTranslations("Tasks");
+  const tStatus = await getTranslations("Enums.taskStatus");
+  const tPriority = await getTranslations("Enums.taskPriority");
+  const notices: Record<string, string> = {
+    "acao-criada": t("created"),
+    "acao-atualizada": t("updated"),
+    "acao-eliminada": t("deleted"),
+  };
   const params = await searchParams;
   const rawStatus = singleValue(params.estado);
   const rawPriority = singleValue(params.prioridade);
@@ -112,58 +116,56 @@ export default async function ActionsPage({
     ...(status
       ? [
           {
-            label: "Estado",
-            value:
-              actionStatusOptions.find((option) => option.value === status)
-                ?.label ?? status,
+            label: t("status"),
+            value: tStatus(status),
           },
         ]
       : []),
     ...(priority
       ? [
           {
-            label: "Prioridade",
-            value:
-              actionPriorityOptions.find((option) => option.value === priority)
-                ?.label ?? priority,
+            label: t("priority"),
+            value: tPriority(priority),
           },
         ]
       : []),
     ...(timing
       ? [
           {
-            label: "Prazo",
-            value:
-              dueFilterOptions.find((option) => option.value === timing)
-                ?.label ?? timing,
+            label: t("deadline"),
+            value: t(`timing_${timing}`),
           },
         ]
       : []),
     ...(applicationId
       ? [
           {
-            label: "Candidatura",
+            label: t("application"),
             value:
               applications.find(
                 (application) => application.id === applicationId,
-              )?.title ?? "Desconhecida",
+              )?.title ?? t("unknown"),
           },
         ]
       : []),
-    ...(dueFrom ? [{ label: "Desde", value: formatActionDate(dueFrom) }] : []),
-    ...(dueTo ? [{ label: "Até", value: formatActionDate(dueTo) }] : []),
+    ...(dueFrom
+      ? [{ label: t("from"), value: formatActionDate(dueFrom, locale) }]
+      : []),
+    ...(dueTo
+      ? [{ label: t("to"), value: formatActionDate(dueTo, locale) }]
+      : []),
   ];
   const hasFilters = activeFilters.length > 0;
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Tarefas"
-        description="Organiza as tarefas concretas que mantêm cada candidatura em movimento."
+        title={t("title")}
+        description={t("description")}
         action={
           <Link href="/acoes/nova" className={buttonClassName()}>
             <Plus aria-hidden="true" className="size-4" />
-            Nova tarefa
+            {t("new")}
           </Link>
         }
       />
@@ -173,29 +175,31 @@ export default async function ActionsPage({
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
           {
-            label: "Pendentes",
+            label: t("pending"),
             value: data.summary.pending,
             tone: "text-blue-700",
           },
           {
-            label: "Em atraso",
+            label: t("timing_overdue"),
             value: data.summary.overdue,
             tone: "text-red-600",
           },
           {
-            label: "Para hoje",
+            label: t("timing_today"),
             value: data.summary.dueToday,
             tone: "text-amber-600",
           },
           {
-            label: "Concluídas",
+            label: t("completed"),
             value: data.summary.completed,
             tone: "text-emerald-600",
           },
         ].map((item) => (
           <Card key={item.label}>
             <CardContent>
-              <p className={`text-3xl font-bold ${item.tone}`}>{item.value}</p>
+              <p className={`text-3xl font-bold ${item.tone}`}>
+                {item.value.toLocaleString(locale)}
+              </p>
               <p className="mt-1 text-sm text-slate-500">{item.label}</p>
             </CardContent>
           </Card>
@@ -211,49 +215,49 @@ export default async function ActionsPage({
           <AutoSubmitSelect
             name="estado"
             defaultValue={status ?? ""}
-            aria-label="Filtrar por estado"
+            aria-label={t("filterStatus")}
             className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
           >
-            <option value="">Todos os estados</option>
+            <option value="">{t("allStatuses")}</option>
             {actionStatusOptions.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {tStatus(option.value)}
               </option>
             ))}
           </AutoSubmitSelect>
           <AutoSubmitSelect
             name="prioridade"
             defaultValue={priority ?? ""}
-            aria-label="Filtrar por prioridade"
+            aria-label={t("filterPriority")}
             className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
           >
-            <option value="">Todas as prioridades</option>
+            <option value="">{t("allPriorities")}</option>
             {actionPriorityOptions.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {tPriority(option.value)}
               </option>
             ))}
           </AutoSubmitSelect>
           <AutoSubmitSelect
             name="prazo"
             defaultValue={timing ?? ""}
-            aria-label="Filtrar por prazo"
+            aria-label={t("filterDeadline")}
             className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
           >
-            <option value="">Todos os prazos</option>
+            <option value="">{t("allDeadlines")}</option>
             {dueFilterOptions.map((option) => (
               <option key={option.value} value={option.value}>
-                {option.label}
+                {t(`timing_${option.value}`)}
               </option>
             ))}
           </AutoSubmitSelect>
           <AutoSubmitSelect
             name="candidatura"
             defaultValue={applicationId}
-            aria-label="Filtrar por candidatura"
+            aria-label={t("filterApplication")}
             className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
           >
-            <option value="">Todas as candidaturas</option>
+            <option value="">{t("allApplications")}</option>
             {applications.map((application) => (
               <option key={application.id} value={application.id}>
                 {application.companyName} — {application.title}
@@ -261,7 +265,7 @@ export default async function ActionsPage({
             ))}
           </AutoSubmitSelect>
           <label className="grid gap-1.5 text-xs font-semibold text-slate-600">
-            Prazo desde
+            {t("dueFrom")}
             <input
               type="date"
               name="desde"
@@ -271,7 +275,7 @@ export default async function ActionsPage({
             />
           </label>
           <label className="grid gap-1.5 text-xs font-semibold text-slate-600">
-            Prazo até
+            {t("dueTo")}
             <input
               type="date"
               name="ate"
@@ -285,7 +289,7 @@ export default async function ActionsPage({
             className={buttonClassName({ variant: "secondary" })}
           >
             <Filter aria-hidden="true" className="size-4" />
-            Aplicar datas
+            {t("applyDates")}
           </button>
         </form>
       </Card>
@@ -295,17 +299,11 @@ export default async function ActionsPage({
       {data.items.length === 0 ? (
         <EmptyState
           icon={hasFilters ? CircleAlert : ListChecks}
-          title={
-            hasFilters
-              ? "Nenhuma tarefa encontrada"
-              : "Ainda não existem tarefas"
-          }
+          title={hasFilters ? t("emptyFiltered") : t("empty")}
           description={
-            hasFilters
-              ? "Altera ou limpa os filtros para voltares a ver todas as tarefas."
-              : "Cria uma tarefa concreta para manteres o próximo passo visível."
+            hasFilters ? t("emptyFilteredDescription") : t("emptyDescription")
           }
-          actionLabel={hasFilters ? "Limpar filtros" : "Criar tarefa"}
+          actionLabel={hasFilters ? t("clearFilters") : t("create")}
           actionHref={hasFilters ? "/acoes" : "/acoes/nova"}
         />
       ) : (
@@ -353,11 +351,13 @@ export default async function ActionsPage({
                         />
                         {item.dueDate
                           ? item.timing === "today"
-                            ? "Hoje"
+                            ? t("today")
                             : item.timing === "overdue"
-                              ? `Em atraso · ${formatActionDate(item.dueDate)}`
-                              : formatActionDate(item.dueDate)
-                          : "Sem prazo"}
+                              ? t("overdueDate", {
+                                  date: formatActionDate(item.dueDate, locale),
+                                })
+                              : formatActionDate(item.dueDate, locale)
+                          : t("timing_no_date")}
                       </span>
                     </div>
                   </div>
@@ -370,7 +370,9 @@ export default async function ActionsPage({
                   />
                   <Link
                     href={`/acoes/${item.id}/editar`}
-                    aria-label={`Editar ${item.description}`}
+                    aria-label={t("editDescriptionLabel", {
+                      description: item.description,
+                    })}
                     className={buttonClassName({
                       variant: "secondary",
                       size: "icon",

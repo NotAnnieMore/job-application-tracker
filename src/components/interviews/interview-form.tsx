@@ -2,6 +2,7 @@
 
 import { ExternalLink, LoaderCircle, Save } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useActionState, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
 
@@ -10,7 +11,6 @@ import { Button, buttonClassName } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FormField, fieldClassName } from "@/components/ui/form-field";
 import {
-  commonInterviewTypes,
   interviewFormatOptions,
   interviewStatusOptions,
 } from "@/features/interviews/constants";
@@ -32,6 +32,7 @@ const textareaClassName =
 
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
+  const t = useTranslations("InterviewForm");
 
   return (
     <Button type="submit" disabled={pending}>
@@ -40,7 +41,7 @@ function SubmitButton({ label }: { label: string }) {
       ) : (
         <Save aria-hidden="true" className="size-4" />
       )}
-      {pending ? "A guardar..." : label}
+      {pending ? t("saving") : label}
     </Button>
   );
 }
@@ -81,6 +82,9 @@ export function InterviewForm({
   submitLabel: string;
   cancelHref?: string;
 }) {
+  const t = useTranslations("InterviewForm");
+  const tStatus = useTranslations("Enums.interviewStatus");
+  const tFormat = useTranslations("Enums.interviewFormat");
   const [state, formAction] = useActionState(
     action,
     initialInterviewActionState,
@@ -158,17 +162,16 @@ export function InterviewForm({
       <Card>
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Agendamento</h2>
+            <h2 className="font-bold text-slate-950">{t("scheduling")}</h2>
             <p className="mt-1 text-sm text-slate-500">
-              Liga a entrevista ao processo e regista quando e como irá
-              acontecer.
+              {t("schedulingDescription")}
             </p>
           </div>
         </CardHeader>
         <CardContent className="grid gap-5 md:grid-cols-2">
           <div className="md:col-span-2">
             <FormField
-              label="Candidatura"
+              label={t("application")}
               htmlFor="interview-application"
               required
               error={state.fieldErrors?.applicationId}
@@ -182,7 +185,7 @@ export function InterviewForm({
                 aria-invalid={Boolean(state.fieldErrors?.applicationId)}
                 required
               >
-                <option value="">Seleciona uma candidatura</option>
+                <option value="">{t("selectApplication")}</option>
                 {applications.map((application) => (
                   <option key={application.id} value={application.id}>
                     {application.companyName} — {application.title}
@@ -193,10 +196,10 @@ export function InterviewForm({
           </div>
 
           <FormField
-            label="Tipo de entrevista"
+            label={t("interviewType")}
             htmlFor="interview-type"
             required
-            hint="Podes escolher uma sugestão ou escrever outro tipo."
+            hint={t("interviewTypeHint")}
             error={state.fieldErrors?.interviewType}
           >
             <input
@@ -210,17 +213,27 @@ export function InterviewForm({
               required
             />
             <datalist id="interview-types">
-              {commonInterviewTypes.map((type) => (
-                <option key={type} value={type} />
+              {(
+                [
+                  "initial",
+                  "hr",
+                  "technical",
+                  "coding",
+                  "manager",
+                  "culture",
+                  "final",
+                ] as const
+              ).map((type) => (
+                <option key={type} value={t(`types.${type}`)} />
               ))}
             </datalist>
           </FormField>
 
           <FormField
-            label="Data e hora"
+            label={t("dateAndTime")}
             htmlFor="interview-scheduled-at"
             required
-            hint="A hora é guardada com o fuso horário do teu dispositivo."
+            hint={t("dateAndTimeHint")}
             error={state.fieldErrors?.scheduledAtLocal}
           >
             <input
@@ -240,7 +253,7 @@ export function InterviewForm({
           </FormField>
 
           <FormField
-            label="Estado"
+            label={t("status")}
             htmlFor="interview-status"
             required
             error={state.fieldErrors?.status}
@@ -254,14 +267,14 @@ export function InterviewForm({
             >
               {interviewStatusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {tStatus(option.value)}
                 </option>
               ))}
             </select>
           </FormField>
 
           <FormField
-            label="Formato"
+            label={t("format")}
             htmlFor="interview-format"
             required
             error={state.fieldErrors?.format}
@@ -275,16 +288,16 @@ export function InterviewForm({
             >
               {interviewFormatOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {tFormat(option.value)}
                 </option>
               ))}
             </select>
           </FormField>
 
           <FormField
-            label="Duração prevista"
+            label={t("expectedDuration")}
             htmlFor="interview-duration"
-            hint="Em minutos."
+            hint={t("inMinutes")}
             error={state.fieldErrors?.durationMinutes}
           >
             <input
@@ -301,9 +314,9 @@ export function InterviewForm({
           </FormField>
 
           <FormField
-            label="Local ou ligação"
+            label={t("locationOrLink")}
             htmlFor="interview-location"
-            hint="Ex.: Microsoft Teams, endereço ou número de telefone."
+            hint={t("locationOrLinkHint")}
             error={state.fieldErrors?.locationOrUrl}
           >
             <input
@@ -318,9 +331,9 @@ export function InterviewForm({
           </FormField>
 
           <FormField
-            label="Contacto principal"
+            label={t("mainContact")}
             htmlFor="interview-recruiter"
-            hint="São apresentados os contactos compatíveis com a empresa."
+            hint={t("mainContactHint")}
             error={state.fieldErrors?.recruiterId}
           >
             <select
@@ -331,7 +344,7 @@ export function InterviewForm({
               className={fieldClassName}
               disabled={!selectedApplication}
             >
-              <option value="">Sem contacto associado</option>
+              <option value="">{t("noContact")}</option>
               {availableRecruiters.map((recruiter) => (
                 <option key={recruiter.id} value={recruiter.id}>
                   {recruiter.name}
@@ -342,9 +355,9 @@ export function InterviewForm({
 
           <div className="md:col-span-2">
             <FormField
-              label="Participantes"
+              label={t("participants")}
               htmlFor="interview-participants"
-              hint="Separa os nomes por vírgulas ou linhas."
+              hint={t("participantsHint")}
               error={state.fieldErrors?.participants}
             >
               <textarea
@@ -352,7 +365,7 @@ export function InterviewForm({
                 name="participants"
                 rows={3}
                 defaultValue={initialValues.participants}
-                placeholder="Ana Silva&#10;João Costa"
+                placeholder={t("participantsPlaceholder")}
                 className={textareaClassName}
               />
             </FormField>
@@ -363,9 +376,9 @@ export function InterviewForm({
       <Card>
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Preparação</h2>
+            <h2 className="font-bold text-slate-950">{t("preparation")}</h2>
             <p className="mt-1 text-sm text-slate-500">
-              Consulta o guião pessoal e as perguntas guardadas na candidatura.
+              {t("preparationDescription")}
             </p>
           </div>
           {selectedApplication ? (
@@ -374,7 +387,7 @@ export function InterviewForm({
               target="_blank"
               className={buttonClassName({ variant: "secondary", size: "sm" })}
             >
-              Editar guião
+              {t("editScript")}
               <ExternalLink aria-hidden="true" className="size-3.5" />
             </Link>
           ) : null}
@@ -399,14 +412,14 @@ export function InterviewForm({
           ) : null}
           <div className="grid gap-4 lg:grid-cols-2">
             <PreparationBlock
-              label="Guião pessoal e CV"
+              label={t("personalScript")}
               content={selectedApplication?.interviewPreparation ?? ""}
-              emptyText="Ainda não adicionaste um guião nesta candidatura."
+              emptyText={t("personalScriptEmpty")}
             />
             <PreparationBlock
-              label="Perguntas para a empresa"
+              label={t("companyQuestions")}
               content={selectedApplication?.questionsForCompany ?? ""}
-              emptyText="Ainda não adicionaste perguntas para esta empresa."
+              emptyText={t("companyQuestionsEmpty")}
             />
           </div>
         </CardContent>
@@ -415,16 +428,15 @@ export function InterviewForm({
       <Card>
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Depois da entrevista</h2>
+            <h2 className="font-bold text-slate-950">{t("afterInterview")}</h2>
             <p className="mt-1 text-sm text-slate-500">
-              Guarda o que correu bem, o que aprendeste e o resultado desta
-              etapa.
+              {t("afterInterviewDescription")}
             </p>
           </div>
         </CardHeader>
         <CardContent className="grid gap-5 lg:grid-cols-2">
           <FormField
-            label="Feedback e notas"
+            label={t("feedbackAndNotes")}
             htmlFor="interview-feedback"
             error={state.fieldErrors?.feedback}
           >
@@ -433,15 +445,15 @@ export function InterviewForm({
               name="feedback"
               rows={7}
               defaultValue={initialValues.feedback}
-              placeholder="Questões feitas, respostas, pontos fortes e aspetos a melhorar..."
+              placeholder={t("feedbackPlaceholder")}
               className={textareaClassName}
               maxLength={10000}
             />
           </FormField>
           <FormField
-            label="Resultado"
+            label={t("result")}
             htmlFor="interview-result"
-            hint="Ex.: passei à etapa seguinte, aguardo resposta ou processo terminado."
+            hint={t("resultHint")}
             error={state.fieldErrors?.result}
           >
             <textarea
@@ -449,7 +461,7 @@ export function InterviewForm({
               name="result"
               rows={7}
               defaultValue={initialValues.result}
-              placeholder="Resultado e próximos passos..."
+              placeholder={t("resultPlaceholder")}
               className={textareaClassName}
               maxLength={4000}
             />
@@ -462,7 +474,7 @@ export function InterviewForm({
           href={cancelHref}
           className={buttonClassName({ variant: "secondary" })}
         >
-          Cancelar
+          {t("cancel")}
         </Link>
         <SubmitButton label={submitLabel} />
       </div>

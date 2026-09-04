@@ -1,14 +1,17 @@
+import { useTranslations } from "next-intl";
+
 function SkeletonBlock({ className }: { className: string }) {
   return <div className={`rounded-lg bg-slate-200 ${className}`} />;
 }
 
 export function ApplicationDetailSkeleton() {
+  const t = useTranslations("ApplicationDetail");
   return (
     <div
       role="status"
       aria-live="polite"
       aria-busy="true"
-      aria-label="A carregar candidatura"
+      aria-label={t("loading")}
       className="animate-pulse space-y-6 motion-reduce:animate-none"
     >
       <SkeletonBlock className="h-5 w-40" />

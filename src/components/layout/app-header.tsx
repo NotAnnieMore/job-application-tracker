@@ -2,7 +2,9 @@
 
 import { LogOut, Menu, Search } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 
+import { LanguageSwitcher } from "@/components/i18n/language-switcher";
 import { UserAvatar } from "@/components/profile/user-avatar";
 import { ThemeToggle } from "@/components/theme/theme-toggle";
 import { Button } from "@/components/ui/button";
@@ -16,13 +18,16 @@ export function AppHeader({
   onOpenMenu: () => void;
   user: CurrentUser;
 }) {
+  const t = useTranslations("Header");
+  const navigation = useTranslations("Navigation");
+
   return (
     <header className="sticky top-0 z-20 flex h-18 items-center gap-3 border-b border-slate-200 bg-white/95 px-4 backdrop-blur sm:px-6 lg:px-8">
       <Button
         variant="ghost"
         size="icon"
         className="lg:hidden"
-        aria-label="Abrir menu"
+        aria-label={navigation("openMenu")}
         onClick={onOpenMenu}
       >
         <Menu aria-hidden="true" className="size-5" />
@@ -35,7 +40,7 @@ export function AppHeader({
         className="relative hidden max-w-xl flex-1 sm:block"
       >
         <label htmlFor="global-search" className="sr-only">
-          Pesquisar candidaturas
+          {t("searchLabel")}
         </label>
         <Search
           aria-hidden="true"
@@ -46,18 +51,19 @@ export function AppHeader({
           name="q"
           type="search"
           maxLength={100}
-          placeholder="Pesquisar vaga, empresa ou recrutador..."
+          placeholder={t("searchPlaceholder")}
           className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pr-4 pl-10 text-sm text-slate-700 outline-none transition focus:border-blue-400 focus:bg-white focus:ring-3 focus:ring-blue-100"
         />
       </form>
 
       <div className="ml-auto flex items-center gap-2">
+        <LanguageSwitcher />
         <ThemeToggle />
         <div className="hidden h-8 w-px bg-slate-200 sm:block" />
         <Link
           href="/definicoes"
           className="flex items-center gap-3 rounded-xl p-1.5 text-left transition hover:bg-slate-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
-          aria-label="Abrir definições do perfil"
+          aria-label={t("openProfileSettings")}
         >
           <UserAvatar fullName={user.fullName} imageUrl={user.avatarUrl} />
           <span className="hidden sm:block">
@@ -71,8 +77,8 @@ export function AppHeader({
             type="submit"
             variant="ghost"
             size="icon"
-            aria-label="Terminar sessão"
-            title="Terminar sessão"
+            aria-label={t("logout")}
+            title={t("logout")}
           >
             <LogOut aria-hidden="true" className="size-5" />
           </Button>

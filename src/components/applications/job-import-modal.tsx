@@ -1,6 +1,7 @@
 "use client";
 
 import { ArrowLeft, FileSearch, LoaderCircle, Sparkles, X } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -27,6 +28,9 @@ export function JobImportModal({
   onApply: (data: ImportedJobData) => void;
   onClose: () => void;
 }) {
+  const locale = useLocale();
+  const t = useTranslations("JobImport");
+  const enums = useTranslations("Enums.workMode");
   const [phase, setPhase] = useState<Phase>("input");
   const [url, setUrl] = useState(initialUrl);
   const [rawText, setRawText] = useState("");
@@ -81,14 +85,14 @@ export function JobImportModal({
       });
       const payload = (await response.json()) as JobImportResponse;
       if (!response.ok || !payload.data) {
-        setError(payload.message ?? "Não foi possível analisar a vaga.");
+        setError(payload.message ?? t("analyseFailed"));
         return;
       }
       setData(payload.data);
       setWarnings(payload.warnings ?? []);
       setPhase("review");
     } catch {
-      setError("Não foi possível contactar o importador. Tenta novamente.");
+      setError(t("connectionFailed"));
     } finally {
       setPending(false);
     }
@@ -104,7 +108,7 @@ export function JobImportModal({
   function applyData() {
     if (!data) return;
     if (!data.title.trim() || !data.companyName.trim()) {
-      setError("Confirma pelo menos o título da vaga e o nome da empresa.");
+      setError(t("requiredFields"));
       return;
     }
     onApply({
@@ -138,12 +142,10 @@ export function JobImportModal({
             </span>
             <div>
               <h2 id="job-import-title" className="font-bold text-slate-950">
-                {phase === "input" ? "Importar vaga" : "Rever dados importados"}
+                {phase === "input" ? t("title") : t("reviewTitle")}
               </h2>
               <p className="mt-1 text-sm leading-5 text-slate-500">
-                {phase === "input"
-                  ? "Preenche automaticamente a candidatura sem guardar nada antes da tua confirmação."
-                  : "Corrige o que for necessário antes de preencher o formulário."}
+                {phase === "input" ? t("description") : t("reviewDescription")}
               </p>
             </div>
           </div>
@@ -151,8 +153,8 @@ export function JobImportModal({
             type="button"
             variant="ghost"
             size="icon"
-            aria-label="Fechar"
-            title="Fechar"
+            aria-label={t("close")}
+            title={t("close")}
             disabled={pending}
             onClick={onClose}
           >
@@ -173,9 +175,9 @@ export function JobImportModal({
           {phase === "input" ? (
             <>
               <FormField
-                label="Link da vaga"
+                label={t("jobLink")}
                 htmlFor="job-import-url"
-                hint="Aceita links de vaga do LinkedIn e do Indeed, incluindo links longos vindos dos resultados de pesquisa."
+                hint={t("jobLinkHint")}
               >
                 <input
                   id="job-import-url"
@@ -189,9 +191,9 @@ export function JobImportModal({
                 />
               </FormField>
               <FormField
-                label="Texto da vaga"
+                label={t("jobText")}
                 htmlFor="job-import-text"
-                hint="Opcional. Usa este campo apenas se a página já não estiver pública ou o site bloquear a leitura."
+                hint={t("jobTextHint")}
               >
                 <textarea
                   id="job-import-text"
@@ -199,16 +201,12 @@ export function JobImportModal({
                   onChange={(event) => setRawText(event.target.value)}
                   rows={12}
                   maxLength={20_000}
-                  placeholder={
-                    "Exemplo:\nApplication Support Engineer\nEmpresa · Lisboa (Híbrido)\n\nSobre a vaga\nResponsabilidades..."
-                  }
+                  placeholder={t("jobTextPlaceholder")}
                   className={textareaClassName}
                 />
               </FormField>
               <div className="rounded-xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm leading-6 text-blue-900">
-                A app faz uma única leitura da página pública quando clicas em
-                “Analisar vaga”. Não utiliza a tua sessão nem as tuas
-                credenciais do LinkedIn ou do Indeed.
+                {t("privacy")}
               </div>
             </>
           ) : data ? (
@@ -223,7 +221,7 @@ export function JobImportModal({
               ))}
               <div className="grid gap-5 sm:grid-cols-2">
                 <FormField
-                  label="Título da vaga"
+                  label={t("jobTitle")}
                   htmlFor="imported-title"
                   required
                 >
@@ -236,7 +234,11 @@ export function JobImportModal({
                     required
                   />
                 </FormField>
-                <FormField label="Empresa" htmlFor="imported-company" required>
+                <FormField
+                  label={t("company")}
+                  htmlFor="imported-company"
+                  required
+                >
                   <input
                     id="imported-company"
                     value={data.companyName}
@@ -248,7 +250,7 @@ export function JobImportModal({
                     required
                   />
                 </FormField>
-                <FormField label="Localização" htmlFor="imported-location">
+                <FormField label={t("location")} htmlFor="imported-location">
                   <input
                     id="imported-location"
                     value={data.location}
@@ -257,7 +259,7 @@ export function JobImportModal({
                     maxLength={160}
                   />
                 </FormField>
-                <FormField label="Modalidade" htmlFor="imported-work-mode">
+                <FormField label={t("workMode")} htmlFor="imported-work-mode">
                   <select
                     id="imported-work-mode"
                     value={data.workMode}
@@ -269,17 +271,17 @@ export function JobImportModal({
                     }
                     className={fieldClassName}
                   >
-                    <option value="">Sem modalidade definida</option>
+                    <option value="">{t("noWorkMode")}</option>
                     {workModeOptions.map((option) => (
                       <option key={option.value} value={option.value}>
-                        {option.label}
+                        {enums(option.value)}
                       </option>
                     ))}
                   </select>
                 </FormField>
                 <div className="sm:col-span-2">
                   <FormField
-                    label="Sobre a vaga"
+                    label={t("aboutJob")}
                     htmlFor="imported-description"
                   >
                     <textarea
@@ -293,14 +295,14 @@ export function JobImportModal({
                       className={textareaClassName}
                     />
                     <p className="mt-1.5 text-right text-xs text-slate-500">
-                      {data.description.length.toLocaleString("pt-PT")}/5 000
+                      {data.description.length.toLocaleString(locale)}/
+                      {(5_000).toLocaleString(locale)}
                     </p>
                   </FormField>
                 </div>
               </div>
               <p className="text-sm leading-6 text-slate-500">
-                Se a empresa não existir, será aberto o formulário rápido para
-                confirmares o nome, o website e o logótipo antes de a criar.
+                {t("newCompanyHint")}
               </p>
             </>
           ) : null}
@@ -316,11 +318,11 @@ export function JobImportModal({
                 }}
               >
                 <ArrowLeft aria-hidden="true" className="size-4" />
-                Voltar
+                {t("back")}
               </Button>
             ) : (
               <Button type="button" variant="secondary" onClick={onClose}>
-                Cancelar
+                {t("cancel")}
               </Button>
             )}
             <Button
@@ -337,10 +339,10 @@ export function JobImportModal({
                 <Sparkles aria-hidden="true" className="size-4" />
               )}
               {pending
-                ? "A analisar..."
+                ? t("analysing")
                 : phase === "input"
-                  ? "Analisar vaga"
-                  : "Preencher candidatura"}
+                  ? t("analyse")
+                  : t("fillApplication")}
             </Button>
           </div>
         </div>

@@ -1,5 +1,7 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -14,20 +16,22 @@ import { createClient } from "@/lib/supabase/server";
 
 const actionsPath = "/acoes";
 
-function validationError(
+async function validationError(
   fieldErrors: NonNullable<ActionActionState["fieldErrors"]>,
-): ActionActionState {
+): Promise<ActionActionState> {
+  const t = await getTranslations("TaskActions");
   return {
     status: "error",
-    message: "Revê os campos assinalados.",
+    message: t("reviewFields"),
     fieldErrors,
   };
 }
 
-function saveError(): ActionActionState {
+async function saveError(): Promise<ActionActionState> {
+  const t = await getTranslations("TaskActions");
   return {
     status: "error",
-    message: "Não foi possível guardar a tarefa. Tenta novamente.",
+    message: t("saveFailed"),
   };
 }
 
@@ -54,13 +58,17 @@ export async function createActionAction(
   _previousState: ActionActionState,
   formData: FormData,
 ): Promise<ActionActionState> {
-  const { values, fieldErrors } = validateActionForm(formData);
+  const t = await getTranslations("TaskActions");
+  const { values, fieldErrors } = validateActionForm(
+    formData,
+    await getTranslations("TaskValidation"),
+  );
   if (hasActionFieldErrors(fieldErrors)) return validationError(fieldErrors);
 
   const user = await requireCurrentUser();
   if (!(await applicationBelongsToUser(values.application_id, user.id))) {
     return validationError({
-      applicationId: "Seleciona uma candidatura disponível.",
+      applicationId: t("availableApplication"),
     });
   }
 
@@ -81,17 +89,21 @@ export async function updateActionAction(
   _previousState: ActionActionState,
   formData: FormData,
 ): Promise<ActionActionState> {
+  const t = await getTranslations("TaskActions");
   if (!isValidActionId(actionId)) {
-    return { status: "error", message: "A tarefa indicada não é válida." };
+    return { status: "error", message: t("invalidTask") };
   }
 
-  const { values, fieldErrors } = validateActionForm(formData);
+  const { values, fieldErrors } = validateActionForm(
+    formData,
+    await getTranslations("TaskValidation"),
+  );
   if (hasActionFieldErrors(fieldErrors)) return validationError(fieldErrors);
 
   const user = await requireCurrentUser();
   if (!(await applicationBelongsToUser(values.application_id, user.id))) {
     return validationError({
-      applicationId: "Seleciona uma candidatura disponível.",
+      applicationId: t("availableApplication"),
     });
   }
 
@@ -105,7 +117,7 @@ export async function updateActionAction(
       .maybeSingle();
 
     if (existingActionError || !existingAction) {
-      return { status: "error", message: "A tarefa já não está disponível." };
+      return { status: "error", message: t("unavailable") };
     }
     values.completed_at = existingAction.completed_at ?? values.completed_at;
   }
@@ -120,7 +132,7 @@ export async function updateActionAction(
 
   if (error) return saveError();
   if (!data) {
-    return { status: "error", message: "A tarefa já não está disponível." };
+    return { status: "error", message: t("unavailable") };
   }
 
   revalidateActionPages();
@@ -137,11 +149,12 @@ export async function deleteActionAction(
   _previousState: ActionActionState,
   _formData: FormData,
 ): Promise<ActionActionState> {
+  const t = await getTranslations("TaskActions");
   void _previousState;
   void _formData;
 
   if (!isValidActionId(actionId)) {
-    return { status: "error", message: "A tarefa indicada não é válida." };
+    return { status: "error", message: t("invalidTask") };
   }
 
   const user = await requireCurrentUser();
@@ -157,11 +170,11 @@ export async function deleteActionAction(
   if (error) {
     return {
       status: "error",
-      message: "Não foi possível eliminar a tarefa. Tenta novamente.",
+      message: t("deleteFailed"),
     };
   }
   if (!data) {
-    return { status: "error", message: "A tarefa já não está disponível." };
+    return { status: "error", message: t("unavailable") };
   }
 
   revalidateActionPages();
@@ -176,8 +189,9 @@ async function setActionCompletion(
   actionId: string,
   completed: boolean,
 ): Promise<ActionActionState> {
+  const t = await getTranslations("TaskActions");
   if (!isValidActionId(actionId)) {
-    return { status: "error", message: "A tarefa indicada não é válida." };
+    return { status: "error", message: t("invalidTask") };
   }
 
   const user = await requireCurrentUser();
@@ -196,7 +210,7 @@ async function setActionCompletion(
   if (error || !data) {
     return {
       status: "error",
-      message: "Não foi possível atualizar a tarefa. Tenta novamente.",
+      message: t("updateFailed"),
     };
   }
 

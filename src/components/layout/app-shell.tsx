@@ -8,6 +8,7 @@ import {
   type ReactNode,
   type TouchEvent,
 } from "react";
+import { useTranslations } from "next-intl";
 
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
@@ -29,6 +30,7 @@ export function AppShell({
   children: ReactNode;
   user: CurrentUser;
 }) {
+  const t = useTranslations("Navigation");
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const mobileDialogRef = useRef<HTMLDivElement>(null);
@@ -50,7 +52,7 @@ export function AppShell({
     const previousOverflow = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     mobileDialogRef.current
-      ?.querySelector<HTMLElement>('[aria-label="Fechar menu"]')
+      ?.querySelector<HTMLElement>("[data-mobile-menu-close]")
       ?.focus();
 
     return () => {
@@ -129,7 +131,7 @@ export function AppShell({
         href="#main-content"
         className="fixed top-2 left-2 z-[60] -translate-y-20 rounded-lg bg-slate-950 px-4 py-2 text-sm font-semibold text-white transition focus:translate-y-0 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
       >
-        Saltar para o conteúdo
+        {t("skipToContent")}
       </a>
       <div className="sticky top-0 hidden h-screen shrink-0 lg:block">
         <AppSidebar
@@ -143,7 +145,7 @@ export function AppShell({
           ref={mobileDialogRef}
           role="dialog"
           aria-modal="true"
-          aria-label="Navegação principal"
+          aria-label={t("mainNavigation")}
           className="fixed inset-0 z-50 lg:hidden"
           onKeyDown={handleDialogKeyDown}
         >
@@ -151,7 +153,7 @@ export function AppShell({
             type="button"
             tabIndex={-1}
             className="absolute inset-0 bg-slate-950/35 backdrop-blur-[1px]"
-            aria-label="Fechar navegação"
+            aria-label={t("closeNavigation")}
             onClick={closeMobileMenu}
           />
           <div className="relative h-full w-72 max-w-[85vw] shadow-2xl">

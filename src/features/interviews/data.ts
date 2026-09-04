@@ -1,4 +1,5 @@
 import "server-only";
+import { interviewCreationStatuses } from "@/features/interviews/eligibility";
 
 import {
   lisbonOffsetForInstant,
@@ -15,19 +16,26 @@ import { isValidInterviewId } from "@/features/interviews/validation";
 import { requireCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 
-export async function getInterviewApplicationOptions(): Promise<
-  InterviewApplicationOption[]
-> {
+export async function getInterviewApplicationOptions({
+  forCreation = false,
+}: { forCreation?: boolean } = {}): Promise<InterviewApplicationOption[]> {
   const user = await requireCurrentUser();
   const supabase = await createClient();
+  let applicationsQuery = supabase
+    .from("applications")
+    .select(
+      "id, opportunity_id, primary_recruiter_id, interview_preparation, questions_for_company",
+    )
+    .eq("user_id", user.id);
+  if (forCreation) {
+    applicationsQuery = applicationsQuery.in(
+      "status",
+      interviewCreationStatuses,
+    );
+  }
   const [applicationsResult, opportunitiesResult, companiesResult] =
     await Promise.all([
-      supabase
-        .from("applications")
-        .select(
-          "id, opportunity_id, primary_recruiter_id, interview_preparation, questions_for_company",
-        )
-        .eq("user_id", user.id),
+      applicationsQuery,
       supabase
         .from("opportunities")
         .select("id, company_id, title")

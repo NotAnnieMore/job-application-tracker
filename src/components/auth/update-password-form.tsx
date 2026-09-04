@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 
 import { AuthFormMessage } from "@/components/auth/auth-form-message";
 import { AuthSubmitButton } from "@/components/auth/auth-submit-button";
@@ -9,6 +10,7 @@ import { updatePasswordAction } from "@/features/auth/actions";
 import { initialAuthActionState } from "@/features/auth/types";
 
 export function UpdatePasswordForm() {
+  const t = useTranslations("Auth");
   const [state, formAction] = useActionState(
     updatePasswordAction,
     initialAuthActionState,
@@ -18,10 +20,10 @@ export function UpdatePasswordForm() {
     <form action={formAction} className="space-y-5">
       <AuthFormMessage state={state} />
       <FormField
-        label="Nova palavra-passe"
+        label={t("newPassword")}
         htmlFor="new-password"
         required
-        hint="Usa entre 12 e 128 caracteres."
+        hint={t("newPasswordHint")}
         error={state.fieldErrors?.password}
       >
         <input
@@ -42,7 +44,7 @@ export function UpdatePasswordForm() {
         />
       </FormField>
       <FormField
-        label="Confirmar nova palavra-passe"
+        label={t("confirmNewPassword")}
         htmlFor="confirm-new-password"
         required
         error={state.fieldErrors?.confirmPassword}
@@ -65,8 +67,8 @@ export function UpdatePasswordForm() {
         />
       </FormField>
       <AuthSubmitButton
-        label="Guardar nova palavra-passe"
-        pendingLabel="A guardar..."
+        label={t("saveNewPassword")}
+        pendingLabel={t("saving")}
       />
     </form>
   );

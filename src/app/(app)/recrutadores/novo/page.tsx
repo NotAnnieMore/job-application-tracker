@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -12,6 +13,7 @@ export default async function NewRecruiterPage({
 }: {
   searchParams: Promise<{ empresa?: string | string[] }>;
 }) {
+  const t = await getTranslations("Recruiters");
   const companies = await getRecruiterCompanyOptions();
   const companyParam = (await searchParams).empresa;
   const companyId =
@@ -27,17 +29,14 @@ export default async function NewRecruiterPage({
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        Voltar aos contactos
+        {t("back")}
       </Link>
-      <PageHeader
-        title="Novo contacto"
-        description="Guarda os dados de um recrutador ou outro contacto do processo."
-      />
+      <PageHeader title={t("new")} description={t("newDescription")} />
       <RecruiterForm
         action={createRecruiterAction}
         companies={companies}
         initialValues={{ ...emptyRecruiterFormValues, companyId }}
-        submitLabel="Guardar contacto"
+        submitLabel={t("save")}
       />
     </div>
   );

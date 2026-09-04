@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -19,6 +20,7 @@ export default async function EditActionPage({
   params: Promise<{ actionId: string }>;
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const t = await getTranslations("Tasks");
   const [{ actionId }, query] = await Promise.all([params, searchParams]);
   const [actionDetails, applications] = await Promise.all([
     getActionById(actionId),
@@ -43,27 +45,22 @@ export default async function EditActionPage({
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        {returnToApplication ? "Voltar à candidatura" : "Voltar às tarefas"}
+        {returnToApplication ? t("backToApplication") : t("back")}
       </Link>
-      <PageHeader
-        title="Editar tarefa"
-        description="Atualiza a tarefa, o prazo, a prioridade ou o estado."
-      />
+      <PageHeader title={t("edit")} description={t("editDescription")} />
       <ActionForm
         action={action}
         applications={applications}
         initialValues={actionDetails}
-        submitLabel="Guardar alterações"
+        submitLabel={t("saveChanges")}
         cancelHref={returnHref}
       />
 
       <Card className="border-red-200">
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Eliminar tarefa</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              A candidatura e os restantes dados do processo serão mantidos.
-            </p>
+            <h2 className="font-bold text-slate-950">{t("delete")}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t("deleteHint")}</p>
           </div>
         </CardHeader>
         <CardContent>

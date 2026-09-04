@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import {
   Building2,
   Check,
@@ -49,6 +51,7 @@ export function CompanyLogoBatchManager({
 }: {
   companies: CompanyWithoutLogo[];
 }) {
+  const t = useTranslations("CompanyLogos");
   const router = useRouter();
   const [searches, setSearches] = useState<Record<string, CompanySearchState>>(
     {},
@@ -97,8 +100,7 @@ export function CompanyLogoBatchManager({
       };
 
       if (!response.ok) {
-        const message =
-          payload.message ?? "Não foi possível procurar este logótipo.";
+        const message = payload.message ?? t("searchFailed");
         setSearches((current) => ({
           ...current,
           [company.id]: { status: "error", message },
@@ -115,7 +117,7 @@ export function CompanyLogoBatchManager({
       }));
       return { status: response.status };
     } catch {
-      const message = "Não foi possível contactar o serviço de logótipos.";
+      const message = t("connectionFailed");
       setSearches((current) => ({
         ...current,
         [company.id]: { status: "error", message },
@@ -193,9 +195,9 @@ export function CompanyLogoBatchManager({
     return (
       <EmptyState
         icon={Building2}
-        title="Todas as empresas têm logótipo"
-        description="Não existem empresas por completar neste momento. Podes alterar qualquer imagem na edição individual."
-        actionLabel="Voltar às empresas"
+        title={t("allComplete")}
+        description={t("allCompleteDescription")}
+        actionLabel={t("backToCompanies")}
         actionHref="/empresas"
       />
     );
@@ -207,11 +209,10 @@ export function CompanyLogoBatchManager({
         <CardContent className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="font-semibold text-slate-900">
-              {visibleCompanies.length} empresa(s) sem logótipo
+              {t("missingCount", { count: visibleCompanies.length })}
             </p>
             <p className="mt-1 text-sm leading-6 text-slate-500">
-              A pesquisa não guarda nada automaticamente. Confirma apenas as
-              correspondências corretas.
+              {t("reviewHint")}
             </p>
           </div>
           <Button
@@ -228,7 +229,7 @@ export function CompanyLogoBatchManager({
             ) : (
               <WandSparkles aria-hidden="true" className="size-4" />
             )}
-            {isSearchingAll ? "A procurar..." : "Procurar todas"}
+            {isSearchingAll ? t("searching") : t("searchAll")}
           </Button>
         </CardContent>
       </Card>
@@ -256,7 +257,7 @@ export function CompanyLogoBatchManager({
                       {company.name}
                     </h2>
                     <p className="mt-0.5 truncate text-xs text-slate-500">
-                      {company.website || "Website ainda por definir"}
+                      {company.website || t("noWebsite")}
                     </p>
                   </div>
                   <Button
@@ -277,16 +278,16 @@ export function CompanyLogoBatchManager({
                       <RotateCcw aria-hidden="true" className="size-4" />
                     )}
                     {state.status === "loading"
-                      ? "A procurar"
+                      ? t("searchingShort")
                       : state.status === "idle"
-                        ? "Procurar"
-                        : "Repetir"}
+                        ? t("search")
+                        : t("retry")}
                   </Button>
                 </div>
 
                 {state.status === "idle" ? (
                   <p className="mt-5 rounded-xl bg-slate-50 px-3 py-4 text-center text-sm text-slate-500">
-                    Ainda não pesquisado.
+                    {t("notSearched")}
                   </p>
                 ) : null}
 
@@ -312,15 +313,14 @@ export function CompanyLogoBatchManager({
 
                 {state.status === "success" && state.results.length === 0 ? (
                   <p className="mt-5 rounded-xl bg-slate-50 px-3 py-4 text-center text-sm text-slate-500">
-                    Nenhuma sugestão encontrada. Mantém as iniciais ou adiciona
-                    o URL na edição da empresa.
+                    {t("noResults")}
                   </p>
                 ) : null}
 
                 {state.status === "success" && state.results.length > 0 ? (
                   <div className="mt-5">
                     <p className="mb-2 text-xs font-semibold tracking-wide text-slate-500 uppercase">
-                      Escolhe apenas se reconheces a empresa
+                      {t("recogniseHint")}
                     </p>
                     <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
                       {state.results.map((result) => {
@@ -369,11 +369,11 @@ export function CompanyLogoBatchManager({
                         onClick={() => clearResult(company.id)}
                         className="mt-3 text-xs font-semibold text-slate-500 hover:text-slate-900"
                       >
-                        Não usar nenhuma destas sugestões
+                        {t("clearSelection")}
                       </button>
                     ) : (
                       <p className="mt-3 text-xs text-slate-500">
-                        Sem seleção — esta empresa será ignorada ao guardar.
+                        {t("noSelection")}
                       </p>
                     )}
                   </div>
@@ -388,7 +388,7 @@ export function CompanyLogoBatchManager({
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-sm font-semibold text-slate-900">
-              {selections.length} logótipo(s) selecionado(s)
+              {t("selectedCount", { count: selections.length })}
             </p>
             {saveResult ? (
               <p
@@ -404,7 +404,7 @@ export function CompanyLogoBatchManager({
               </p>
             ) : (
               <p className="mt-1 text-xs text-slate-500">
-                As restantes empresas não serão alteradas.
+                {t("unchangedHint")}
               </p>
             )}
           </div>
@@ -413,7 +413,7 @@ export function CompanyLogoBatchManager({
               href="/empresas"
               className={buttonClassName({ variant: "secondary" })}
             >
-              Voltar
+              {t("back")}
             </Link>
             <Button
               type="button"
@@ -428,7 +428,7 @@ export function CompanyLogoBatchManager({
               ) : (
                 <Save aria-hidden="true" className="size-4" />
               )}
-              {isSaving ? "A guardar..." : "Guardar selecionados"}
+              {isSaving ? t("saving") : t("saveSelected")}
             </Button>
           </div>
         </div>

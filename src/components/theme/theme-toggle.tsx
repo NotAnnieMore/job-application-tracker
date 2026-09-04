@@ -1,14 +1,16 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Button } from "@/components/ui/button";
 import { useTheme } from "@/components/theme/theme-provider";
 
 export function ThemeToggle({ className }: { className?: string }) {
   const { theme, toggleTheme } = useTheme();
+  const t = useTranslations("Theme");
   const dark = theme === "dark";
-  const label = dark ? "Ativar modo claro" : "Ativar modo escuro";
+  const label = dark ? t("enableLight") : t("enableDark");
 
   return (
     <Button

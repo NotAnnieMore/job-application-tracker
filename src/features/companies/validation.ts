@@ -1,5 +1,10 @@
+import type messages from "../../../messages/en-GB.json";
 import type { CompanyActionState } from "@/features/companies/types";
 import type { WorkModeValue } from "@/types/database.types";
+
+type ValidationTranslator = (
+  key: keyof typeof messages.CompanyValidation,
+) => string;
 
 const workModes = new Set<WorkModeValue>(["onsite", "hybrid", "remote"]);
 
@@ -8,7 +13,7 @@ function readText(formData: FormData, field: string) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function normalizeWebsite(value: string) {
+function normalizeWebsite(value: string, t: ValidationTranslator) {
   if (!value) return { website: "" };
 
   const candidate = /^https?:\/\//i.test(value) ? value : `https://${value}`;
@@ -17,16 +22,16 @@ function normalizeWebsite(value: string) {
     const url = new URL(candidate);
 
     if (!url.hostname || !["http:", "https:"].includes(url.protocol)) {
-      return { website: "", error: "Introduz um endereço web válido." };
+      return { website: "", error: t("invalidWebsite") };
     }
 
     return { website: url.toString() };
   } catch {
-    return { website: "", error: "Introduz um endereço web válido." };
+    return { website: "", error: t("invalidWebsite") };
   }
 }
 
-function normalizeLogoUrl(value: string) {
+function normalizeLogoUrl(value: string, t: ValidationTranslator) {
   if (!value) return { logoUrl: "" };
 
   try {
@@ -35,17 +40,20 @@ function normalizeLogoUrl(value: string) {
     if (!url.hostname || url.protocol !== "https:") {
       return {
         logoUrl: "",
-        error: "O endereço do logótipo tem de começar por https://.",
+        error: t("httpsLogo"),
       };
     }
 
     return { logoUrl: url.toString() };
   } catch {
-    return { logoUrl: "", error: "Introduz um endereço de imagem válido." };
+    return { logoUrl: "", error: t("invalidLogo") };
   }
 }
 
-export function validateCompanyForm(formData: FormData) {
+export function validateCompanyForm(
+  formData: FormData,
+  t: ValidationTranslator,
+) {
   const name = readText(formData, "name");
   const rawWebsite = readText(formData, "website");
   const rawLogoUrl = readText(formData, "logoUrl");
@@ -56,35 +64,35 @@ export function validateCompanyForm(formData: FormData) {
   const fieldErrors: NonNullable<CompanyActionState["fieldErrors"]> = {};
 
   if (!name) {
-    fieldErrors.name = "Introduz o nome da empresa.";
+    fieldErrors.name = t("requiredName");
   } else if (name.length > 160) {
-    fieldErrors.name = "O nome pode ter no máximo 160 caracteres.";
+    fieldErrors.name = t("nameLength");
   }
 
-  const { website, error: websiteError } = normalizeWebsite(rawWebsite);
+  const { website, error: websiteError } = normalizeWebsite(rawWebsite, t);
   if (rawWebsite.length > 500) {
-    fieldErrors.website = "O endereço pode ter no máximo 500 caracteres.";
+    fieldErrors.website = t("websiteLength");
   } else if (websiteError) {
     fieldErrors.website = websiteError;
   }
 
-  const { logoUrl, error: logoUrlError } = normalizeLogoUrl(rawLogoUrl);
+  const { logoUrl, error: logoUrlError } = normalizeLogoUrl(rawLogoUrl, t);
   if (rawLogoUrl.length > 1000) {
-    fieldErrors.logoUrl = "O endereço pode ter no máximo 1000 caracteres.";
+    fieldErrors.logoUrl = t("logoLength");
   } else if (logoUrlError) {
     fieldErrors.logoUrl = logoUrlError;
   }
 
   if (location.length > 160) {
-    fieldErrors.location = "A localização pode ter no máximo 160 caracteres.";
+    fieldErrors.location = t("locationLength");
   }
 
   if (industry.length > 160) {
-    fieldErrors.industry = "O setor pode ter no máximo 160 caracteres.";
+    fieldErrors.industry = t("industryLength");
   }
 
   if (notes.length > 4000) {
-    fieldErrors.notes = "As notas podem ter no máximo 4000 caracteres.";
+    fieldErrors.notes = t("notesLength");
   }
 
   let workMode: WorkModeValue | null = null;
@@ -92,7 +100,7 @@ export function validateCompanyForm(formData: FormData) {
     if (workModes.has(rawWorkMode as WorkModeValue)) {
       workMode = rawWorkMode as WorkModeValue;
     } else {
-      fieldErrors.workMode = "Seleciona uma modalidade válida.";
+      fieldErrors.workMode = t("invalidWorkMode");
     }
   }
 

@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { CompanyLogo } from "@/components/companies/company-logo";
 import { InterviewOutcomeEditor } from "@/components/interviews/interview-outcome-editor";
@@ -23,7 +24,6 @@ import { PageHeader } from "@/components/shared/page-header";
 import { SuccessToast } from "@/components/shared/success-toast";
 import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { interviewFormatLabels } from "@/features/interviews/constants";
 import { formatInterviewDateTime } from "@/features/interviews/date";
 import { getInterviewById } from "@/features/interviews/data";
 
@@ -66,6 +66,11 @@ export default async function InterviewDetailsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const [{ interviewId }, query] = await Promise.all([params, searchParams]);
+  const [locale, t, tFormat] = await Promise.all([
+    getLocale(),
+    getTranslations("Interviews"),
+    getTranslations("Enums.interviewFormat"),
+  ]);
   const interview = await getInterviewById(interviewId);
   if (!interview) notFound();
 
@@ -78,7 +83,7 @@ export default async function InterviewDetailsPage({
     : `/entrevistas/${interview.id}/editar`;
   const notice =
     singleValue(query.aviso) === "entrevista-atualizada"
-      ? "Entrevista atualizada com sucesso."
+      ? t("updated")
       : undefined;
 
   return (
@@ -88,7 +93,7 @@ export default async function InterviewDetailsPage({
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        {returnToApplication ? "Voltar à candidatura" : "Voltar às entrevistas"}
+        {returnToApplication ? t("backToApplication") : t("back")}
       </Link>
 
       <PageHeader
@@ -97,7 +102,7 @@ export default async function InterviewDetailsPage({
         action={
           <Link href={editHref} className={buttonClassName()}>
             <Pencil aria-hidden="true" className="size-4" />
-            Editar entrevista
+            {t("editInterview")}
           </Link>
         }
       />
@@ -139,10 +144,10 @@ export default async function InterviewDetailsPage({
                 />
                 <div className="min-w-0">
                   <p className="text-xs font-bold tracking-wide text-slate-400 uppercase">
-                    Data e hora
+                    {t("dateAndTime")}
                   </p>
                   <p className="mt-1 break-words text-sm font-medium text-slate-800 [overflow-wrap:anywhere]">
-                    {formatInterviewDateTime(interview.scheduledAt)}
+                    {formatInterviewDateTime(interview.scheduledAt, locale)}
                   </p>
                 </div>
               </div>
@@ -153,10 +158,10 @@ export default async function InterviewDetailsPage({
                 />
                 <div className="min-w-0">
                   <p className="text-xs font-bold tracking-wide text-slate-400 uppercase">
-                    Duração
+                    {t("duration")}
                   </p>
                   <p className="mt-1 text-sm font-medium text-slate-800">
-                    {interview.durationMinutes} minutos
+                    {t("minutes", { count: interview.durationMinutes })}
                   </p>
                 </div>
               </div>
@@ -167,10 +172,10 @@ export default async function InterviewDetailsPage({
                 />
                 <div className="min-w-0">
                   <p className="text-xs font-bold tracking-wide text-slate-400 uppercase">
-                    Formato
+                    {t("format")}
                   </p>
                   <p className="mt-1 text-sm font-medium text-slate-800">
-                    {interviewFormatLabels[interview.format]}
+                    {tFormat(interview.format)}
                   </p>
                 </div>
               </div>
@@ -181,7 +186,7 @@ export default async function InterviewDetailsPage({
                 />
                 <div className="min-w-0">
                   <p className="text-xs font-bold tracking-wide text-slate-400 uppercase">
-                    Local ou ligação
+                    {t("locationOrLink")}
                   </p>
                   {interview.locationOrUrl ? (
                     isExternalLocation(interview.locationOrUrl) ? (
@@ -191,7 +196,7 @@ export default async function InterviewDetailsPage({
                         rel="noreferrer"
                         className="mt-1 inline-flex items-center gap-1.5 text-sm font-medium text-blue-600 hover:text-blue-700"
                       >
-                        Abrir ligação
+                        {t("openLink")}
                         <ExternalLink aria-hidden="true" className="size-3.5" />
                       </a>
                     ) : (
@@ -200,7 +205,9 @@ export default async function InterviewDetailsPage({
                       </p>
                     )
                   ) : (
-                    <p className="mt-1 text-sm text-slate-500">Por definir</p>
+                    <p className="mt-1 text-sm text-slate-500">
+                      {t("notDefined")}
+                    </p>
                   )}
                 </div>
               </div>
@@ -210,9 +217,9 @@ export default async function InterviewDetailsPage({
           <Card className="min-w-0">
             <CardHeader className="flex-wrap items-start">
               <div className="min-w-0">
-                <h2 className="font-bold text-slate-950">Preparação</h2>
+                <h2 className="font-bold text-slate-950">{t("preparation")}</h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Guião e perguntas para levares para a conversa.
+                  {t("preparationDescription")}
                 </p>
               </div>
               <InterviewPreparationEditor
@@ -223,14 +230,14 @@ export default async function InterviewDetailsPage({
             </CardHeader>
             <CardContent className="space-y-7">
               <TextSection
-                title="Guião pessoal e CV"
+                title={t("personalScript")}
                 value={interview.applicationPreparation}
-                emptyText="Ainda não existe preparação geral guardada na candidatura."
+                emptyText={t("personalScriptEmpty")}
               />
               <TextSection
-                title="Perguntas para a empresa"
+                title={t("companyQuestions")}
                 value={interview.questionsForCompany}
-                emptyText="Ainda não existem perguntas guardadas."
+                emptyText={t("companyQuestionsEmpty")}
               />
             </CardContent>
           </Card>
@@ -238,9 +245,11 @@ export default async function InterviewDetailsPage({
           <Card className="min-w-0">
             <CardHeader className="flex-wrap items-start">
               <div className="min-w-0">
-                <h2 className="font-bold text-slate-950">Resultado e notas</h2>
+                <h2 className="font-bold text-slate-950">
+                  {t("outcomeAndNotes")}
+                </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Registo feito depois da entrevista.
+                  {t("outcomeDescription")}
                 </p>
               </div>
               <InterviewOutcomeEditor
@@ -251,14 +260,14 @@ export default async function InterviewDetailsPage({
             </CardHeader>
             <CardContent className="space-y-7">
               <TextSection
-                title="Feedback e notas"
+                title={t("feedbackAndNotes")}
                 value={interview.feedback}
-                emptyText="Ainda não existe feedback registado."
+                emptyText={t("feedbackEmpty")}
               />
               <TextSection
-                title="Resultado"
+                title={t("result")}
                 value={interview.result}
-                emptyText="Ainda não existe um resultado registado."
+                emptyText={t("resultEmpty")}
               />
             </CardContent>
           </Card>
@@ -267,7 +276,7 @@ export default async function InterviewDetailsPage({
         <aside className="min-w-0 space-y-6">
           <Card className="min-w-0">
             <CardHeader>
-              <h2 className="font-bold text-slate-950">Pessoas</h2>
+              <h2 className="font-bold text-slate-950">{t("people")}</h2>
             </CardHeader>
             <CardContent className="space-y-5">
               <div className="flex gap-3">
@@ -277,10 +286,10 @@ export default async function InterviewDetailsPage({
                 />
                 <div className="min-w-0">
                   <p className="text-xs font-bold tracking-wide text-slate-400 uppercase">
-                    Recrutador
+                    {t("recruiter")}
                   </p>
                   <p className="mt-1 break-words text-sm font-medium text-slate-800 [overflow-wrap:anywhere]">
-                    {interview.recruiterName || "Por definir"}
+                    {interview.recruiterName || t("notDefined")}
                   </p>
                 </div>
               </div>
@@ -313,10 +322,10 @@ export default async function InterviewDetailsPage({
                 />
                 <div className="min-w-0">
                   <p className="text-xs font-bold tracking-wide text-slate-400 uppercase">
-                    Participantes
+                    {t("participants")}
                   </p>
                   <p className="mt-1 break-words whitespace-pre-wrap text-sm text-slate-700 [overflow-wrap:anywhere]">
-                    {interview.participants || "Por definir"}
+                    {interview.participants || t("notDefined")}
                   </p>
                 </div>
               </div>
@@ -333,7 +342,7 @@ export default async function InterviewDetailsPage({
                 })}
               >
                 <BriefcaseBusiness aria-hidden="true" className="size-4" />
-                Abrir candidatura
+                {t("openApplication")}
               </Link>
             </CardContent>
           </Card>

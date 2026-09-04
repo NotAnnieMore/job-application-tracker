@@ -20,7 +20,9 @@
   <img alt="Vercel" src="https://img.shields.io/badge/Deployed%20on-Vercel-000000?logo=vercel" />
 </p>
 
-![Dashboard do Job Application Tracker](docs/screenshots/dashboard.png)
+![Dashboard em inglês, no modo claro, com dados fictícios](docs/screenshots/anonymized-v2/dashboard-light-en.png)
+
+> As imagens de apresentação foram editadas com IA para substituir dados pessoais e de empresas por exemplos fictícios. São ilustrações da interface e podem apresentar pequenas diferenças visuais face à aplicação.
 
 ## Sobre o projeto
 
@@ -36,12 +38,14 @@ A aplicação encontra-se publicada na Vercel e utiliza o Supabase para autentic
 - Dashboard com métricas, taxa de resposta, candidaturas recentes e atalhos rápidos.
 - Registo e gestão completa de candidaturas, empresas e oportunidades.
 - Importação assistida de vagas através de dados estruturados ou texto colado pelo utilizador, com normalização de links do LinkedIn e Indeed.
+- Aviso antes de confirmar uma importação quando a descrição ultrapassa o limite de 5 000 caracteres.
 - Atalho de importação no dashboard, abrindo diretamente o importador da nova candidatura.
 - Pesquisa, ordenação e filtros combináveis guardados no URL.
 - Alteração rápida do estado diretamente na lista e no detalhe da candidatura.
 - Página de detalhe com o contexto completo de cada candidatura.
 - Gestão de recrutadores e respetivos contactos.
 - Página de resumo para preparar, acompanhar e registar o resultado de entrevistas.
+- Criação de entrevistas apenas para candidaturas enviadas ou a aguardar resposta, com validação também no servidor. As entrevistas anteriores continuam disponíveis para consulta e edição.
 - Edição rápida do guião pessoal/CV e das perguntas para a empresa num modal, sem abandonar o resumo da entrevista.
 - Registo rápido de feedback, notas e resultado num modal durante ou depois da entrevista.
 - Tarefas com prioridade, prazo e estado, associadas a candidaturas.
@@ -50,35 +54,47 @@ A aplicação encontra-se publicada na Vercel e utiliza o Supabase para autentic
 - Criação rápida de uma empresa durante o registo de uma candidatura, sem abandonar o formulário.
 - Perfil com nome e avatar guardado no Supabase Storage.
 - Modo claro e escuro com preferência persistente por browser.
+- Interface em português de Portugal e inglês, com seleção no cabeçalho, autenticação e Definições. A preferência é guardada no browser; datas, contagens e mensagens acompanham o idioma.
 - Interface responsiva para computador e telemóvel.
 - Estados de carregamento com títulos reais e feedback imediato durante a navegação.
 - Registo, login, logout e recuperação de palavra-passe.
 
 ## Galeria
 
+Os exemplos mostram os dois idiomas e temas. Os dados escritos ou importados pelo utilizador — como nomes, descrições, notas e guiões — não são traduzidos automaticamente. Os modelos de email do Supabase também não são alterados pelo seletor de idioma.
+
 ### Pesquisa e organização de candidaturas
 
 As candidaturas podem ser pesquisadas, filtradas por vários critérios e ordenadas. Os filtros ativos permanecem no URL, sobrevivendo a recargas e permitindo guardar ou partilhar a vista atual.
 
-![Lista e filtros de candidaturas](docs/screenshots/applications.png)
+![Lista e filtros de candidaturas em inglês, com dados fictícios](docs/screenshots/anonymized-v2/applications-light-en.png)
 
-### Contexto completo de cada candidatura
+### Preparação e acompanhamento de entrevistas
 
-O detalhe reúne os dados da vaga, a empresa, o contacto principal, o estado atual, notas, preparação para entrevista e próximas tarefas.
+O resumo reúne data, duração, formato, contactos e preparação. O estado pode ser atualizado diretamente; o guião pessoal/CV, as perguntas para a empresa e as notas podem ser editados em janelas rápidas, sem abandonar a página.
 
-![Detalhe de uma candidatura](docs/screenshots/application-detail.png)
+![Resumo de entrevista em inglês, no modo claro, com dados fictícios](docs/screenshots/anonymized-v2/interview-light-en.png)
 
-### Entrevistas
+### Modo escuro
 
-As entrevistas ficam associadas à respetiva candidatura e podem guardar data, duração, formato, participantes, preparação, feedback e resultado.
+A preferência de tema é independente do idioma e mantém-se ao navegar e recarregar a página.
 
-![Gestão de entrevistas](docs/screenshots/interviews.png)
+![Dashboard em inglês, no modo escuro, com dados fictícios](docs/screenshots/anonymized-v2/dashboard-dark-en.png)
 
-### Empresas
+<details>
+<summary>Ver também a preparação de entrevista em português</summary>
 
-O diretório de empresas mantém logótipo, website, setor, localização e os totais de candidaturas e contactos associados.
+![Resumo de entrevista em português, no modo escuro, com dados fictícios](docs/screenshots/anonymized-v2/interview-dark-pt.png)
 
-![Diretório de empresas](docs/screenshots/companies.png)
+</details>
+
+### No telemóvel
+
+Os blocos e controlos adaptam-se ao ecrã pequeno, permitindo consultar a preparação e atualizar a entrevista durante a conversa.
+
+<img src="docs/screenshots/anonymized-v2/interview-mobile-dark-pt.png" alt="Resumo de entrevista em português no telemóvel, com modo escuro e dados fictícios" width="320" />
+
+[Detalhes da anonimização e galeria completa](docs/screenshots/anonymized-v2/README.md).
 
 ## Arquitetura
 
@@ -106,6 +122,7 @@ flowchart LR
 | Aplicação    | Next.js 16, React 19 e App Router |
 | Linguagem    | TypeScript em modo estrito        |
 | Interface    | Tailwind CSS 4 e Lucide Icons     |
+| Idiomas      | next-intl, pt-PT e en-GB          |
 | Autenticação | Supabase Auth com suporte SSR     |
 | Dados        | Supabase PostgreSQL com RLS       |
 | Ficheiros    | Supabase Storage                  |
@@ -170,6 +187,12 @@ flowchart LR
 pnpm lint
 pnpm typecheck
 pnpm format:check
+pnpm test:i18n
+pnpm test:companies-recruiters
+pnpm test:tasks-calendar
+pnpm test:remaining-validation
+pnpm test:job-import-messages
+pnpm test:interview-eligibility
 pnpm build
 ```
 
@@ -181,6 +204,7 @@ pnpm build
 - [Modelo de dados](docs/database.md)
 - [Autenticação e segurança](docs/authentication.md)
 - [Testes e validação](docs/testing.md)
+- [Interface PT/EN: cobertura e decisões](docs/decisions/018-idiomas-pt-en.md)
 - [Decisões técnicas e funcionais](docs/decisions)
 
 Os documentos de contexto usados durante a conceção permanecem apenas na pasta local ignorada `context/` e não fazem parte do repositório.

@@ -278,7 +278,7 @@ export function parseIndeedJobHtml(
       elementContent(html, [
         /<div[^>]+id=["']jobDescriptionText["'][^>]*>([\s\S]*?)<\/div>/iu,
       ]),
-  ).slice(0, 5000);
+  );
   const logoUrl = absoluteUrl(jsonStringField(html, "logoUrl"), pageUrl);
 
   if (!title || !companyName) return null;
@@ -346,7 +346,7 @@ export function parseLinkedInJobHtml(
     location,
     workMode: detectWorkMode(`${title} ${location}`),
     employmentType: linkedInEmploymentType(html),
-    description: description.slice(0, 5000),
+    description,
     source: "LinkedIn",
   };
 }
@@ -423,7 +423,7 @@ export function parsePastedJobText(
     "";
   const descriptionLines =
     aboutIndex >= 0 ? lines.slice(aboutIndex + 1) : lines;
-  const description = descriptionLines.join("\n").slice(0, 5000);
+  const description = descriptionLines.join("\n");
 
   return {
     jobUrl,

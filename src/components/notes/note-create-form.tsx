@@ -1,6 +1,7 @@
 "use client";
 
 import { LoaderCircle, Plus } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
@@ -12,6 +13,7 @@ const textareaClassName =
   "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-6 text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-3 focus:ring-blue-100";
 
 function SubmitButton() {
+  const t = useTranslations("Notes");
   const { pending } = useFormStatus();
 
   return (
@@ -21,19 +23,20 @@ function SubmitButton() {
       ) : (
         <Plus aria-hidden="true" className="size-4" />
       )}
-      {pending ? "A guardar..." : "Adicionar nota"}
+      {pending ? t("saving") : t("add")}
     </Button>
   );
 }
 
 export function NoteCreateForm({ applicationId }: { applicationId: string }) {
+  const t = useTranslations("Notes");
   const action = createNoteAction.bind(null, applicationId);
   const [state, formAction] = useActionState(action, initialNoteActionState);
 
   return (
     <form action={formAction} className="space-y-3">
       <label htmlFor="new-note" className="sr-only">
-        Nova nota
+        {t("new")}
       </label>
       <textarea
         id="new-note"
@@ -41,7 +44,7 @@ export function NoteCreateForm({ applicationId }: { applicationId: string }) {
         rows={4}
         maxLength={5000}
         required
-        placeholder="Regista um contacto, feedback, decisão ou qualquer informação importante..."
+        placeholder={t("placeholder")}
         className={textareaClassName}
         aria-describedby={
           state.fieldErrors?.content ? "new-note-error" : undefined
@@ -59,9 +62,7 @@ export function NoteCreateForm({ applicationId }: { applicationId: string }) {
               {state.fieldErrors?.content ?? state.message}
             </p>
           ) : (
-            <p className="text-xs text-slate-500">
-              As notas ficam ordenadas da mais recente para a mais antiga.
-            </p>
+            <p className="text-xs text-slate-500">{t("orderHint")}</p>
           )}
         </div>
         <SubmitButton />

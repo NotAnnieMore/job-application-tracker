@@ -1,16 +1,18 @@
 import { CalendarX2 } from "lucide-react";
+import { getTranslations } from "next-intl/server";
 
 import { EmptyState } from "@/components/shared/empty-state";
 
-export default function InterviewDetailsNotFound() {
+export default async function InterviewDetailsNotFound() {
+  const t = await getTranslations("Interviews");
   return (
     <>
-      <title>Entrevista não encontrada | Job Application Tracker</title>
+      <title>{t("notFoundMetadata")}</title>
       <EmptyState
         icon={CalendarX2}
-        title="Entrevista não encontrada"
-        description="Esta entrevista não existe ou já foi eliminada."
-        actionLabel="Voltar às entrevistas"
+        title={t("notFound")}
+        description={t("notFoundDescription")}
+        actionLabel={t("back")}
         actionHref="/entrevistas"
         headingLevel="h1"
       />

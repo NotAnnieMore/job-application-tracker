@@ -1,6 +1,7 @@
 "use client";
 
 import { ImagePlus, LoaderCircle, Save, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState, useActionState } from "react";
 import { useFormStatus } from "react-dom";
 
@@ -14,6 +15,7 @@ import { avatarMaxSize, avatarMimeTypes } from "@/features/profile/validation";
 
 function SubmitButton() {
   const { pending } = useFormStatus();
+  const t = useTranslations("Settings.profile");
 
   return (
     <Button type="submit" disabled={pending}>
@@ -22,7 +24,7 @@ function SubmitButton() {
       ) : (
         <Save aria-hidden="true" className="size-4" />
       )}
-      {pending ? "A guardar..." : "Guardar alterações"}
+      {pending ? t("saving") : t("save")}
     </Button>
   );
 }
@@ -36,6 +38,7 @@ export function ProfileForm({
   email: string;
   avatarUrl: string;
 }) {
+  const t = useTranslations("Settings.profile");
   const [state, formAction] = useActionState(
     updateProfileAction,
     initialProfileActionState,
@@ -73,14 +76,14 @@ export function ProfileForm({
 
     if (!avatarMimeTypes.includes(file.type)) {
       event.target.value = "";
-      setClientAvatarError("Escolhe uma imagem JPG, PNG ou WebP.");
+      setClientAvatarError(t("invalidPhotoType"));
       setPreviewUrl(removeAvatar ? "" : avatarUrl);
       return;
     }
 
     if (file.size > avatarMaxSize) {
       event.target.value = "";
-      setClientAvatarError("A imagem não pode ultrapassar 2 MB.");
+      setClientAvatarError(t("photoTooLarge"));
       setPreviewUrl(removeAvatar ? "" : avatarUrl);
       return;
     }
@@ -115,10 +118,8 @@ export function ProfileForm({
       <Card>
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Perfil da conta</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              A informação apresentada no cabeçalho da aplicação.
-            </p>
+            <h2 className="font-bold text-slate-950">{t("title")}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t("description")}</p>
           </div>
         </CardHeader>
         <CardContent className="grid gap-8 lg:grid-cols-[220px_1fr]">
@@ -133,7 +134,7 @@ export function ProfileForm({
               })}
             >
               <ImagePlus aria-hidden="true" className="size-4" />
-              {previewUrl ? "Alterar fotografia" : "Escolher fotografia"}
+              {previewUrl ? t("changePhoto") : t("choosePhoto")}
             </label>
             <input
               ref={fileInputRef}
@@ -159,15 +160,14 @@ export function ProfileForm({
                 onClick={handleRemoveAvatar}
               >
                 <Trash2 aria-hidden="true" className="size-4" />
-                Remover
+                {t("remove")}
               </Button>
             ) : null}
             <p
               id="profile-avatar-hint"
               className="mt-3 text-xs leading-5 text-slate-500"
             >
-              JPG, PNG ou WebP até 2 MB. Usa uma imagem quadrada para obteres o
-              melhor resultado.
+              {t("photoHint")}
             </p>
             {avatarError ? (
               <p role="alert" className="mt-2 text-xs font-medium text-red-600">
@@ -178,7 +178,7 @@ export function ProfileForm({
 
           <div className="grid content-start gap-5 md:grid-cols-2">
             <FormField
-              label="Nome"
+              label={t("name")}
               htmlFor="profile-name"
               required
               error={state.fieldErrors?.name}
@@ -200,9 +200,9 @@ export function ProfileForm({
               />
             </FormField>
             <FormField
-              label="Email"
+              label={t("email")}
               htmlFor="profile-email"
-              hint="O email identifica a tua conta e não pode ser alterado aqui."
+              hint={t("emailHint")}
             >
               <input
                 id="profile-email"

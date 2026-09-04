@@ -1,3 +1,8 @@
+import type messages from "../../../messages/en-GB.json";
+type ValidationTranslator = (
+  key: keyof typeof messages.InterviewValidation,
+  values?: Record<string, string | number>,
+) => string;
 import type { InterviewActionState } from "@/features/interviews/types";
 import type {
   InterviewFormatValue,
@@ -51,7 +56,10 @@ function parseScheduledAt(value: string, rawOffset: string) {
   return new Date(localAsUtc + offset * 60_000).toISOString();
 }
 
-export function validateInterviewForm(formData: FormData) {
+export function validateInterviewForm(
+  formData: FormData,
+  t: ValidationTranslator,
+) {
   const applicationId = readText(formData, "applicationId");
   const recruiterId = readText(formData, "recruiterId");
   const interviewType = readText(formData, "interviewType");
@@ -68,26 +76,26 @@ export function validateInterviewForm(formData: FormData) {
   const fieldErrors: NonNullable<InterviewActionState["fieldErrors"]> = {};
 
   if (!isValidUuid(applicationId)) {
-    fieldErrors.applicationId = "Seleciona uma candidatura válida.";
+    fieldErrors.applicationId = t("invalidApplication");
   }
   if (recruiterId && !isValidUuid(recruiterId)) {
-    fieldErrors.recruiterId = "Seleciona um contacto válido.";
+    fieldErrors.recruiterId = t("invalidRecruiter");
   }
   if (!interviewType) {
-    fieldErrors.interviewType = "Indica o tipo de entrevista.";
+    fieldErrors.interviewType = t("requiredType");
   } else if (interviewType.length > 120) {
-    fieldErrors.interviewType = "O tipo pode ter no máximo 120 caracteres.";
+    fieldErrors.interviewType = t("typeLength");
   }
 
   const scheduledAt = parseScheduledAt(scheduledAtLocal, timezoneOffset);
   if (!scheduledAt) {
-    fieldErrors.scheduledAtLocal = "Indica uma data e hora válidas.";
+    fieldErrors.scheduledAtLocal = t("invalidDate");
   }
   if (!interviewStatuses.has(rawStatus)) {
-    fieldErrors.status = "Seleciona um estado válido.";
+    fieldErrors.status = t("invalidStatus");
   }
   if (!interviewFormats.has(rawFormat)) {
-    fieldErrors.format = "Seleciona um formato válido.";
+    fieldErrors.format = t("invalidFormat");
   }
 
   const durationMinutes = Number(rawDuration);
@@ -96,11 +104,10 @@ export function validateInterviewForm(formData: FormData) {
     durationMinutes < 5 ||
     durationMinutes > 480
   ) {
-    fieldErrors.durationMinutes = "Indica uma duração entre 5 e 480 minutos.";
+    fieldErrors.durationMinutes = t("invalidDuration");
   }
   if (locationOrUrl.length > 1000) {
-    fieldErrors.locationOrUrl =
-      "O local ou ligação pode ter no máximo 1000 caracteres.";
+    fieldErrors.locationOrUrl = t("locationLength");
   }
 
   const participants = rawParticipants
@@ -111,18 +118,16 @@ export function validateInterviewForm(formData: FormData) {
     participants.length > 20 ||
     participants.some((item) => item.length > 160)
   ) {
-    fieldErrors.participants =
-      "Indica no máximo 20 participantes, com 160 caracteres por nome.";
+    fieldErrors.participants = t("participantsLength");
   }
   if (preparation.length > 10_000) {
-    fieldErrors.preparation =
-      "A preparação pode ter no máximo 10 000 caracteres.";
+    fieldErrors.preparation = t("preparationLength");
   }
   if (feedback.length > 10_000) {
-    fieldErrors.feedback = "O feedback pode ter no máximo 10 000 caracteres.";
+    fieldErrors.feedback = t("feedbackLength");
   }
   if (result.length > 4_000) {
-    fieldErrors.result = "O resultado pode ter no máximo 4 000 caracteres.";
+    fieldErrors.result = t("resultLength");
   }
 
   return {

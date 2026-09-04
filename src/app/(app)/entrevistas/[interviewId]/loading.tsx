@@ -1,7 +1,7 @@
 import { PageSkeleton } from "@/components/shared/page-skeleton";
+import { getTranslations } from "next-intl/server";
 
-export default function InterviewDetailsLoading() {
-  return (
-    <PageSkeleton description="A carregar o resumo e a preparação da entrevista." />
-  );
+export default async function InterviewDetailsLoading() {
+  const t = await getTranslations("Interviews");
+  return <PageSkeleton description={t("loadingDetails")} />;
 }

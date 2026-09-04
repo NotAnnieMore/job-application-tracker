@@ -1,5 +1,7 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
+
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
@@ -14,20 +16,22 @@ import { createClient } from "@/lib/supabase/server";
 
 const recruitersPath = "/recrutadores";
 
-function validationError(
+async function validationError(
   fieldErrors: NonNullable<RecruiterActionState["fieldErrors"]>,
-): RecruiterActionState {
+): Promise<RecruiterActionState> {
+  const t = await getTranslations("RecruiterActions");
   return {
     status: "error",
-    message: "Revê os campos assinalados.",
+    message: t("reviewFields"),
     fieldErrors,
   };
 }
 
-function saveError(): RecruiterActionState {
+async function saveError(): Promise<RecruiterActionState> {
+  const t = await getTranslations("RecruiterActions");
   return {
     status: "error",
-    message: "Não foi possível guardar o contacto. Tenta novamente.",
+    message: t("saveFailed"),
   };
 }
 
@@ -88,12 +92,16 @@ export async function createRecruiterAction(
   _previousState: RecruiterActionState,
   formData: FormData,
 ): Promise<RecruiterActionState> {
-  const { values, fieldErrors } = validateRecruiterForm(formData);
+  const t = await getTranslations("RecruiterActions");
+  const { values, fieldErrors } = validateRecruiterForm(
+    formData,
+    await getTranslations("RecruiterValidation"),
+  );
   if (hasRecruiterFieldErrors(fieldErrors)) return validationError(fieldErrors);
 
   const user = await requireCurrentUser();
   if (!(await companyBelongsToUser(values.company_id, user.id))) {
-    return validationError({ companyId: "Seleciona uma empresa disponível." });
+    return validationError({ companyId: t("availableCompany") });
   }
 
   const supabase = await createClient();
@@ -112,23 +120,26 @@ export async function updateRecruiterAction(
   _previousState: RecruiterActionState,
   formData: FormData,
 ): Promise<RecruiterActionState> {
+  const t = await getTranslations("RecruiterActions");
   if (!isValidRecruiterId(recruiterId)) {
-    return { status: "error", message: "O contacto indicado não é válido." };
+    return { status: "error", message: t("invalidContact") };
   }
 
-  const { values, fieldErrors } = validateRecruiterForm(formData);
+  const { values, fieldErrors } = validateRecruiterForm(
+    formData,
+    await getTranslations("RecruiterValidation"),
+  );
   if (hasRecruiterFieldErrors(fieldErrors)) return validationError(fieldErrors);
 
   const user = await requireCurrentUser();
   if (!(await companyBelongsToUser(values.company_id, user.id))) {
-    return validationError({ companyId: "Seleciona uma empresa disponível." });
+    return validationError({ companyId: t("availableCompany") });
   }
   if (
     !(await companyChangeIsCompatible(recruiterId, values.company_id, user.id))
   ) {
     return validationError({
-      companyId:
-        "Este contacto já está associado a candidaturas de outra empresa.",
+      companyId: t("incompatibleCompany"),
     });
   }
 
@@ -143,7 +154,7 @@ export async function updateRecruiterAction(
 
   if (error) return saveError();
   if (!data) {
-    return { status: "error", message: "O contacto já não está disponível." };
+    return { status: "error", message: t("unavailable") };
   }
 
   revalidateRecruiterPages();
@@ -155,11 +166,12 @@ export async function deleteRecruiterAction(
   _previousState: RecruiterActionState,
   _formData: FormData,
 ): Promise<RecruiterActionState> {
+  const t = await getTranslations("RecruiterActions");
   void _previousState;
   void _formData;
 
   if (!isValidRecruiterId(recruiterId)) {
-    return { status: "error", message: "O contacto indicado não é válido." };
+    return { status: "error", message: t("invalidContact") };
   }
 
   const user = await requireCurrentUser();
@@ -175,11 +187,11 @@ export async function deleteRecruiterAction(
   if (error) {
     return {
       status: "error",
-      message: "Não foi possível eliminar o contacto. Tenta novamente.",
+      message: t("deleteFailed"),
     };
   }
   if (!data) {
-    return { status: "error", message: "O contacto já não está disponível." };
+    return { status: "error", message: t("unavailable") };
   }
 
   revalidateRecruiterPages();

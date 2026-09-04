@@ -1,16 +1,18 @@
+import { getTranslations } from "next-intl/server";
 import { Users } from "lucide-react";
 
 import { EmptyState } from "@/components/shared/empty-state";
 
-export default function RecruiterNotFound() {
+export default async function RecruiterNotFound() {
+  const t = await getTranslations("Recruiters");
   return (
     <>
-      <title>Contacto não encontrado | Job Application Tracker</title>
+      <title>{t("notFoundMetadata")}</title>
       <EmptyState
         icon={Users}
-        title="Contacto não encontrado"
-        description="Este contacto não existe ou já foi eliminado."
-        actionLabel="Voltar aos contactos"
+        title={t("notFound")}
+        description={t("notFoundDescription")}
+        actionLabel={t("back")}
         actionHref="/recrutadores"
         headingLevel="h1"
       />

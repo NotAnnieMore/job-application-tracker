@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle2, LoaderCircle, Pencil, Save, X } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
@@ -20,6 +21,8 @@ export function InterviewOutcomeEditor({
   initialFeedback: string;
   initialResult: string;
 }) {
+  const locale = useLocale();
+  const t = useTranslations("InterviewEditors");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [feedback, setFeedback] = useState(initialFeedback);
@@ -62,7 +65,7 @@ export function InterviewOutcomeEditor({
         result,
       );
       if (actionResult.status === "error") {
-        setError(actionResult.message ?? "Não foi possível guardar as notas.");
+        setError(actionResult.message ?? t("notesSaveFailed"));
         return;
       }
       setOpen(false);
@@ -101,7 +104,7 @@ export function InterviewOutcomeEditor({
         {saved ? (
           <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
             <CheckCircle2 aria-hidden="true" className="size-4" />
-            Guardado
+            {t("saved")}
           </span>
         ) : null}
         <Button
@@ -111,7 +114,7 @@ export function InterviewOutcomeEditor({
           onClick={openEditor}
         >
           <Pencil aria-hidden="true" className="size-4" />
-          Editar notas
+          {t("editNotes")}
         </Button>
       </div>
 
@@ -137,17 +140,17 @@ export function InterviewOutcomeEditor({
                       id="interview-outcome-title"
                       className="font-bold text-slate-950"
                     >
-                      Resultado e notas
+                      {t("outcomeAndNotes")}
                     </h2>
                     <p className="mt-1 text-sm text-slate-500">
-                      Regista apontamentos sem abandonar o resumo da entrevista.
+                      {t("notesDescription")}
                     </p>
                   </div>
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    aria-label="Fechar"
+                    aria-label={t("close")}
                     disabled={pending}
                     onClick={closeEditor}
                   >
@@ -169,7 +172,7 @@ export function InterviewOutcomeEditor({
                       htmlFor="interview-feedback-quick-edit"
                       className="text-sm font-semibold text-slate-700"
                     >
-                      Feedback e notas
+                      {t("feedbackAndNotes")}
                     </label>
                     <textarea
                       id="interview-feedback-quick-edit"
@@ -179,10 +182,11 @@ export function InterviewOutcomeEditor({
                       maxLength={10_000}
                       autoFocus
                       className={`${textareaClassName} mt-2`}
-                      placeholder="Questões feitas, respostas, pontos fortes e pequenos detalhes..."
+                      placeholder={t("feedbackPlaceholder")}
                     />
                     <p className="mt-1.5 text-right text-xs text-slate-500">
-                      {feedback.length.toLocaleString("pt-PT")}/10 000
+                      {feedback.length.toLocaleString(locale)}/
+                      {(10_000).toLocaleString(locale)}
                     </p>
                   </div>
                   <div>
@@ -190,7 +194,7 @@ export function InterviewOutcomeEditor({
                       htmlFor="interview-result-quick-edit"
                       className="text-sm font-semibold text-slate-700"
                     >
-                      Resultado
+                      {t("result")}
                     </label>
                     <textarea
                       id="interview-result-quick-edit"
@@ -199,10 +203,11 @@ export function InterviewOutcomeEditor({
                       rows={5}
                       maxLength={4_000}
                       className={`${textareaClassName} mt-2`}
-                      placeholder="Próxima etapa, resposta esperada ou resultado final..."
+                      placeholder={t("resultPlaceholder")}
                     />
                     <p className="mt-1.5 text-right text-xs text-slate-500">
-                      {result.length.toLocaleString("pt-PT")}/4 000
+                      {result.length.toLocaleString(locale)}/
+                      {(4_000).toLocaleString(locale)}
                     </p>
                   </div>
                   <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
@@ -212,7 +217,7 @@ export function InterviewOutcomeEditor({
                       disabled={pending}
                       onClick={closeEditor}
                     >
-                      Cancelar
+                      {t("cancel")}
                     </Button>
                     <Button type="submit" disabled={pending}>
                       {pending ? (
@@ -223,7 +228,7 @@ export function InterviewOutcomeEditor({
                       ) : (
                         <Save aria-hidden="true" className="size-4" />
                       )}
-                      {pending ? "A guardar..." : "Guardar notas"}
+                      {pending ? t("saving") : t("saveNotes")}
                     </Button>
                   </div>
                 </form>

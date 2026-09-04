@@ -1,9 +1,11 @@
 "use server";
+import { getTranslations } from "next-intl/server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 
 import { interviewStatusOptions } from "@/features/interviews/constants";
+import { canCreateInterview } from "@/features/interviews/eligibility";
 import type {
   InterviewActionState,
   InterviewPreparationActionState,
@@ -33,20 +35,22 @@ const applicationStatusesAwaitingInterviewResult: ApplicationStatusValue[] = [
   "awaiting_response",
 ];
 
-function validationError(
+async function validationError(
   fieldErrors: NonNullable<InterviewActionState["fieldErrors"]>,
-): InterviewActionState {
+): Promise<InterviewActionState> {
+  const t = await getTranslations("InterviewActions");
   return {
     status: "error",
-    message: "Revê os campos assinalados.",
+    message: t("reviewFields"),
     fieldErrors,
   };
 }
 
-function saveError(): InterviewActionState {
+async function saveError(): Promise<InterviewActionState> {
+  const t = await getTranslations("InterviewActions");
   return {
     status: "error",
-    message: "Não foi possível guardar a entrevista. Tenta novamente.",
+    message: t("saveFailed"),
   };
 }
 
@@ -118,23 +122,40 @@ export async function createInterviewAction(
   _previousState: InterviewActionState,
   formData: FormData,
 ): Promise<InterviewActionState> {
-  const { values, fieldErrors } = validateInterviewForm(formData);
+  const t = await getTranslations("InterviewActions");
+  const { values, fieldErrors } = validateInterviewForm(
+    formData,
+    await getTranslations("InterviewValidation"),
+  );
   if (hasInterviewFieldErrors(fieldErrors)) return validationError(fieldErrors);
 
   const user = await requireCurrentUser();
+  const supabase = await createClient();
+  // Recheck at submission: the application may have changed since the form opened.
+  const { data: application, error: applicationError } = await supabase
+    .from("applications")
+    .select("id, status")
+    .eq("id", values.application_id)
+    .eq("user_id", user.id)
+    .maybeSingle();
+  if (applicationError || !application) {
+    return validationError({ applicationId: t("availableApplication") });
+  }
+  if (!canCreateInterview(application.status)) {
+    return validationError({ applicationId: t("ineligibleApplication") });
+  }
   const companyId = await getApplicationCompany(values.application_id, user.id);
   if (!companyId) {
     return validationError({
-      applicationId: "Seleciona uma candidatura disponível.",
+      applicationId: t("availableApplication"),
     });
   }
   if (!(await recruiterIsCompatible(values.recruiter_id, companyId, user.id))) {
     return validationError({
-      recruiterId: "Seleciona um contacto disponível para esta empresa.",
+      recruiterId: t("availableRecruiter"),
     });
   }
 
-  const supabase = await createClient();
   const { error } = await supabase.from("interviews").insert({
     user_id: user.id,
     ...values,
@@ -151,23 +172,27 @@ export async function updateInterviewAction(
   _previousState: InterviewActionState,
   formData: FormData,
 ): Promise<InterviewActionState> {
+  const t = await getTranslations("InterviewActions");
   if (!isValidInterviewId(interviewId)) {
-    return { status: "error", message: "A entrevista indicada não é válida." };
+    return { status: "error", message: t("invalidInterview") };
   }
 
-  const { values, fieldErrors } = validateInterviewForm(formData);
+  const { values, fieldErrors } = validateInterviewForm(
+    formData,
+    await getTranslations("InterviewValidation"),
+  );
   if (hasInterviewFieldErrors(fieldErrors)) return validationError(fieldErrors);
 
   const user = await requireCurrentUser();
   const companyId = await getApplicationCompany(values.application_id, user.id);
   if (!companyId) {
     return validationError({
-      applicationId: "Seleciona uma candidatura disponível.",
+      applicationId: t("availableApplication"),
     });
   }
   if (!(await recruiterIsCompatible(values.recruiter_id, companyId, user.id))) {
     return validationError({
-      recruiterId: "Seleciona um contacto disponível para esta empresa.",
+      recruiterId: t("availableRecruiter"),
     });
   }
 
@@ -182,7 +207,7 @@ export async function updateInterviewAction(
 
   if (error) return saveError();
   if (!data) {
-    return { status: "error", message: "A entrevista já não está disponível." };
+    return { status: "error", message: t("unavailable") };
   }
 
   if (
@@ -192,8 +217,7 @@ export async function updateInterviewAction(
     revalidateInterviewPages();
     return {
       status: "error",
-      message:
-        "A entrevista ficou concluída, mas não foi possível atualizar a candidatura. Tenta guardar novamente.",
+      message: t("applicationUpdateFailed"),
     };
   }
 
@@ -208,11 +232,12 @@ export async function updateInterviewStatusAction(
   interviewId: string,
   rawStatus: InterviewStatusValue,
 ): Promise<InterviewStatusActionState> {
+  const t = await getTranslations("InterviewActions");
   if (!isValidInterviewId(interviewId)) {
-    return { status: "error", message: "A entrevista indicada não é válida." };
+    return { status: "error", message: t("invalidInterview") };
   }
   if (!quickStatusValues.has(rawStatus)) {
-    return { status: "error", message: "Seleciona um estado válido." };
+    return { status: "error", message: t("invalidStatus") };
   }
 
   const user = await requireCurrentUser();
@@ -228,7 +253,7 @@ export async function updateInterviewStatusAction(
   if (error || !data) {
     return {
       status: "error",
-      message: "Não foi possível atualizar o estado. Tenta novamente.",
+      message: t("updateFailed"),
     };
   }
 
@@ -239,8 +264,7 @@ export async function updateInterviewStatusAction(
     revalidateInterviewPages();
     return {
       status: "warning",
-      message:
-        "A entrevista ficou concluída, mas não foi possível atualizar a candidatura. Altera-a manualmente para “A aguardar resposta” ou tenta novamente.",
+      message: t("applicationUpdateWarning"),
     };
   }
 
@@ -254,8 +278,9 @@ export async function updateInterviewApplicationPreparationAction(
   rawApplicationPreparation: string,
   rawQuestionsForCompany: string,
 ): Promise<InterviewPreparationActionState> {
+  const t = await getTranslations("InterviewActions");
   if (!isValidInterviewId(interviewId)) {
-    return { status: "error", message: "A entrevista indicada não é válida." };
+    return { status: "error", message: t("invalidInterview") };
   }
   const applicationPreparation =
     typeof rawApplicationPreparation === "string"
@@ -268,13 +293,13 @@ export async function updateInterviewApplicationPreparationAction(
   if (applicationPreparation.length > 10_000) {
     return {
       status: "error",
-      message: "O guião pode ter no máximo 10 000 caracteres.",
+      message: t("preparationLength"),
     };
   }
   if (questionsForCompany.length > 10_000) {
     return {
       status: "error",
-      message: "As perguntas podem ter no máximo 10 000 caracteres.",
+      message: t("questionsLength"),
     };
   }
 
@@ -290,7 +315,7 @@ export async function updateInterviewApplicationPreparationAction(
   if (interviewError || !interview) {
     return {
       status: "error",
-      message: "Não foi possível guardar o guião. Tenta novamente.",
+      message: t("preparationSaveFailed"),
     };
   }
 
@@ -308,7 +333,7 @@ export async function updateInterviewApplicationPreparationAction(
   if (applicationError || !application) {
     return {
       status: "error",
-      message: "Não foi possível guardar o guião. Tenta novamente.",
+      message: t("preparationSaveFailed"),
     };
   }
 
@@ -322,21 +347,22 @@ export async function updateInterviewOutcomeAction(
   rawFeedback: string,
   rawResult: string,
 ): Promise<InterviewPreparationActionState> {
+  const t = await getTranslations("InterviewActions");
   if (!isValidInterviewId(interviewId)) {
-    return { status: "error", message: "A entrevista indicada não é válida." };
+    return { status: "error", message: t("invalidInterview") };
   }
   const feedback = typeof rawFeedback === "string" ? rawFeedback.trim() : "";
   const result = typeof rawResult === "string" ? rawResult.trim() : "";
   if (feedback.length > 10_000) {
     return {
       status: "error",
-      message: "O feedback pode ter no máximo 10 000 caracteres.",
+      message: t("feedbackLength"),
     };
   }
   if (result.length > 4_000) {
     return {
       status: "error",
-      message: "O resultado pode ter no máximo 4 000 caracteres.",
+      message: t("resultLength"),
     };
   }
 
@@ -353,7 +379,7 @@ export async function updateInterviewOutcomeAction(
   if (error || !data) {
     return {
       status: "error",
-      message: "Não foi possível guardar as notas. Tenta novamente.",
+      message: t("notesSaveFailed"),
     };
   }
 
@@ -368,11 +394,12 @@ export async function deleteInterviewAction(
   _previousState: InterviewActionState,
   _formData: FormData,
 ): Promise<InterviewActionState> {
+  const t = await getTranslations("InterviewActions");
   void _previousState;
   void _formData;
 
   if (!isValidInterviewId(interviewId)) {
-    return { status: "error", message: "A entrevista indicada não é válida." };
+    return { status: "error", message: t("invalidInterview") };
   }
 
   const user = await requireCurrentUser();
@@ -388,11 +415,11 @@ export async function deleteInterviewAction(
   if (error) {
     return {
       status: "error",
-      message: "Não foi possível eliminar a entrevista. Tenta novamente.",
+      message: t("deleteFailed"),
     };
   }
   if (!data) {
-    return { status: "error", message: "A entrevista já não está disponível." };
+    return { status: "error", message: t("unavailable") };
   }
 
   revalidateInterviewPages();

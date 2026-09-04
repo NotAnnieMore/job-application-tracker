@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { LoaderCircle, Trash2 } from "lucide-react";
 import { useActionState } from "react";
 
@@ -14,6 +16,7 @@ export function DeleteRecruiterForm({
   recruiterId: string;
   recruiterName: string;
 }) {
+  const t = useTranslations("Recruiters");
   const action = deleteRecruiterAction.bind(null, recruiterId);
   const [state, formAction, pending] = useActionState(
     action,
@@ -36,11 +39,7 @@ export function DeleteRecruiterForm({
         variant="danger"
         disabled={pending}
         onClick={(event) => {
-          if (
-            !window.confirm(
-              `Eliminar ${recruiterName}? As candidaturas serão mantidas sem recrutador principal.`,
-            )
-          ) {
+          if (!window.confirm(t("deleteConfirm", { name: recruiterName }))) {
             event.preventDefault();
           }
         }}
@@ -50,7 +49,7 @@ export function DeleteRecruiterForm({
         ) : (
           <Trash2 aria-hidden="true" className="size-4" />
         )}
-        {pending ? "A eliminar..." : "Eliminar contacto"}
+        {pending ? t("deleting") : t("delete")}
       </Button>
     </form>
   );

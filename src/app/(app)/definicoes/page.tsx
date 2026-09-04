@@ -1,12 +1,10 @@
 import { ProfileForm } from "@/components/profile/profile-form";
+import { LanguageSettings } from "@/components/i18n/language-settings";
 import { PageHeader } from "@/components/shared/page-header";
 import { SuccessToast } from "@/components/shared/success-toast";
 import { ThemeSettings } from "@/components/theme/theme-settings";
 import { requireCurrentUser } from "@/lib/auth/session";
-
-const notices: Record<string, string> = {
-  "perfil-atualizado": "Perfil atualizado com sucesso.",
-};
+import { getTranslations } from "next-intl/server";
 
 export default async function SettingsPage({
   searchParams,
@@ -14,16 +12,16 @@ export default async function SettingsPage({
   searchParams: Promise<{ estado?: string | string[] }>;
 }) {
   const user = await requireCurrentUser();
+  const t = await getTranslations("Settings");
   const status = (await searchParams).estado;
-  const notice = typeof status === "string" ? notices[status] : undefined;
+  const notice =
+    status === "perfil-atualizado" ? t("profileUpdated") : undefined;
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title="Definições"
-        description="Gere os dados apresentados na tua conta."
-      />
+      <PageHeader title={t("title")} description={t("description")} />
       <SuccessToast message={notice} />
+      <LanguageSettings />
       <ThemeSettings />
       <ProfileForm
         key={`${user.fullName}-${user.avatarUrl}`}

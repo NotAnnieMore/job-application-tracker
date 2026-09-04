@@ -1,22 +1,25 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import { AuthShell } from "@/components/auth/auth-shell";
 import { LoginForm } from "@/components/auth/login-form";
 import type { AuthActionState } from "@/features/auth/types";
 
-function stateFromQuery(value: string | string[] | undefined): AuthActionState {
+function stateFromQuery(
+  value: string | string[] | undefined,
+  messages: { passwordUpdated: string; invalidConfirmation: string },
+): AuthActionState {
   if (value === "password-atualizada") {
     return {
       status: "success",
-      message: "Palavra-passe atualizada. Já podes iniciar sessão.",
+      message: messages.passwordUpdated,
     };
   }
 
   if (value === "confirmacao-invalida") {
     return {
       status: "error",
-      message:
-        "A ligação de confirmação é inválida ou expirou. Tenta iniciar sessão ou pede uma nova recuperação.",
+      message: messages.invalidConfirmation,
     };
   }
 
@@ -29,20 +32,24 @@ export default async function LoginPage({
   searchParams: Promise<{ estado?: string | string[] }>;
 }) {
   const { estado } = await searchParams;
+  const t = await getTranslations("Auth.loginPage");
+  const auth = await getTranslations("Auth");
 
   return (
-    <AuthShell
-      title="Bem-vindo de volta"
-      description="Inicia sessão para continuares a acompanhar as tuas candidaturas."
-    >
-      <LoginForm initialState={stateFromQuery(estado)} />
+    <AuthShell title={t("title")} description={t("description")}>
+      <LoginForm
+        initialState={stateFromQuery(estado, {
+          passwordUpdated: t("passwordUpdated"),
+          invalidConfirmation: t("invalidConfirmation"),
+        })}
+      />
       <p className="mt-6 text-center text-sm text-slate-500">
-        Ainda não tens conta?{" "}
+        {t("noAccount")}{" "}
         <Link
           href="/registo"
           className="font-semibold text-blue-600 hover:text-blue-700"
         >
-          Criar conta
+          {auth("createAccount")}
         </Link>
       </p>
     </AuthShell>

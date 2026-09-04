@@ -1,6 +1,7 @@
 "use client";
 
 import { useActionState } from "react";
+import { useTranslations } from "next-intl";
 
 import { AuthFormMessage } from "@/components/auth/auth-form-message";
 import { AuthSubmitButton } from "@/components/auth/auth-submit-button";
@@ -9,6 +10,7 @@ import { requestPasswordResetAction } from "@/features/auth/actions";
 import { initialAuthActionState } from "@/features/auth/types";
 
 export function PasswordResetForm() {
+  const t = useTranslations("Auth");
   const [state, formAction] = useActionState(
     requestPasswordResetAction,
     initialAuthActionState,
@@ -18,7 +20,7 @@ export function PasswordResetForm() {
     <form action={formAction} className="space-y-5">
       <AuthFormMessage state={state} />
       <FormField
-        label="Email"
+        label={t("email")}
         htmlFor="reset-email"
         required
         error={state.fieldErrors?.email}
@@ -28,7 +30,7 @@ export function PasswordResetForm() {
           name="email"
           type="email"
           autoComplete="email"
-          placeholder="nome@exemplo.pt"
+          placeholder={t("emailPlaceholder")}
           className={fieldClassName}
           aria-invalid={Boolean(state.fieldErrors?.email)}
           aria-describedby={
@@ -37,10 +39,7 @@ export function PasswordResetForm() {
           required
         />
       </FormField>
-      <AuthSubmitButton
-        label="Enviar ligação de recuperação"
-        pendingLabel="A enviar..."
-      />
+      <AuthSubmitButton label={t("sendRecovery")} pendingLabel={t("sending")} />
     </form>
   );
 }

@@ -1,5 +1,6 @@
 import { ArrowLeft, BriefcaseBusiness } from "lucide-react";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import { InterviewForm } from "@/components/interviews/interview-form";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -16,8 +17,10 @@ export default async function NewInterviewPage({
 }: {
   searchParams: Promise<{ candidatura?: string | string[] }>;
 }) {
+  const t = await getTranslations("Interviews");
+  const tForm = await getTranslations("InterviewForm");
   const [applications, recruiters] = await Promise.all([
-    getInterviewApplicationOptions(),
+    getInterviewApplicationOptions({ forCreation: true }),
     getInterviewRecruiterOptions(),
   ]);
   const applicationParam = (await searchParams).candidatura;
@@ -37,19 +40,16 @@ export default async function NewInterviewPage({
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        Voltar às entrevistas
+        {t("back")}
       </Link>
-      <PageHeader
-        title="Nova entrevista"
-        description="Agenda a conversa e reúne toda a preparação necessária."
-      />
+      <PageHeader title={t("new")} description={t("newDescription")} />
       {applications.length === 0 ? (
         <EmptyState
           icon={BriefcaseBusiness}
-          title="Cria primeiro uma candidatura"
-          description="Cada entrevista precisa de estar associada a uma candidatura existente."
-          actionLabel="Criar candidatura"
-          actionHref="/candidaturas/nova"
+          title={t("noEligibleApplications")}
+          description={t("creationEligibility")}
+          actionLabel={t("viewApplications")}
+          actionHref="/candidaturas"
         />
       ) : (
         <InterviewForm
@@ -58,10 +58,11 @@ export default async function NewInterviewPage({
           recruiters={recruiters}
           initialValues={{
             ...emptyInterviewFormValues,
+            interviewType: tForm("types.initial"),
             applicationId,
             recruiterId: selectedApplication?.primaryRecruiterId ?? "",
           }}
-          submitLabel="Guardar entrevista"
+          submitLabel={t("saveInterview")}
         />
       )}
     </div>

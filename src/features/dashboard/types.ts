@@ -20,7 +20,6 @@ export type DashboardApplication = {
 
 export type DashboardStatusSummary = {
   status: ApplicationStatusValue;
-  label: string;
   value: number;
   percentage: number;
 };
@@ -59,7 +58,7 @@ export type DashboardActivityKind =
 export type DashboardActivity = {
   id: string;
   kind: DashboardActivityKind;
-  label: string;
+  change: "created" | "updated";
   description: string;
   occurredAt: string;
   href: string;

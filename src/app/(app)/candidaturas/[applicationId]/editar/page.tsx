@@ -1,6 +1,8 @@
+import { canCreateInterview } from "@/features/interviews/eligibility";
 import { ArrowLeft, CalendarPlus, ListPlus } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 
 import { ApplicationForm } from "@/components/applications/application-form";
 import { DeleteApplicationForm } from "@/components/applications/delete-application-form";
@@ -20,6 +22,7 @@ export default async function EditApplicationPage({
   params: Promise<{ applicationId: string }>;
 }) {
   const { applicationId } = await params;
+  const t = await getTranslations("Applications.editPage");
   const [application, companies, recruiters] = await Promise.all([
     getApplicationById(applicationId),
     getCompanyOptions(),
@@ -38,11 +41,11 @@ export default async function EditApplicationPage({
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        Voltar à candidatura
+        {t("back")}
       </Link>
       <PageHeader
-        title={`Editar ${application.title}`}
-        description="Atualiza a vaga, o estado e a preparação desta candidatura."
+        title={t("title", { title: application.title })}
+        description={t("description")}
         action={
           <div className="flex flex-wrap gap-2">
             <Link
@@ -50,15 +53,17 @@ export default async function EditApplicationPage({
               className={buttonClassName({ variant: "secondary" })}
             >
               <ListPlus aria-hidden="true" className="size-4" />
-              Nova tarefa
+              {t("newTask")}
             </Link>
-            <Link
-              href={`/entrevistas/nova?candidatura=${application.id}`}
-              className={buttonClassName({ variant: "secondary" })}
-            >
-              <CalendarPlus aria-hidden="true" className="size-4" />
-              Agendar entrevista
-            </Link>
+            {canCreateInterview(application.status) ? (
+              <Link
+                href={`/entrevistas/nova?candidatura=${application.id}`}
+                className={buttonClassName({ variant: "secondary" })}
+              >
+                <CalendarPlus aria-hidden="true" className="size-4" />
+                {t("scheduleInterview")}
+              </Link>
+            ) : null}
           </div>
         }
       />
@@ -67,17 +72,16 @@ export default async function EditApplicationPage({
         companies={companies}
         recruiters={recruiters}
         initialValues={application}
-        submitLabel="Guardar alterações"
+        submitLabel={t("save")}
         cancelHref={detailHref}
       />
 
       <Card className="border-red-200">
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Eliminar candidatura</h2>
+            <h2 className="font-bold text-slate-950">{t("deleteTitle")}</h2>
             <p className="mt-1 text-sm text-slate-500">
-              A vaga e todos os dados dependentes desta candidatura também serão
-              eliminados.
+              {t("deleteDescription")}
             </p>
           </div>
         </CardHeader>

@@ -1,3 +1,4 @@
+import { canCreateInterview } from "@/features/interviews/eligibility";
 import {
   ArrowLeft,
   BriefcaseBusiness,
@@ -15,6 +16,7 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import {
   ActionPriorityBadge,
@@ -32,31 +34,18 @@ import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { getActions } from "@/features/actions/data";
 import { formatActionDate } from "@/features/actions/date";
-import { workModeLabels } from "@/features/applications/constants";
 import { getApplicationById } from "@/features/applications/data";
 import { isValidApplicationId } from "@/features/applications/validation";
-import { interviewFormatLabels } from "@/features/interviews/constants";
 import { getInterviews } from "@/features/interviews/data";
 import { formatInterviewDateTime } from "@/features/interviews/date";
 import { getApplicationNotes } from "@/features/notes/data";
-
-const notices: Record<string, string> = {
-  "candidatura-atualizada": "Candidatura atualizada com sucesso.",
-  "entrevista-atualizada": "Entrevista atualizada com sucesso.",
-  "entrevista-eliminada": "Entrevista eliminada com sucesso.",
-  "acao-atualizada": "Tarefa atualizada com sucesso.",
-  "acao-eliminada": "Tarefa eliminada com sucesso.",
-  "nota-criada": "Nota adicionada com sucesso.",
-  "nota-atualizada": "Nota atualizada com sucesso.",
-  "nota-eliminada": "Nota eliminada com sucesso.",
-};
 
 function singleValue(value: string | string[] | undefined) {
   return typeof value === "string" ? value : "";
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("pt-PT", {
+function formatDate(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -64,38 +53,48 @@ function formatDate(value: string) {
   }).format(new Date(`${value}T00:00:00Z`));
 }
 
-function formatMoney(value: string, currency: string) {
+function formatMoney(value: string, currency: string, locale: string) {
   const amount = Number(value);
   if (!Number.isFinite(amount)) return "";
 
   try {
-    return new Intl.NumberFormat("pt-PT", {
+    return new Intl.NumberFormat(locale, {
       style: "currency",
       currency,
       maximumFractionDigits: 0,
     }).format(amount);
   } catch {
-    return `${amount.toLocaleString("pt-PT")} ${currency}`;
+    return `${amount.toLocaleString(locale)} ${currency}`;
   }
 }
 
-function salaryRange(minimum: string, maximum: string, currency: string) {
+function salaryRange(
+  minimum: string,
+  maximum: string,
+  currency: string,
+  locale: string,
+  from: string,
+  upTo: string,
+  notDefined: string,
+) {
   if (minimum && maximum) {
-    return `${formatMoney(minimum, currency)} – ${formatMoney(maximum, currency)}`;
+    return `${formatMoney(minimum, currency, locale)} – ${formatMoney(maximum, currency, locale)}`;
   }
-  if (minimum) return `A partir de ${formatMoney(minimum, currency)}`;
-  if (maximum) return `Até ${formatMoney(maximum, currency)}`;
-  return "Por definir";
+  if (minimum) return `${from} ${formatMoney(minimum, currency, locale)}`;
+  if (maximum) return `${upTo} ${formatMoney(maximum, currency, locale)}`;
+  return notDefined;
 }
 
 function DetailItem({
   icon: Icon,
   label,
   value,
+  fallback,
 }: {
   icon: typeof BriefcaseBusiness;
   label: string;
   value: string;
+  fallback: string;
 }) {
   return (
     <div className="flex gap-3">
@@ -107,7 +106,7 @@ function DetailItem({
           {label}
         </p>
         <p className="mt-0.5 break-words text-sm font-medium text-slate-700">
-          {value || "Por definir"}
+          {value || fallback}
         </p>
       </div>
     </div>
@@ -122,6 +121,13 @@ export default async function ApplicationDetailPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const [{ applicationId }, query] = await Promise.all([params, searchParams]);
+  const [locale, t, tWorkMode, tFormat, tEmployment] = await Promise.all([
+    getLocale(),
+    getTranslations("ApplicationDetail"),
+    getTranslations("Enums.workMode"),
+    getTranslations("Enums.interviewFormat"),
+    getTranslations("ApplicationForm.employment"),
+  ]);
 
   if (!isValidApplicationId(applicationId)) notFound();
 
@@ -134,7 +140,18 @@ export default async function ApplicationDetailPage({
 
   if (!application) notFound();
 
-  const notice = notices[singleValue(query.aviso)];
+  const noticeKey = singleValue(query.aviso);
+  const noticeMap: Record<string, string> = {
+    "candidatura-atualizada": t("notices.applicationUpdated"),
+    "entrevista-atualizada": t("notices.interviewUpdated"),
+    "entrevista-eliminada": t("notices.interviewDeleted"),
+    "acao-atualizada": t("notices.taskUpdated"),
+    "acao-eliminada": t("notices.taskDeleted"),
+    "nota-criada": t("notices.noteCreated"),
+    "nota-atualizada": t("notices.noteUpdated"),
+    "nota-eliminada": t("notices.noteDeleted"),
+  };
+  const notice = noticeMap[noticeKey];
   const skills = application.skills
     .split(",")
     .map((skill) => skill.trim())
@@ -147,12 +164,15 @@ export default async function ApplicationDetailPage({
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        Voltar às candidaturas
+        {t("back")}
       </Link>
 
       <PageHeader
         title={application.title}
-        description={`${application.companyName} · candidatura de ${formatDate(application.applicationDate)}`}
+        description={t("applicationOf", {
+          company: application.companyName,
+          date: formatDate(application.applicationDate, locale),
+        })}
         action={
           <div className="flex flex-wrap gap-2">
             <Link
@@ -160,22 +180,24 @@ export default async function ApplicationDetailPage({
               className={buttonClassName({ variant: "secondary" })}
             >
               <Pencil aria-hidden="true" className="size-4" />
-              Editar
+              {t("edit")}
             </Link>
             <Link
               href={`/acoes/nova?candidatura=${application.id}`}
               className={buttonClassName({ variant: "secondary" })}
             >
               <ListPlus aria-hidden="true" className="size-4" />
-              Nova tarefa
+              {t("newTask")}
             </Link>
-            <Link
-              href={`/entrevistas/nova?candidatura=${application.id}`}
-              className={buttonClassName()}
-            >
-              <CalendarDays aria-hidden="true" className="size-4" />
-              Agendar entrevista
-            </Link>
+            {canCreateInterview(application.status) ? (
+              <Link
+                href={`/entrevistas/nova?candidatura=${application.id}`}
+                className={buttonClassName()}
+              >
+                <CalendarDays aria-hidden="true" className="size-4" />
+                {t("scheduleInterview")}
+              </Link>
+            ) : null}
           </div>
         }
       />
@@ -195,9 +217,7 @@ export default async function ApplicationDetailPage({
                 <h2 className="truncate font-bold text-slate-950">
                   {application.companyName}
                 </h2>
-                <p className="mt-0.5 text-sm text-slate-500">
-                  Resumo da candidatura
-                </p>
+                <p className="mt-0.5 text-sm text-slate-500">{t("summary")}</p>
               </div>
             </div>
             <ApplicationQuickStatusForm
@@ -209,64 +229,87 @@ export default async function ApplicationDetailPage({
           <CardContent className="grid gap-5 sm:grid-cols-2">
             <DetailItem
               icon={CalendarDays}
-              label="Data da candidatura"
-              value={formatDate(application.applicationDate)}
+              label={t("applicationDate")}
+              value={formatDate(application.applicationDate, locale)}
+              fallback={t("notDefined")}
             />
             <DetailItem
               icon={BriefcaseBusiness}
-              label="Origem"
+              label={t("source")}
               value={application.source}
+              fallback={t("notDefined")}
             />
             <DetailItem
               icon={MapPin}
-              label="Local e modalidade"
+              label={t("locationAndWorkMode")}
               value={[
                 application.location,
-                application.workMode
-                  ? workModeLabels[application.workMode]
-                  : "",
+                application.workMode ? tWorkMode(application.workMode) : "",
               ]
                 .filter(Boolean)
                 .join(" · ")}
+              fallback={t("notDefined")}
             />
             <DetailItem
               icon={BriefcaseBusiness}
-              label="Tipo de contrato"
-              value={application.employmentType}
+              label={t("employmentType")}
+              value={
+                application.employmentType === "Contrato sem termo"
+                  ? tEmployment("permanent")
+                  : application.employmentType === "Contrato a termo"
+                    ? tEmployment("fixedTerm")
+                    : application.employmentType === "Prestação de serviços"
+                      ? tEmployment("contractor")
+                      : application.employmentType === "Estágio"
+                        ? tEmployment("internship")
+                        : application.employmentType === "Trainee"
+                          ? tEmployment("trainee")
+                          : application.employmentType
+              }
+              fallback={t("notDefined")}
             />
             <DetailItem
               icon={CircleDollarSign}
-              label="Intervalo da vaga"
+              label={t("jobSalaryRange")}
               value={salaryRange(
                 application.salaryMin,
                 application.salaryMax,
                 application.currency,
+                locale,
+                t("fromAmount"),
+                t("upToAmount"),
+                t("notDefined"),
               )}
+              fallback={t("notDefined")}
             />
             <DetailItem
               icon={CircleDollarSign}
-              label="Salário esperado"
+              label={t("expectedSalary")}
               value={
                 application.expectedSalary
                   ? formatMoney(
                       application.expectedSalary,
                       application.currency,
+                      locale,
                     )
                   : ""
               }
+              fallback={t("notDefined")}
             />
             {application.followUpDate ? (
               <DetailItem
                 icon={CalendarDays}
-                label="Próximo follow-up"
-                value={formatDate(application.followUpDate)}
+                label={t("nextFollowUp")}
+                value={formatDate(application.followUpDate, locale)}
+                fallback={t("notDefined")}
               />
             ) : null}
             {application.nextActionSummary ? (
               <DetailItem
                 icon={ListPlus}
-                label="Próxima tarefa"
+                label={t("nextTask")}
                 value={application.nextActionSummary}
+                fallback={t("notDefined")}
               />
             ) : null}
           </CardContent>
@@ -280,7 +323,7 @@ export default async function ApplicationDetailPage({
                   className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-800"
                 >
                   <Globe2 aria-hidden="true" className="size-4" />
-                  Website da empresa
+                  {t("companyWebsite")}
                   <ExternalLink aria-hidden="true" className="size-3.5" />
                 </a>
               ) : null}
@@ -292,7 +335,7 @@ export default async function ApplicationDetailPage({
                   className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-800"
                 >
                   <BriefcaseBusiness aria-hidden="true" className="size-4" />
-                  Abrir vaga original
+                  {t("openOriginalJob")}
                   <ExternalLink aria-hidden="true" className="size-3.5" />
                 </a>
               ) : null}
@@ -303,9 +346,9 @@ export default async function ApplicationDetailPage({
         <Card>
           <CardHeader>
             <div>
-              <h2 className="font-bold text-slate-950">Contacto principal</h2>
+              <h2 className="font-bold text-slate-950">{t("mainContact")}</h2>
               <p className="mt-1 text-sm text-slate-500">
-                Recrutador associado à candidatura
+                {t("mainContactDescription")}
               </p>
             </div>
           </CardHeader>
@@ -345,7 +388,7 @@ export default async function ApplicationDetailPage({
                     rel="noreferrer"
                     className="inline-flex items-center gap-1.5 text-sm font-semibold text-blue-600 hover:text-blue-800"
                   >
-                    Abrir LinkedIn
+                    {t("openLinkedin")}
                     <ExternalLink aria-hidden="true" className="size-3.5" />
                   </a>
                 ) : null}
@@ -357,13 +400,13 @@ export default async function ApplicationDetailPage({
                   className="mx-auto size-8 text-slate-300"
                 />
                 <p className="mt-3 text-sm text-slate-500">
-                  Ainda não existe um recrutador associado.
+                  {t("noRecruiter")}
                 </p>
                 <Link
                   href={`/candidaturas/${application.id}/editar`}
                   className="mt-3 inline-flex text-sm font-semibold text-blue-600 hover:text-blue-800"
                 >
-                  Associar contacto
+                  {t("linkContact")}
                 </Link>
               </div>
             )}
@@ -377,9 +420,9 @@ export default async function ApplicationDetailPage({
         <Card>
           <CardHeader>
             <div>
-              <h2 className="font-bold text-slate-950">Vaga e contexto</h2>
+              <h2 className="font-bold text-slate-950">{t("jobAndContext")}</h2>
               <p className="mt-1 text-sm text-slate-500">
-                Informação guardada sobre a oportunidade
+                {t("jobAndContextDescription")}
               </p>
             </div>
           </CardHeader>
@@ -387,7 +430,7 @@ export default async function ApplicationDetailPage({
             {application.opportunitySummary ? (
               <section>
                 <h3 className="text-sm font-semibold text-slate-950">
-                  Resumo da vaga
+                  {t("jobSummary")}
                 </h3>
                 <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600">
                   {application.opportunitySummary}
@@ -397,7 +440,7 @@ export default async function ApplicationDetailPage({
             {application.summaryNotes ? (
               <section>
                 <h3 className="text-sm font-semibold text-slate-950">
-                  Notas gerais
+                  {t("generalNotes")}
                 </h3>
                 <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-slate-600">
                   {application.summaryNotes}
@@ -407,7 +450,7 @@ export default async function ApplicationDetailPage({
             {skills.length > 0 ? (
               <section className="lg:col-span-2">
                 <h3 className="text-sm font-semibold text-slate-950">
-                  Tecnologias e competências
+                  {t("skills")}
                 </h3>
                 <div className="mt-3 flex flex-wrap gap-2">
                   {skills.map((skill) => (
@@ -428,11 +471,9 @@ export default async function ApplicationDetailPage({
       <Card>
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">
-              Preparação para entrevistas
-            </h2>
+            <h2 className="font-bold text-slate-950">{t("preparation")}</h2>
             <p className="mt-1 text-sm text-slate-500">
-              Guião pessoal e perguntas preparadas para esta empresa
+              {t("preparationDescription")}
             </p>
           </div>
           <Link
@@ -440,26 +481,24 @@ export default async function ApplicationDetailPage({
             className={buttonClassName({ variant: "secondary", size: "sm" })}
           >
             <Pencil aria-hidden="true" className="size-4" />
-            Editar preparação
+            {t("editPreparation")}
           </Link>
         </CardHeader>
         <CardContent className="grid gap-6 lg:grid-cols-2">
           <section className="rounded-xl bg-blue-50/70 p-4">
             <h3 className="text-sm font-bold text-blue-950">
-              Guião sobre mim e o CV
+              {t("personalScript")}
             </h3>
             <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-blue-900/75">
-              {application.interviewPreparation ||
-                "Ainda não adicionaste um guião de preparação."}
+              {application.interviewPreparation || t("personalScriptEmpty")}
             </p>
           </section>
           <section className="rounded-xl bg-violet-50/70 p-4">
             <h3 className="text-sm font-bold text-violet-950">
-              Perguntas para a empresa
+              {t("companyQuestions")}
             </h3>
             <p className="mt-2 whitespace-pre-wrap text-sm leading-6 text-violet-900/75">
-              {application.questionsForCompany ||
-                "Ainda não adicionaste perguntas para a empresa."}
+              {application.questionsForCompany || t("companyQuestionsEmpty")}
             </p>
           </section>
         </CardContent>
@@ -469,18 +508,23 @@ export default async function ApplicationDetailPage({
         <Card>
           <CardHeader>
             <div>
-              <h2 className="font-bold text-slate-950">Entrevistas</h2>
+              <h2 className="font-bold text-slate-950">{t("interviews")}</h2>
               <p className="mt-1 text-sm text-slate-500">
-                {interviews.length} entrevista(s) associada(s)
+                {t("interviewCount", { count: interviews.length })}
               </p>
             </div>
-            <Link
-              href={`/entrevistas/nova?candidatura=${application.id}`}
-              className={buttonClassName({ variant: "secondary", size: "sm" })}
-            >
-              <Plus aria-hidden="true" className="size-4" />
-              Agendar
-            </Link>
+            {canCreateInterview(application.status) ? (
+              <Link
+                href={`/entrevistas/nova?candidatura=${application.id}`}
+                className={buttonClassName({
+                  variant: "secondary",
+                  size: "sm",
+                })}
+              >
+                <Plus aria-hidden="true" className="size-4" />
+                {t("schedule")}
+              </Link>
+            ) : null}
           </CardHeader>
           <CardContent>
             {interviews.length > 0 ? (
@@ -499,8 +543,11 @@ export default async function ApplicationDetailPage({
                           {interview.interviewType}
                         </Link>
                         <p className="mt-1 text-sm text-slate-500">
-                          {formatInterviewDateTime(interview.scheduledAt)} ·{" "}
-                          {interviewFormatLabels[interview.format]}
+                          {formatInterviewDateTime(
+                            interview.scheduledAt,
+                            locale,
+                          )}{" "}
+                          · {tFormat(interview.format)}
                         </p>
                       </div>
                       <InterviewStatusBadge status={interview.status} />
@@ -511,12 +558,12 @@ export default async function ApplicationDetailPage({
                   href={`/entrevistas?candidatura=${application.id}`}
                   className="inline-flex text-sm font-semibold text-blue-600 hover:text-blue-800"
                 >
-                  Ver na página de entrevistas
+                  {t("viewInterviews")}
                 </Link>
               </div>
             ) : (
               <p className="py-6 text-center text-sm text-slate-500">
-                Ainda não existem entrevistas associadas.
+                {t("noInterviews")}
               </p>
             )}
           </CardContent>
@@ -525,9 +572,9 @@ export default async function ApplicationDetailPage({
         <Card>
           <CardHeader>
             <div>
-              <h2 className="font-bold text-slate-950">Tarefas</h2>
+              <h2 className="font-bold text-slate-950">{t("tasks")}</h2>
               <p className="mt-1 text-sm text-slate-500">
-                {actionsData.items.length} tarefa(s) associada(s)
+                {t("taskCount", { count: actionsData.items.length })}
               </p>
             </div>
             <Link
@@ -535,7 +582,7 @@ export default async function ApplicationDetailPage({
               className={buttonClassName({ variant: "secondary", size: "sm" })}
             >
               <Plus aria-hidden="true" className="size-4" />
-              Criar
+              {t("create")}
             </Link>
           </CardHeader>
           <CardContent>
@@ -560,8 +607,10 @@ export default async function ApplicationDetailPage({
                         </div>
                         <p className="mt-2 text-xs text-slate-500">
                           {action.dueDate
-                            ? `Prazo: ${formatActionDate(action.dueDate)}`
-                            : "Sem data limite"}
+                            ? t("deadline", {
+                                date: formatActionDate(action.dueDate, locale),
+                              })
+                            : t("noDeadline")}
                         </p>
                       </div>
                       <ActionQuickStatusForm
@@ -575,12 +624,12 @@ export default async function ApplicationDetailPage({
                   href={`/acoes?candidatura=${application.id}`}
                   className="inline-flex text-sm font-semibold text-blue-600 hover:text-blue-800"
                 >
-                  Ver na página de tarefas
+                  {t("viewTasks")}
                 </Link>
               </div>
             ) : (
               <p className="py-6 text-center text-sm text-slate-500">
-                Ainda não existem tarefas associadas.
+                {t("noTasks")}
               </p>
             )}
           </CardContent>
@@ -590,9 +639,9 @@ export default async function ApplicationDetailPage({
       <Card id="notas" className="scroll-mt-6">
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Histórico de notas</h2>
+            <h2 className="font-bold text-slate-950">{t("noteHistory")}</h2>
             <p className="mt-1 text-sm text-slate-500">
-              {notes.length} nota(s) guardada(s) nesta candidatura
+              {t("noteCount", { count: notes.length })}
             </p>
           </div>
         </CardHeader>
@@ -606,7 +655,7 @@ export default async function ApplicationDetailPage({
             </div>
           ) : (
             <p className="border-t border-slate-100 pt-5 text-center text-sm text-slate-500">
-              Ainda não existem notas. Usa o campo acima para criar a primeira.
+              {t("noNotes")}
             </p>
           )}
         </CardContent>

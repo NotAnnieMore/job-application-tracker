@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { LoaderCircle, Save } from "lucide-react";
 import Link from "next/link";
 import { useActionState } from "react";
@@ -24,6 +26,7 @@ const textareaClassName =
   "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-3 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-50";
 
 function SubmitButton({ label }: { label: string }) {
+  const t = useTranslations("RecruiterForm");
   const { pending } = useFormStatus();
 
   return (
@@ -33,7 +36,7 @@ function SubmitButton({ label }: { label: string }) {
       ) : (
         <Save aria-hidden="true" className="size-4" />
       )}
-      {pending ? "A guardar..." : label}
+      {pending ? t("saving") : label}
     </Button>
   );
 }
@@ -49,6 +52,7 @@ export function RecruiterForm({
   initialValues: RecruiterFormValues;
   submitLabel: string;
 }) {
+  const t = useTranslations("RecruiterForm");
   const [state, formAction] = useActionState(
     action,
     initialRecruiterActionState,
@@ -69,16 +73,13 @@ export function RecruiterForm({
       <Card>
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Informação do contacto</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Apenas o nome é obrigatório. A empresa também pode ficar por
-              definir.
-            </p>
+            <h2 className="font-bold text-slate-950">{t("information")}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t("description")}</p>
           </div>
         </CardHeader>
         <CardContent className="grid gap-5 md:grid-cols-2">
           <FormField
-            label="Nome"
+            label={t("name")}
             htmlFor="recruiter-name"
             required
             error={state.fieldErrors?.name}
@@ -89,7 +90,7 @@ export function RecruiterForm({
               type="text"
               autoComplete="name"
               defaultValue={initialValues.name}
-              placeholder="Ex.: Ana Silva"
+              placeholder={t("namePlaceholder")}
               className={fieldClassName}
               maxLength={160}
               aria-invalid={Boolean(state.fieldErrors?.name)}
@@ -100,9 +101,9 @@ export function RecruiterForm({
             />
           </FormField>
           <FormField
-            label="Empresa"
+            label={t("company")}
             htmlFor="recruiter-company"
-            hint="Pode ficar vazio para recrutadores externos ou ainda não identificados."
+            hint={t("companyHint")}
             error={state.fieldErrors?.companyId}
           >
             <select
@@ -117,7 +118,7 @@ export function RecruiterForm({
                   : "recruiter-company-hint"
               }
             >
-              <option value="">Sem empresa associada</option>
+              <option value="">{t("noCompany")}</option>
               {companies.map((company) => (
                 <option key={company.id} value={company.id}>
                   {company.name}
@@ -126,7 +127,7 @@ export function RecruiterForm({
             </select>
           </FormField>
           <FormField
-            label="Cargo"
+            label={t("jobTitle")}
             htmlFor="recruiter-job-title"
             error={state.fieldErrors?.jobTitle}
           >
@@ -136,7 +137,7 @@ export function RecruiterForm({
               type="text"
               autoComplete="organization-title"
               defaultValue={initialValues.jobTitle}
-              placeholder="Ex.: Talent Acquisition Specialist"
+              placeholder={t("jobTitlePlaceholder")}
               className={fieldClassName}
               maxLength={160}
               aria-invalid={Boolean(state.fieldErrors?.jobTitle)}
@@ -148,7 +149,7 @@ export function RecruiterForm({
             />
           </FormField>
           <FormField
-            label="Email"
+            label={t("email")}
             htmlFor="recruiter-email"
             error={state.fieldErrors?.email}
           >
@@ -158,7 +159,7 @@ export function RecruiterForm({
               type="email"
               autoComplete="email"
               defaultValue={initialValues.email}
-              placeholder="ana@empresa.pt"
+              placeholder={t("emailPlaceholder")}
               className={fieldClassName}
               maxLength={254}
               aria-invalid={Boolean(state.fieldErrors?.email)}
@@ -168,7 +169,7 @@ export function RecruiterForm({
             />
           </FormField>
           <FormField
-            label="Telefone"
+            label={t("phone")}
             htmlFor="recruiter-phone"
             error={state.fieldErrors?.phone}
           >
@@ -188,9 +189,9 @@ export function RecruiterForm({
             />
           </FormField>
           <FormField
-            label="LinkedIn"
+            label={t("linkedin")}
             htmlFor="recruiter-linkedin"
-            hint="Podes colar o endereço completo ou começar em linkedin.com."
+            hint={t("linkedinHint")}
             error={state.fieldErrors?.linkedinUrl}
           >
             <input
@@ -199,7 +200,7 @@ export function RecruiterForm({
               type="text"
               inputMode="url"
               defaultValue={initialValues.linkedinUrl}
-              placeholder="linkedin.com/in/ana-silva"
+              placeholder={t("linkedinPlaceholder")}
               className={fieldClassName}
               maxLength={500}
               aria-invalid={Boolean(state.fieldErrors?.linkedinUrl)}
@@ -212,9 +213,9 @@ export function RecruiterForm({
           </FormField>
           <div className="md:col-span-2">
             <FormField
-              label="Notas"
+              label={t("notes")}
               htmlFor="recruiter-notes"
-              hint="Contexto das conversas, disponibilidade ou informação útil para o próximo contacto."
+              hint={t("notesHint")}
               error={state.fieldErrors?.notes}
             >
               <textarea
@@ -222,7 +223,7 @@ export function RecruiterForm({
                 name="notes"
                 rows={6}
                 defaultValue={initialValues.notes}
-                placeholder="Notas sobre o contacto..."
+                placeholder={t("notesPlaceholder")}
                 className={textareaClassName}
                 maxLength={4000}
                 aria-invalid={Boolean(state.fieldErrors?.notes)}
@@ -242,7 +243,7 @@ export function RecruiterForm({
           href="/recrutadores"
           className={buttonClassName({ variant: "secondary" })}
         >
-          Cancelar
+          {t("cancel")}
         </Link>
         <SubmitButton label={submitLabel} />
       </div>

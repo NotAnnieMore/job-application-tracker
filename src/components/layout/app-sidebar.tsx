@@ -2,6 +2,7 @@
 
 import { ChevronLeft, ChevronRight, X } from "lucide-react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 
 import { AppLogo } from "@/components/shared/app-logo";
@@ -23,6 +24,7 @@ export function AppSidebar({
   onToggle,
 }: AppSidebarProps) {
   const pathname = usePathname();
+  const t = useTranslations("Navigation");
   const compact = collapsed && !mobile;
 
   return (
@@ -55,7 +57,8 @@ export function AppSidebar({
           <Button
             variant="ghost"
             size="icon"
-            aria-label="Fechar menu"
+            aria-label={t("closeMenu")}
+            data-mobile-menu-close
             onClick={onClose}
           >
             <X aria-hidden="true" className="size-5" />
@@ -65,7 +68,7 @@ export function AppSidebar({
 
       <nav
         className="flex-1 space-y-1 overflow-y-auto p-3"
-        aria-label="Principal"
+        aria-label={t("main")}
       >
         {mainNavigation.map((item) => {
           const isActive =
@@ -79,7 +82,7 @@ export function AppSidebar({
               key={item.href}
               href={item.href}
               aria-current={isActive ? "page" : undefined}
-              title={compact ? item.label : undefined}
+              title={compact ? t(item.labelKey) : undefined}
               onClick={onClose}
               className={cn(
                 "flex h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600",
@@ -90,7 +93,7 @@ export function AppSidebar({
               )}
             >
               <Icon aria-hidden="true" className="size-5 shrink-0" />
-              {!compact ? <span>{item.label}</span> : null}
+              {!compact ? <span>{t(item.labelKey)}</span> : null}
             </Link>
           );
         })}
@@ -102,7 +105,7 @@ export function AppSidebar({
             variant="ghost"
             size={compact ? "icon" : "sm"}
             className={cn("w-full", !compact && "justify-start")}
-            aria-label={compact ? "Expandir sidebar" : "Recolher sidebar"}
+            aria-label={compact ? t("expandSidebar") : t("collapseSidebar")}
             onClick={onToggle}
           >
             {compact ? (
@@ -110,7 +113,7 @@ export function AppSidebar({
             ) : (
               <>
                 <ChevronLeft aria-hidden="true" className="size-4" />
-                Recolher
+                {t("collapse")}
               </>
             )}
           </Button>

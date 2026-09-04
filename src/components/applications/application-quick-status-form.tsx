@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDown, LoaderCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useId, useState, useTransition } from "react";
 
 import { updateApplicationStatusAction } from "@/features/applications/actions";
@@ -31,6 +32,8 @@ export function ApplicationQuickStatusForm({
   status: ApplicationStatusValue;
   className?: string;
 }) {
+  const t = useTranslations("Applications");
+  const enums = useTranslations("Enums.applicationStatus");
   const normalizedStatus = normalizeApplicationStatus(status);
   const statusErrorId = useId();
   const [selectedStatus, setSelectedStatus] =
@@ -52,10 +55,10 @@ export function ApplicationQuickStatusForm({
 
         if (result.status !== "error") return;
         setSelectedStatus(previousStatus);
-        setMessage(result.message ?? "Não foi possível atualizar o estado.");
+        setMessage(result.message ?? t("statusUpdateFailed"));
       } catch {
         setSelectedStatus(previousStatus);
-        setMessage("Não foi possível atualizar o estado. Tenta novamente.");
+        setMessage(t("statusUpdateRetry"));
       }
     });
   }
@@ -63,7 +66,7 @@ export function ApplicationQuickStatusForm({
   return (
     <div className={cn("min-w-0", className)}>
       <label className="relative block min-w-0">
-        <span className="sr-only">Alterar estado da candidatura</span>
+        <span className="sr-only">{t("changeStatus")}</span>
         <select
           value={selectedStatus}
           disabled={pending}
@@ -80,7 +83,7 @@ export function ApplicationQuickStatusForm({
         >
           {applicationStatusOptions.map((option) => (
             <option key={option.value} value={option.value}>
-              {option.label}
+              {enums(option.value)}
             </option>
           ))}
         </select>

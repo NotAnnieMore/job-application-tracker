@@ -19,6 +19,7 @@ import {
   XCircle,
 } from "lucide-react";
 import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { ApplicationStatusBadge } from "@/components/applications/application-status-badge";
 import { ActionPriorityBadge } from "@/components/actions/action-badges";
@@ -26,12 +27,11 @@ import { CompanyLogo } from "@/components/companies/company-logo";
 import { PageHeader } from "@/components/shared/page-header";
 import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { workModeLabels } from "@/features/applications/constants";
 import { formatActionDate } from "@/features/actions/date";
 import { getDashboardData } from "@/features/dashboard/data";
 import type { DashboardActivityKind } from "@/features/dashboard/types";
-import { interviewFormatLabels } from "@/features/interviews/constants";
 import { formatInterviewDateTime } from "@/features/interviews/date";
+import type { AppLocale } from "@/i18n/config";
 import { cn } from "@/lib/utils";
 import type { ApplicationStatusValue } from "@/types/database.types";
 
@@ -46,8 +46,8 @@ const statusBarClasses: Record<ApplicationStatusValue, string> = {
   withdrawn: "bg-slate-600",
 };
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("pt-PT", {
+function formatDate(value: string, locale: AppLocale) {
+  return new Intl.DateTimeFormat(locale, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -55,29 +55,28 @@ function formatDate(value: string) {
   }).format(new Date(`${value}T00:00:00Z`));
 }
 
-function formatActivityTime(value: string) {
+function activityTimeParts(value: string) {
   const differenceMinutes = Math.max(
     0,
     Math.round((Date.now() - Date.parse(value)) / 60_000),
   );
 
-  if (differenceMinutes < 1) return "Agora";
-  if (differenceMinutes < 60) return `Há ${differenceMinutes} min`;
+  if (differenceMinutes < 1) return { unit: "now" as const, count: 0 };
+  if (differenceMinutes < 60) {
+    return { unit: "minutes" as const, count: differenceMinutes };
+  }
 
   const differenceHours = Math.round(differenceMinutes / 60);
-  if (differenceHours < 24) return `Há ${differenceHours} h`;
+  if (differenceHours < 24) {
+    return { unit: "hours" as const, count: differenceHours };
+  }
 
   const differenceDays = Math.round(differenceHours / 24);
   if (differenceDays < 7) {
-    return `Há ${differenceDays} dia${differenceDays === 1 ? "" : "s"}`;
+    return { unit: "days" as const, count: differenceDays };
   }
 
-  return new Intl.DateTimeFormat("pt-PT", {
-    day: "2-digit",
-    month: "short",
-    year: "numeric",
-    timeZone: "Europe/Lisbon",
-  }).format(new Date(value));
+  return { unit: "date" as const, count: 0 };
 }
 
 const activityIcons: Record<
@@ -90,13 +89,7 @@ const activityIcons: Record<
   action: { icon: ListChecks, className: "bg-amber-50 text-amber-700" },
 };
 
-function SectionLink({
-  href,
-  label = "Ver todas",
-}: {
-  href: string;
-  label?: string;
-}) {
+function SectionLink({ href, label }: { href: string; label: string }) {
   return (
     <Link
       href={href}
@@ -110,25 +103,27 @@ function SectionLink({
 
 const quickAccessItems = [
   {
-    label: "Registar candidatura",
+    labelKey: "application",
     href: "/candidaturas/nova",
     icon: Plus,
   },
-  { label: "Criar tarefa", href: "/acoes/nova", icon: ListChecks },
+  { labelKey: "task", href: "/acoes/nova", icon: ListChecks },
   {
-    label: "Agendar entrevista",
+    labelKey: "interview",
     href: "/entrevistas/nova",
     icon: CalendarDays,
   },
-  { label: "Abrir agenda", href: "/agenda", icon: CalendarRange },
-  { label: "Consultar empresas", href: "/empresas", icon: Building2 },
+  { labelKey: "calendar", href: "/agenda", icon: CalendarRange },
+  { labelKey: "companies", href: "/empresas", icon: Building2 },
 ] as const;
 
-function QuickAccessCard() {
+async function QuickAccessCard() {
+  const t = await getTranslations("Dashboard");
+
   return (
     <Card>
       <CardHeader>
-        <h2 className="font-bold text-slate-950">Acesso rápido</h2>
+        <h2 className="font-bold text-slate-950">{t("quickAccess")}</h2>
       </CardHeader>
       <CardContent className="space-y-2">
         {quickAccessItems.map((item) => {
@@ -141,7 +136,7 @@ function QuickAccessCard() {
               className="flex items-center gap-3 rounded-xl border border-slate-200 p-3 text-sm font-semibold text-slate-700 transition hover:border-blue-200 hover:bg-blue-50/50 hover:text-blue-700"
             >
               <Icon aria-hidden="true" className="size-4" />
-              {item.label}
+              {t(`quick.${item.labelKey}`)}
               <ChevronRight
                 aria-hidden="true"
                 className="ml-auto size-4 text-slate-400"
@@ -155,36 +150,45 @@ function QuickAccessCard() {
 }
 
 export async function DashboardPage() {
-  const data = await getDashboardData();
+  const locale = (await getLocale()) as AppLocale;
+  const t = await getTranslations("Dashboard");
+  const enums = await getTranslations("Enums");
+  const data = await getDashboardData(locale);
   const stats = [
     {
-      label: "Total de candidaturas",
+      label: t("stats.totalApplications"),
       value: data.stats.totalApplications,
-      detail: `${data.stats.applicationsLast30Days} nos últimos 30 dias`,
+      detail: t("stats.last30Days", {
+        count: data.stats.applicationsLast30Days,
+      }),
       icon: FileText,
       iconClass: "bg-blue-50 text-blue-600",
       href: "/candidaturas",
     },
     {
-      label: "Candidaturas ativas",
+      label: t("stats.activeApplications"),
       value: data.stats.activeApplications,
-      detail: `${data.stats.interviewApplications} em fase de entrevista`,
+      detail: t("stats.interviewStage", {
+        count: data.stats.interviewApplications,
+      }),
       icon: BriefcaseBusiness,
       iconClass: "bg-violet-50 text-violet-600",
       href: "/candidaturas",
     },
     {
-      label: "Próximas entrevistas",
+      label: t("stats.upcomingInterviews"),
       value: data.stats.upcomingInterviews,
-      detail: "Agendadas para os próximos dias",
+      detail: t("stats.scheduledSoon"),
       icon: CalendarDays,
       iconClass: "bg-purple-50 text-purple-600",
       href: "/entrevistas?estado=scheduled",
     },
     {
-      label: "Tarefas em atraso",
+      label: t("stats.overdueTasks"),
       value: data.stats.overdueActions,
-      detail: `${data.stats.upcomingActions} até aos próximos 7 dias`,
+      detail: t("stats.upcomingTasks", {
+        count: data.stats.upcomingActions,
+      }),
       icon: ListChecks,
       iconClass:
         data.stats.overdueActions > 0
@@ -193,33 +197,38 @@ export async function DashboardPage() {
       href: "/acoes?estado=pending",
     },
     {
-      label: "Taxa de resposta",
+      label: t("stats.responseRate"),
       value: `${data.stats.responseRate}%`,
-      detail: `${data.stats.respondedApplications} de ${data.stats.sentApplications} enviadas`,
+      detail: t("stats.responses", {
+        responded: data.stats.respondedApplications,
+        sent: data.stats.sentApplications,
+      }),
       icon: Percent,
       iconClass: "bg-indigo-50 text-indigo-600",
       href: "/candidaturas",
     },
     {
-      label: "Propostas recebidas",
+      label: t("stats.offers"),
       value: data.stats.offersReceived,
-      detail: "Processos com proposta",
+      detail: t("stats.offerProcesses"),
       icon: CheckCircle2,
       iconClass: "bg-emerald-50 text-emerald-600",
       href: "/candidaturas?status=offer_received",
     },
     {
-      label: "Rejeições",
+      label: t("stats.rejections"),
       value: data.stats.rejections,
-      detail: "Processos terminados",
+      detail: t("stats.finishedProcesses"),
       icon: XCircle,
       iconClass: "bg-red-50 text-red-600",
       href: "/candidaturas?status=rejected",
     },
     {
-      label: "Empresas",
+      label: t("stats.companies"),
       value: data.stats.totalCompanies,
-      detail: `${data.stats.companiesWithApplications} com candidatura`,
+      detail: t("stats.companiesWithApplication", {
+        count: data.stats.companiesWithApplications,
+      }),
       icon: Building2,
       iconClass: "bg-cyan-50 text-cyan-700",
       href: "/empresas",
@@ -229,8 +238,8 @@ export async function DashboardPage() {
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Dashboard"
-        description="Acompanha o progresso e as próximas prioridades da tua procura de emprego."
+        title={t("title")}
+        description={t("description")}
         action={
           <div className="flex flex-wrap gap-2">
             <Link
@@ -238,11 +247,11 @@ export async function DashboardPage() {
               className={buttonClassName({ variant: "secondary" })}
             >
               <FileSearch aria-hidden="true" className="size-4" />
-              Importar vaga
+              {t("importJob")}
             </Link>
             <Link href="/candidaturas/nova" className={buttonClassName()}>
               <Plus aria-hidden="true" className="size-4" />
-              Nova candidatura
+              {t("newApplication")}
             </Link>
           </div>
         }
@@ -250,7 +259,7 @@ export async function DashboardPage() {
 
       <section
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
-        aria-label="Resumo"
+        aria-label={t("summary")}
       >
         {stats.map((stat) => {
           const Icon = stat.icon;
@@ -290,8 +299,10 @@ export async function DashboardPage() {
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.8fr)_minmax(320px,0.9fr)]">
         <Card className="min-w-0 overflow-hidden">
           <CardHeader>
-            <h2 className="font-bold text-slate-950">Candidaturas recentes</h2>
-            <SectionLink href="/candidaturas" />
+            <h2 className="font-bold text-slate-950">
+              {t("recentApplications")}
+            </h2>
+            <SectionLink href="/candidaturas" label={t("viewAll")} />
           </CardHeader>
 
           {data.recentApplications.length === 0 ? (
@@ -300,11 +311,10 @@ export async function DashboardPage() {
                 <Inbox aria-hidden="true" className="size-5" />
               </span>
               <p className="mt-3 font-semibold text-slate-900">
-                Ainda não existem candidaturas
+                {t("noApplications")}
               </p>
               <p className="mt-1 max-w-sm text-sm leading-6 text-slate-500">
-                Quando adicionares a primeira candidatura, o progresso aparece
-                aqui automaticamente.
+                {t("noApplicationsDescription")}
               </p>
             </div>
           ) : (
@@ -312,17 +322,17 @@ export async function DashboardPage() {
               <div className="hidden overflow-x-auto md:block">
                 <table className="w-full border-collapse text-left text-sm">
                   <caption className="sr-only">
-                    Lista das candidaturas mais recentes
+                    {t("recentApplicationsCaption")}
                   </caption>
                   <thead>
                     <tr className="border-b border-slate-100 bg-slate-50/70 text-xs font-semibold text-slate-500">
-                      <th className="px-5 py-3">Vaga</th>
-                      <th className="px-4 py-3">Empresa</th>
-                      <th className="px-4 py-3">Estado</th>
-                      <th className="px-4 py-3">Data</th>
-                      <th className="px-4 py-3">Próxima tarefa</th>
+                      <th className="px-5 py-3">{t("table.role")}</th>
+                      <th className="px-4 py-3">{t("table.company")}</th>
+                      <th className="px-4 py-3">{t("table.status")}</th>
+                      <th className="px-4 py-3">{t("table.date")}</th>
+                      <th className="px-4 py-3">{t("table.nextTask")}</th>
                       <th className="w-12 px-3 py-3">
-                        <span className="sr-only">Abrir</span>
+                        <span className="sr-only">{t("table.open")}</span>
                       </th>
                     </tr>
                   </thead>
@@ -344,7 +354,7 @@ export async function DashboardPage() {
                               {[
                                 application.location,
                                 application.workMode
-                                  ? workModeLabels[application.workMode]
+                                  ? enums(`workMode.${application.workMode}`)
                                   : "",
                               ]
                                 .filter(Boolean)
@@ -368,23 +378,24 @@ export async function DashboardPage() {
                           <ApplicationStatusBadge status={application.status} />
                         </td>
                         <td className="px-4 py-4 whitespace-nowrap text-slate-600">
-                          {formatDate(application.applicationDate)}
+                          {formatDate(application.applicationDate, locale)}
                         </td>
                         <td className="px-4 py-4">
                           <p className="max-w-44 truncate font-medium text-slate-700">
-                            {application.nextActionSummary ||
-                              "Sem próxima tarefa"}
+                            {application.nextActionSummary || t("noNextTask")}
                           </p>
                           {application.followUpDate ? (
                             <p className="mt-0.5 text-xs text-slate-500">
-                              {formatDate(application.followUpDate)}
+                              {formatDate(application.followUpDate, locale)}
                             </p>
                           ) : null}
                         </td>
                         <td className="px-3 py-4">
                           <Link
                             href="/candidaturas"
-                            aria-label={`Abrir candidatura a ${application.title}`}
+                            aria-label={t("openApplication", {
+                              title: application.title,
+                            })}
                             className="flex size-9 items-center justify-center rounded-lg text-slate-400 hover:bg-slate-100 hover:text-slate-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
                           >
                             <ChevronRight
@@ -422,9 +433,11 @@ export async function DashboardPage() {
                       <ApplicationStatusBadge status={application.status} />
                     </div>
                     <div className="mt-4 flex justify-between gap-4 text-xs text-slate-500">
-                      <span>{formatDate(application.applicationDate)}</span>
+                      <span>
+                        {formatDate(application.applicationDate, locale)}
+                      </span>
                       <span className="truncate text-right">
-                        {application.nextActionSummary || "Sem próxima tarefa"}
+                        {application.nextActionSummary || t("noNextTask")}
                       </span>
                     </div>
                   </article>
@@ -440,8 +453,8 @@ export async function DashboardPage() {
       <div className="grid gap-6 xl:grid-cols-[minmax(0,1.4fr)_minmax(320px,0.6fr)]">
         <Card className="overflow-hidden xl:col-span-2">
           <CardHeader>
-            <h2 className="font-bold text-slate-950">Tarefas pendentes</h2>
-            <SectionLink href="/acoes" />
+            <h2 className="font-bold text-slate-950">{t("pendingTasks")}</h2>
+            <SectionLink href="/acoes" label={t("viewAll")} />
           </CardHeader>
           {data.pendingActions.length === 0 ? (
             <div className="flex min-h-44 flex-col items-center justify-center px-6 text-center">
@@ -449,10 +462,10 @@ export async function DashboardPage() {
                 <ListChecks aria-hidden="true" className="size-5" />
               </span>
               <p className="mt-3 font-semibold text-slate-900">
-                Nenhuma tarefa pendente
+                {t("noPendingTasks")}
               </p>
               <p className="mt-1 text-sm leading-6 text-slate-500">
-                As tarefas das candidaturas irão aparecer aqui.
+                {t("noPendingTasksDescription")}
               </p>
             </div>
           ) : (
@@ -489,11 +502,16 @@ export async function DashboardPage() {
                       >
                         {action.dueDate
                           ? action.timing === "today"
-                            ? "Hoje"
+                            ? t("today")
                             : action.timing === "overdue"
-                              ? `Em atraso · ${formatActionDate(action.dueDate)}`
-                              : formatActionDate(action.dueDate)
-                          : "Sem prazo"}
+                              ? t("overdue", {
+                                  date: formatActionDate(
+                                    action.dueDate,
+                                    locale,
+                                  ),
+                                })
+                              : formatActionDate(action.dueDate, locale)
+                          : t("noDeadline")}
                       </span>
                     </span>
                   </span>
@@ -509,8 +527,10 @@ export async function DashboardPage() {
 
         <Card className="overflow-hidden xl:col-span-2">
           <CardHeader>
-            <h2 className="font-bold text-slate-950">Próximas entrevistas</h2>
-            <SectionLink href="/entrevistas" />
+            <h2 className="font-bold text-slate-950">
+              {t("upcomingInterviews")}
+            </h2>
+            <SectionLink href="/entrevistas" label={t("viewAll")} />
           </CardHeader>
           {data.upcomingInterviews.length === 0 ? (
             <div className="flex min-h-44 flex-col items-center justify-center px-6 text-center">
@@ -518,10 +538,10 @@ export async function DashboardPage() {
                 <CalendarDays aria-hidden="true" className="size-5" />
               </span>
               <p className="mt-3 font-semibold text-slate-900">
-                Nenhuma entrevista agendada
+                {t("noInterviews")}
               </p>
               <p className="mt-1 text-sm leading-6 text-slate-500">
-                As próximas conversas irão aparecer aqui automaticamente.
+                {t("noInterviewsDescription")}
               </p>
             </div>
           ) : (
@@ -546,11 +566,11 @@ export async function DashboardPage() {
                     </span>
                     <span className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs font-medium text-violet-700">
                       <span>
-                        {formatInterviewDateTime(interview.scheduledAt)}
+                        {formatInterviewDateTime(interview.scheduledAt, locale)}
                       </span>
                       <span className="flex items-center gap-1">
                         <Video aria-hidden="true" className="size-3.5" />
-                        {interviewFormatLabels[interview.format]}
+                        {enums(`interviewFormat.${interview.format}`)}
                       </span>
                     </span>
                   </span>
@@ -567,11 +587,9 @@ export async function DashboardPage() {
         <Card>
           <CardHeader>
             <div>
-              <h2 className="font-bold text-slate-950">
-                Evolução das candidaturas
-              </h2>
+              <h2 className="font-bold text-slate-950">{t("trend")}</h2>
               <p className="mt-1 text-sm text-slate-500">
-                Registos efetuados nos últimos seis meses
+                {t("trendDescription")}
               </p>
             </div>
             <span className="flex size-9 items-center justify-center rounded-xl bg-blue-50 text-blue-600">
@@ -581,9 +599,11 @@ export async function DashboardPage() {
           <CardContent>
             <div
               role="img"
-              aria-label={`Gráfico de candidaturas nos últimos seis meses: ${data.applicationTrend
-                .map((point) => `${point.label}, ${point.value}`)
-                .join("; ")}`}
+              aria-label={t("trendAria", {
+                points: data.applicationTrend
+                  .map((point) => `${point.label}, ${point.value}`)
+                  .join("; "),
+              })}
               className="flex h-56 items-end gap-2 sm:gap-4"
             >
               {data.applicationTrend.map((point) => (
@@ -620,9 +640,11 @@ export async function DashboardPage() {
         <Card className="overflow-hidden">
           <CardHeader>
             <div>
-              <h2 className="font-bold text-slate-950">Atividade recente</h2>
+              <h2 className="font-bold text-slate-950">
+                {t("recentActivity")}
+              </h2>
               <p className="mt-1 text-sm text-slate-500">
-                Alterações mais recentes no teu acompanhamento
+                {t("recentActivityDescription")}
               </p>
             </div>
             <Activity aria-hidden="true" className="size-5 text-slate-400" />
@@ -630,15 +652,29 @@ export async function DashboardPage() {
           {data.recentActivity.length === 0 ? (
             <div className="flex min-h-56 flex-col items-center justify-center px-6 text-center">
               <Activity aria-hidden="true" className="size-8 text-slate-300" />
-              <p className="mt-3 text-sm text-slate-500">
-                A atividade aparece quando começares a atualizar candidaturas.
-              </p>
+              <p className="mt-3 text-sm text-slate-500">{t("noActivity")}</p>
             </div>
           ) : (
             <div className="divide-y divide-slate-100">
               {data.recentActivity.map((activity) => {
                 const config = activityIcons[activity.kind];
                 const Icon = config.icon;
+                const time = activityTimeParts(activity.occurredAt);
+                const timeLabel =
+                  time.unit === "now"
+                    ? t("now")
+                    : time.unit === "minutes"
+                      ? t("minutesAgo", { count: time.count })
+                      : time.unit === "hours"
+                        ? t("hoursAgo", { count: time.count })
+                        : time.unit === "days"
+                          ? t("daysAgo", { count: time.count })
+                          : new Intl.DateTimeFormat(locale, {
+                              day: "2-digit",
+                              month: "short",
+                              year: "numeric",
+                              timeZone: "Europe/Lisbon",
+                            }).format(new Date(activity.occurredAt));
 
                 return (
                   <Link
@@ -656,14 +692,14 @@ export async function DashboardPage() {
                     </span>
                     <span className="min-w-0 flex-1">
                       <span className="block text-sm font-semibold text-slate-800">
-                        {activity.label}
+                        {t(`activity.${activity.kind}.${activity.change}`)}
                       </span>
                       <span className="mt-0.5 block truncate text-xs text-slate-500">
                         {activity.description}
                       </span>
                     </span>
                     <span className="shrink-0 text-[11px] font-medium text-slate-400">
-                      {formatActivityTime(activity.occurredAt)}
+                      {timeLabel}
                     </span>
                   </Link>
                 );
@@ -675,14 +711,14 @@ export async function DashboardPage() {
         <Card className="xl:col-span-2">
           <CardHeader>
             <h2 className="font-bold text-slate-950">
-              Candidaturas por estado
+              {t("applicationsByStatus")}
             </h2>
-            <SectionLink href="/candidaturas" label="Abrir candidaturas" />
+            <SectionLink href="/candidaturas" label={t("openApplications")} />
           </CardHeader>
           <CardContent>
             {data.statusSummary.length === 0 ? (
               <p className="py-8 text-center text-sm text-slate-500">
-                A distribuição aparece depois da primeira candidatura.
+                {t("noStatusDistribution")}
               </p>
             ) : (
               <div className="grid gap-x-8 gap-y-5 md:grid-cols-2">
@@ -690,7 +726,7 @@ export async function DashboardPage() {
                   <div key={status.status}>
                     <div className="mb-2 flex items-center justify-between gap-3 text-sm">
                       <span className="font-medium text-slate-600">
-                        {status.label}
+                        {enums(`applicationStatus.${status.status}`)}
                       </span>
                       <span className="font-bold text-slate-900">
                         {status.value}

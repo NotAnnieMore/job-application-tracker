@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle2, LoaderCircle, Pencil, Save, X } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useTransition } from "react";
 import { createPortal } from "react-dom";
@@ -20,6 +21,8 @@ export function InterviewPreparationEditor({
   initialApplicationPreparation: string;
   initialQuestionsForCompany: string;
 }) {
+  const locale = useLocale();
+  const t = useTranslations("InterviewEditors");
   const router = useRouter();
   const [open, setOpen] = useState(false);
   const [applicationPreparation, setApplicationPreparation] = useState(
@@ -66,7 +69,7 @@ export function InterviewPreparationEditor({
         questionsForCompany,
       );
       if (result.status === "error") {
-        setError(result.message ?? "Não foi possível guardar o guião.");
+        setError(result.message ?? t("scriptSaveFailed"));
         return;
       }
       setOpen(false);
@@ -105,7 +108,7 @@ export function InterviewPreparationEditor({
         {saved ? (
           <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-700">
             <CheckCircle2 aria-hidden="true" className="size-4" />
-            Guardado
+            {t("saved")}
           </span>
         ) : null}
         <Button
@@ -115,7 +118,7 @@ export function InterviewPreparationEditor({
           onClick={openEditor}
         >
           <Pencil aria-hidden="true" className="size-4" />
-          Editar guião
+          {t("editScript")}
         </Button>
       </div>
 
@@ -141,17 +144,17 @@ export function InterviewPreparationEditor({
                       id="interview-preparation-title"
                       className="font-bold text-slate-950"
                     >
-                      Editar guião
+                      {t("editScript")}
                     </h2>
                     <p className="mt-1 text-sm text-slate-500">
-                      Atualiza a preparação geral guardada nesta candidatura.
+                      {t("scriptDescription")}
                     </p>
                   </div>
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    aria-label="Fechar"
+                    aria-label={t("close")}
                     disabled={pending}
                     onClick={closeEditor}
                   >
@@ -176,7 +179,7 @@ export function InterviewPreparationEditor({
                       htmlFor="interview-preparation-quick-edit"
                       className="text-sm font-semibold text-slate-700"
                     >
-                      Guião pessoal e CV
+                      {t("personalScript")}
                     </label>
                     <textarea
                       id="interview-preparation-quick-edit"
@@ -188,11 +191,11 @@ export function InterviewPreparationEditor({
                       maxLength={10_000}
                       autoFocus
                       className={`${textareaClassName} mt-2`}
-                      placeholder="Fala-me sobre ti... Porque estás interessado nesta vaga?..."
+                      placeholder={t("personalScriptPlaceholder")}
                     />
                     <p className="mt-1.5 text-right text-xs text-slate-500">
-                      {applicationPreparation.length.toLocaleString("pt-PT")}
-                      /10 000
+                      {applicationPreparation.length.toLocaleString(locale)}/
+                      {(10_000).toLocaleString(locale)}
                     </p>
                   </div>
                   <div>
@@ -200,7 +203,7 @@ export function InterviewPreparationEditor({
                       htmlFor="interview-company-questions-quick-edit"
                       className="text-sm font-semibold text-slate-700"
                     >
-                      Perguntas para a empresa
+                      {t("companyQuestions")}
                     </label>
                     <textarea
                       id="interview-company-questions-quick-edit"
@@ -211,11 +214,11 @@ export function InterviewPreparationEditor({
                       rows={8}
                       maxLength={10_000}
                       className={`${textareaClassName} mt-2`}
-                      placeholder="Como é medido o sucesso nesta função?..."
+                      placeholder={t("companyQuestionsPlaceholder")}
                     />
                     <p className="mt-1.5 text-right text-xs text-slate-500">
-                      {questionsForCompany.length.toLocaleString("pt-PT")}/10
-                      000
+                      {questionsForCompany.length.toLocaleString(locale)}/
+                      {(10_000).toLocaleString(locale)}
                     </p>
                   </div>
                   <div className="flex flex-col-reverse gap-3 border-t border-slate-100 pt-5 sm:flex-row sm:justify-end">
@@ -225,7 +228,7 @@ export function InterviewPreparationEditor({
                       disabled={pending}
                       onClick={closeEditor}
                     >
-                      Cancelar
+                      {t("cancel")}
                     </Button>
                     <Button type="submit" disabled={pending}>
                       {pending ? (
@@ -236,7 +239,7 @@ export function InterviewPreparationEditor({
                       ) : (
                         <Save aria-hidden="true" className="size-4" />
                       )}
-                      {pending ? "A guardar..." : "Guardar guião"}
+                      {pending ? t("saving") : t("saveScript")}
                     </Button>
                   </div>
                 </form>

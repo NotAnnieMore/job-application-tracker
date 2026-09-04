@@ -12,8 +12,8 @@ export function getLisbonToday() {
   return `${values.year}-${values.month}-${values.day}`;
 }
 
-export function formatActionDate(value: string) {
-  return new Intl.DateTimeFormat("pt-PT", {
+export function formatActionDate(value: string, locale = "pt-PT") {
+  return new Intl.DateTimeFormat(locale, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",

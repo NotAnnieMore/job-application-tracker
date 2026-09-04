@@ -1,3 +1,4 @@
+import { JobImportError } from "@/features/job-import/errors";
 function isLinkedInHost(hostname: string) {
   return hostname === "linkedin.com" || hostname.endsWith(".linkedin.com");
 }
@@ -26,9 +27,7 @@ export function normalizeJobUrl(url: URL) {
       validLinkedInJobId(url.searchParams.get("currentJobId"));
 
     if (!jobId) {
-      throw new Error(
-        "No LinkedIn, seleciona uma vaga antes de copiar o link. O endereço deve incluir currentJobId ou /jobs/view/ID.",
-      );
+      throw new JobImportError("linkedinJobRequired");
     }
 
     return new URL(`https://www.linkedin.com/jobs/view/${jobId}/`);
@@ -40,9 +39,7 @@ export function normalizeJobUrl(url: URL) {
       validIndeedJobKey(url.searchParams.get("vjk"));
 
     if (!jobKey) {
-      throw new Error(
-        "No Indeed, abre ou seleciona uma vaga antes de copiar o link. O endereço deve incluir jk ou vjk.",
-      );
+      throw new JobImportError("indeedJobRequired");
     }
 
     const canonicalUrl = new URL(`https://${hostname}/viewjob`);

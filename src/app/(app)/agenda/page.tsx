@@ -1,3 +1,4 @@
+import { getLocale, getTranslations } from "next-intl/server";
 import {
   BellRing,
   CalendarClock,
@@ -22,6 +23,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getAgendaData } from "@/features/calendar/data";
+import { formatAgendaDate } from "@/features/calendar/date";
 import type {
   AgendaItem,
   AgendaItemKind,
@@ -29,40 +31,19 @@ import type {
 } from "@/features/calendar/types";
 import { formatInterviewTime } from "@/features/interviews/date";
 
-const kindOptions: Array<{ value: AgendaItemKind; label: string }> = [
-  { value: "interview", label: "Entrevistas" },
-  { value: "follow_up", label: "Follow-ups" },
-  { value: "action", label: "Tarefas" },
+const kindOptions: Array<{ value: AgendaItemKind }> = [
+  { value: "interview" },
+  { value: "follow_up" },
+  { value: "action" },
 ];
 
-const periodOptions: Array<{ value: AgendaPeriod; label: string }> = [
-  { value: "all", label: "Todos os períodos" },
-  { value: "overdue", label: "Em atraso" },
-  { value: "today", label: "Hoje" },
-  { value: "next_7", label: "Próximos 7 dias" },
-  { value: "next_30", label: "Próximos 30 dias" },
+const periodOptions: Array<{ value: AgendaPeriod }> = [
+  { value: "all" },
+  { value: "overdue" },
+  { value: "today" },
+  { value: "next_7" },
+  { value: "next_30" },
 ];
-
-const itemPresentation = {
-  interview: {
-    label: "Entrevista",
-    icon: CalendarDays,
-    badge: "border-violet-200 bg-violet-50 text-violet-700",
-    iconBox: "bg-violet-50 text-violet-600",
-  },
-  follow_up: {
-    label: "Follow-up",
-    icon: BellRing,
-    badge: "border-amber-200 bg-amber-50 text-amber-700",
-    iconBox: "bg-amber-50 text-amber-600",
-  },
-  action: {
-    label: "Tarefa",
-    icon: ListChecks,
-    badge: "border-blue-200 bg-blue-50 text-blue-700",
-    iconBox: "bg-blue-50 text-blue-600",
-  },
-} as const;
 
 function singleValue(value: string | string[] | undefined) {
   return typeof value === "string" ? value : "";
@@ -83,18 +64,6 @@ function addDays(value: string, days: number) {
     .slice(0, 10);
 }
 
-function formatAgendaDate(value: string) {
-  const formatted = new Intl.DateTimeFormat("pt-PT", {
-    weekday: "long",
-    day: "numeric",
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  }).format(new Date(`${value}T00:00:00Z`));
-
-  return formatted.charAt(0).toLocaleUpperCase("pt-PT") + formatted.slice(1);
-}
-
 function groupItems(items: AgendaItem[]) {
   const groups = new Map<string, AgendaItem[]>();
   for (const item of items) {
@@ -108,6 +77,28 @@ export default async function AgendaPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const locale = await getLocale();
+  const t = await getTranslations("Agenda");
+  const itemPresentation = {
+    interview: {
+      label: t("item_interview"),
+      icon: CalendarDays,
+      badge: "border-violet-200 bg-violet-50 text-violet-700",
+      iconBox: "bg-violet-50 text-violet-600",
+    },
+    follow_up: {
+      label: t("item_follow_up"),
+      icon: BellRing,
+      badge: "border-amber-200 bg-amber-50 text-amber-700",
+      iconBox: "bg-amber-50 text-amber-600",
+    },
+    action: {
+      label: t("item_action"),
+      icon: ListChecks,
+      badge: "border-blue-200 bg-blue-50 text-blue-700",
+      iconBox: "bg-blue-50 text-blue-600",
+    },
+  } as const;
   const params = await searchParams;
   const rawKind = singleValue(params.tipo);
   const rawPeriod = singleValue(params.periodo);
@@ -120,20 +111,16 @@ export default async function AgendaPage({
     ...(kind
       ? [
           {
-            label: "Tipo",
-            value:
-              kindOptions.find((option) => option.value === kind)?.label ??
-              kind,
+            label: t("type"),
+            value: t(`kind_${kind}`),
           },
         ]
       : []),
     ...(period !== "all"
       ? [
           {
-            label: "Período",
-            value:
-              periodOptions.find((option) => option.value === period)?.label ??
-              period,
+            label: t("period"),
+            value: t(`period_${period}`),
           },
         ]
       : []),
@@ -143,12 +130,12 @@ export default async function AgendaPage({
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Agenda"
-        description="Entrevistas, follow-ups e tarefas reunidos numa vista cronológica."
+        title={t("title")}
+        description={t("description")}
         action={
           <Link href="/acoes/nova" className={buttonClassName()}>
             <Plus aria-hidden="true" className="size-4" />
-            Nova tarefa
+            {t("newTask")}
           </Link>
         }
       />
@@ -156,7 +143,7 @@ export default async function AgendaPage({
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {[
           {
-            label: "Em atraso",
+            label: t("period_overdue"),
             value: data.summary.overdue,
             href: "/agenda?periodo=overdue",
             icon: CircleAlert,
@@ -164,7 +151,7 @@ export default async function AgendaPage({
             background: "bg-red-50",
           },
           {
-            label: "Para hoje",
+            label: t("dueToday"),
             value: data.summary.today,
             href: "/agenda?periodo=today",
             icon: CalendarClock,
@@ -172,7 +159,7 @@ export default async function AgendaPage({
             background: "bg-amber-50",
           },
           {
-            label: "Próximos 7 dias",
+            label: t("period_next_7"),
             value: data.summary.nextSevenDays,
             href: "/agenda?periodo=next_7",
             icon: CalendarRange,
@@ -180,7 +167,7 @@ export default async function AgendaPage({
             background: "bg-blue-50",
           },
           {
-            label: "Tarefas sem data",
+            label: t("undatedTasks"),
             value: data.summary.unscheduledActions,
             href: "/acoes?estado=pending&prazo=no_date",
             icon: ListChecks,
@@ -199,7 +186,7 @@ export default async function AgendaPage({
                 <CardContent className="flex items-center justify-between gap-4">
                   <div>
                     <p className={`text-3xl font-bold ${item.tone}`}>
-                      {item.value}
+                      {item.value.toLocaleString(locale)}
                     </p>
                     <p className="mt-1 text-sm text-slate-500">{item.label}</p>
                   </div>
@@ -222,22 +209,22 @@ export default async function AgendaPage({
           className="grid gap-3 p-4 md:grid-cols-2"
         >
           <label>
-            <span className="sr-only">Filtrar por tipo</span>
+            <span className="sr-only">{t("filterType")}</span>
             <AutoSubmitSelect
               name="tipo"
               defaultValue={kind ?? ""}
               className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
             >
-              <option value="">Todos os tipos</option>
+              <option value="">{t("allTypes")}</option>
               {kindOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {t(`kind_${option.value}`)}
                 </option>
               ))}
             </AutoSubmitSelect>
           </label>
           <label>
-            <span className="sr-only">Filtrar por período</span>
+            <span className="sr-only">{t("filterPeriod")}</span>
             <AutoSubmitSelect
               name="periodo"
               defaultValue={period}
@@ -245,7 +232,7 @@ export default async function AgendaPage({
             >
               {periodOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {t(`period_${option.value}`)}
                 </option>
               ))}
             </AutoSubmitSelect>
@@ -258,13 +245,11 @@ export default async function AgendaPage({
       {groups.length === 0 ? (
         <EmptyState
           icon={CalendarRange}
-          title={hasFilters ? "Sem compromissos neste período" : "Agenda vazia"}
+          title={hasFilters ? t("emptyFiltered") : t("empty")}
           description={
-            hasFilters
-              ? "Altera ou limpa os filtros para consultar outros compromissos."
-              : "As entrevistas, os follow-ups e as tarefas com data aparecem aqui automaticamente."
+            hasFilters ? t("emptyFilteredDescription") : t("emptyDescription")
           }
-          actionLabel={hasFilters ? "Limpar filtros" : "Criar tarefa"}
+          actionLabel={hasFilters ? t("clearFilters") : t("createTask")}
           actionHref={hasFilters ? "/agenda" : "/acoes/nova"}
         />
       ) : (
@@ -273,10 +258,10 @@ export default async function AgendaPage({
             const isOverdue = date < data.today;
             const heading =
               date === data.today
-                ? `Hoje · ${formatAgendaDate(date)}`
+                ? t("todayDate", { date: formatAgendaDate(date, locale) })
                 : date === tomorrow
-                  ? `Amanhã · ${formatAgendaDate(date)}`
-                  : formatAgendaDate(date);
+                  ? t("tomorrowDate", { date: formatAgendaDate(date, locale) })
+                  : formatAgendaDate(date, locale);
 
             return (
               <section key={date} aria-labelledby={`agenda-${date}`}>
@@ -289,7 +274,7 @@ export default async function AgendaPage({
                   </h2>
                   {isOverdue ? (
                     <span className="rounded-full bg-red-50 px-2 py-0.5 text-xs font-semibold text-red-600">
-                      Em atraso
+                      {t("period_overdue")}
                     </span>
                   ) : null}
                   <span className="h-px flex-1 bg-slate-200" />
@@ -320,7 +305,10 @@ export default async function AgendaPage({
                           <span className="min-w-0 flex-1">
                             <span className="flex flex-wrap items-center gap-2">
                               <span className="truncate font-semibold text-slate-900">
-                                {item.description}
+                                {item.description ||
+                                  (item.kind === "follow_up"
+                                    ? t("followUpDescription")
+                                    : "")}
                               </span>
                               <span
                                 className={`rounded-full border px-2 py-0.5 text-xs font-semibold ${presentation.badge}`}
@@ -337,7 +325,7 @@ export default async function AgendaPage({
                           </span>
                           {item.scheduledAt ? (
                             <span className="shrink-0 text-sm font-semibold text-violet-700">
-                              {formatInterviewTime(item.scheduledAt)}
+                              {formatInterviewTime(item.scheduledAt, locale)}
                             </span>
                           ) : null}
                           <ChevronRight

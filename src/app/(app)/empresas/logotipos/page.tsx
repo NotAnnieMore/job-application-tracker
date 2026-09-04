@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 
@@ -6,6 +7,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { getCompaniesWithoutLogo } from "@/features/companies/data";
 
 export default async function CompanyLogosPage() {
+  const t = await getTranslations("Companies");
   const companies = await getCompaniesWithoutLogo();
 
   return (
@@ -15,11 +17,11 @@ export default async function CompanyLogosPage() {
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        Voltar às empresas
+        {t("back")}
       </Link>
       <PageHeader
-        title="Completar logótipos"
-        description="Pesquisa sugestões em lote e confirma apenas as correspondências corretas."
+        title={t("completeLogos")}
+        description={t("logosDescription")}
       />
       <CompanyLogoBatchManager companies={companies} />
     </div>

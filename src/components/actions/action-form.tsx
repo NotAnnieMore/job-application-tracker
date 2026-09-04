@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { LoaderCircle, Save } from "lucide-react";
 import Link from "next/link";
 import { useActionState } from "react";
@@ -28,6 +30,7 @@ const textareaClassName =
   "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-3 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-50";
 
 function SubmitButton({ label }: { label: string }) {
+  const t = useTranslations("TaskForm");
   const { pending } = useFormStatus();
 
   return (
@@ -37,7 +40,7 @@ function SubmitButton({ label }: { label: string }) {
       ) : (
         <Save aria-hidden="true" className="size-4" />
       )}
-      {pending ? "A guardar..." : label}
+      {pending ? t("saving") : label}
     </Button>
   );
 }
@@ -55,6 +58,9 @@ export function ActionForm({
   submitLabel: string;
   cancelHref?: string;
 }) {
+  const t = useTranslations("TaskForm");
+  const tStatus = useTranslations("Enums.taskStatus");
+  const tPriority = useTranslations("Enums.taskPriority");
   const [state, formAction] = useActionState(action, initialActionActionState);
 
   return (
@@ -72,16 +78,14 @@ export function ActionForm({
       <Card>
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Detalhes da tarefa</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Define uma tarefa concreta ligada a uma candidatura.
-            </p>
+            <h2 className="font-bold text-slate-950">{t("details")}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t("description")}</p>
           </div>
         </CardHeader>
         <CardContent className="grid gap-5 md:grid-cols-2">
           <div className="md:col-span-2">
             <FormField
-              label="Candidatura"
+              label={t("application")}
               htmlFor="action-application"
               required
               error={state.fieldErrors?.applicationId}
@@ -93,7 +97,7 @@ export function ActionForm({
                 className={fieldClassName}
                 required
               >
-                <option value="">Seleciona uma candidatura</option>
+                <option value="">{t("selectApplication")}</option>
                 {applications.map((application) => (
                   <option key={application.id} value={application.id}>
                     {application.companyName} — {application.title}
@@ -105,10 +109,10 @@ export function ActionForm({
 
           <div className="md:col-span-2">
             <FormField
-              label="Tarefa"
+              label={t("task")}
               htmlFor="action-description"
               required
-              hint="Ex.: adaptar o CV, preparar teste técnico ou enviar agradecimento."
+              hint={t("taskHint")}
               error={state.fieldErrors?.description}
             >
               <textarea
@@ -116,7 +120,7 @@ export function ActionForm({
                 name="description"
                 rows={4}
                 defaultValue={initialValues.description}
-                placeholder="O que precisas de fazer?"
+                placeholder={t("taskPlaceholder")}
                 className={textareaClassName}
                 maxLength={500}
                 required
@@ -125,9 +129,9 @@ export function ActionForm({
           </div>
 
           <FormField
-            label="Data limite"
+            label={t("dueDate")}
             htmlFor="action-due-date"
-            hint="Pode ficar vazia se ainda não existir um prazo."
+            hint={t("dueDateHint")}
             error={state.fieldErrors?.dueDate}
           >
             <input
@@ -140,7 +144,7 @@ export function ActionForm({
           </FormField>
 
           <FormField
-            label="Prioridade"
+            label={t("priority")}
             htmlFor="action-priority"
             required
             error={state.fieldErrors?.priority}
@@ -154,16 +158,16 @@ export function ActionForm({
             >
               {actionPriorityOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {tPriority(option.value)}
                 </option>
               ))}
             </select>
           </FormField>
 
           <FormField
-            label="Estado"
+            label={t("status")}
             htmlFor="action-status"
-            hint="Também podes concluir rapidamente a tarefa na lista de tarefas."
+            hint={t("statusHint")}
             error={state.fieldErrors?.status}
           >
             <select
@@ -175,7 +179,7 @@ export function ActionForm({
             >
               {actionStatusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {tStatus(option.value)}
                 </option>
               ))}
             </select>
@@ -188,7 +192,7 @@ export function ActionForm({
           href={cancelHref}
           className={buttonClassName({ variant: "secondary" })}
         >
-          Cancelar
+          {t("cancel")}
         </Link>
         <SubmitButton label={submitLabel} />
       </div>

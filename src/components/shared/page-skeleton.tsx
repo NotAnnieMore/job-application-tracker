@@ -1,16 +1,20 @@
-export function PageSkeleton({
+import { getTranslations } from "next-intl/server";
+
+export async function PageSkeleton({
   title,
   description,
 }: {
   title?: string;
   description?: string;
 } = {}) {
+  const t = await getTranslations("Common");
+
   return (
     <div
       role="status"
       aria-live="polite"
       aria-busy="true"
-      aria-label="A carregar conteúdo"
+      aria-label={t("loadingContent")}
       className="space-y-6"
     >
       {title ? (

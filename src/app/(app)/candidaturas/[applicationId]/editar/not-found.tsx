@@ -1,27 +1,27 @@
 import { FileText } from "lucide-react";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import { buttonClassName } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
-export default function ApplicationNotFound() {
+export default async function ApplicationNotFound() {
+  const t = await getTranslations("ApplicationDetail");
   return (
     <Card className="flex min-h-80 flex-col items-center justify-center p-8 text-center">
-      <title>Candidatura não encontrada | Job Application Tracker</title>
+      <title>{t("notFoundMetadata")}</title>
       <span className="flex size-12 items-center justify-center rounded-2xl bg-blue-50 text-blue-600">
         <FileText aria-hidden="true" className="size-6" />
       </span>
-      <h1 className="mt-4 text-xl font-bold text-slate-950">
-        Candidatura não encontrada
-      </h1>
+      <h1 className="mt-4 text-xl font-bold text-slate-950">{t("notFound")}</h1>
       <p className="mt-2 max-w-md text-sm leading-6 text-slate-500">
-        A candidatura pode ter sido eliminada ou não pertencer à tua conta.
+        {t("notFoundDescription")}
       </p>
       <Link
         href="/candidaturas"
         className={buttonClassName({ className: "mt-5" })}
       >
-        Voltar às candidaturas
+        {t("back")}
       </Link>
     </Card>
   );

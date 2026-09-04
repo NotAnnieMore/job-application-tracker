@@ -1,5 +1,8 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+
 import { Badge } from "@/components/ui/badge";
-import { applicationStatusLabels } from "@/features/applications/constants";
 import type { ApplicationStatusValue } from "@/types/database.types";
 
 const statusVariants = {
@@ -18,9 +21,7 @@ export function ApplicationStatusBadge({
 }: {
   status: ApplicationStatusValue;
 }) {
-  return (
-    <Badge variant={statusVariants[status]}>
-      {applicationStatusLabels[status]}
-    </Badge>
-  );
+  const t = useTranslations("Enums.applicationStatus");
+
+  return <Badge variant={statusVariants[status]}>{t(status)}</Badge>;
 }

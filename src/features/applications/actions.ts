@@ -1,4 +1,5 @@
 "use server";
+import { getTranslations } from "next-intl/server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -19,12 +20,13 @@ const quickStatusValues = new Set(
   applicationStatusOptions.map((option) => option.value),
 );
 
-function validationError(
+async function validationError(
   fieldErrors: NonNullable<ApplicationActionState["fieldErrors"]>,
-): ApplicationActionState {
+): Promise<ApplicationActionState> {
+  const t = await getTranslations("ApplicationActions");
   return {
     status: "error",
-    message: "Revê os campos assinalados.",
+    message: t("reviewFields"),
     fieldErrors,
   };
 }
@@ -62,10 +64,11 @@ async function recruiterIsAvailable(
   );
 }
 
-function saveError(): ApplicationActionState {
+async function saveError(): Promise<ApplicationActionState> {
+  const t = await getTranslations("ApplicationActions");
   return {
     status: "error",
-    message: "Não foi possível guardar a candidatura. Tenta novamente.",
+    message: t("saveFailed"),
   };
 }
 
@@ -80,14 +83,18 @@ export async function createApplicationAction(
   _previousState: ApplicationActionState,
   formData: FormData,
 ): Promise<ApplicationActionState> {
-  const { values, fieldErrors } = validateApplicationForm(formData);
+  const t = await getTranslations("ApplicationActions");
+  const { values, fieldErrors } = validateApplicationForm(
+    formData,
+    await getTranslations("ApplicationValidation"),
+  );
   if (hasApplicationFieldErrors(fieldErrors)) {
     return validationError(fieldErrors);
   }
 
   const user = await requireCurrentUser();
   if (!(await companyBelongsToUser(values.p_company_id, user.id))) {
-    return validationError({ companyId: "Seleciona uma empresa disponível." });
+    return validationError({ companyId: t("availableCompany") });
   }
   if (
     !(await recruiterIsAvailable(
@@ -97,8 +104,7 @@ export async function createApplicationAction(
     ))
   ) {
     return validationError({
-      primaryRecruiterId:
-        "Seleciona um recrutador sem empresa ou associado a esta empresa.",
+      primaryRecruiterId: t("availableRecruiter"),
     });
   }
 
@@ -119,18 +125,22 @@ export async function updateApplicationAction(
   _previousState: ApplicationActionState,
   formData: FormData,
 ): Promise<ApplicationActionState> {
+  const t = await getTranslations("ApplicationActions");
   if (!isValidApplicationId(applicationId)) {
-    return { status: "error", message: "A candidatura indicada não é válida." };
+    return { status: "error", message: t("invalidApplication") };
   }
 
-  const { values, fieldErrors } = validateApplicationForm(formData);
+  const { values, fieldErrors } = validateApplicationForm(
+    formData,
+    await getTranslations("ApplicationValidation"),
+  );
   if (hasApplicationFieldErrors(fieldErrors)) {
     return validationError(fieldErrors);
   }
 
   const user = await requireCurrentUser();
   if (!(await companyBelongsToUser(values.p_company_id, user.id))) {
-    return validationError({ companyId: "Seleciona uma empresa disponível." });
+    return validationError({ companyId: t("availableCompany") });
   }
   if (
     !(await recruiterIsAvailable(
@@ -140,8 +150,7 @@ export async function updateApplicationAction(
     ))
   ) {
     return validationError({
-      primaryRecruiterId:
-        "Seleciona um recrutador sem empresa ou associado a esta empresa.",
+      primaryRecruiterId: t("availableRecruiter"),
     });
   }
 
@@ -155,7 +164,7 @@ export async function updateApplicationAction(
   if (!data) {
     return {
       status: "error",
-      message: "A candidatura já não está disponível.",
+      message: t("unavailable"),
     };
   }
 
@@ -168,11 +177,12 @@ export async function deleteApplicationAction(
   _previousState: ApplicationActionState,
   _formData: FormData,
 ): Promise<ApplicationActionState> {
+  const t = await getTranslations("ApplicationActions");
   void _previousState;
   void _formData;
 
   if (!isValidApplicationId(applicationId)) {
-    return { status: "error", message: "A candidatura indicada não é válida." };
+    return { status: "error", message: t("invalidApplication") };
   }
 
   await requireCurrentUser();
@@ -185,13 +195,13 @@ export async function deleteApplicationAction(
   if (error) {
     return {
       status: "error",
-      message: "Não foi possível eliminar a candidatura. Tenta novamente.",
+      message: t("deleteFailed"),
     };
   }
   if (!data) {
     return {
       status: "error",
-      message: "A candidatura já não está disponível.",
+      message: t("unavailable"),
     };
   }
 
@@ -203,12 +213,13 @@ export async function updateApplicationStatusAction(
   applicationId: string,
   rawStatus: ApplicationStatusValue,
 ): Promise<ApplicationActionState> {
+  const t = await getTranslations("ApplicationActions");
   if (!isValidApplicationId(applicationId)) {
-    return { status: "error", message: "A candidatura indicada não é válida." };
+    return { status: "error", message: t("invalidApplication") };
   }
 
   if (!quickStatusValues.has(rawStatus)) {
-    return { status: "error", message: "Seleciona um estado válido." };
+    return { status: "error", message: t("invalidStatus") };
   }
 
   const user = await requireCurrentUser();
@@ -224,7 +235,7 @@ export async function updateApplicationStatusAction(
   if (error || !data) {
     return {
       status: "error",
-      message: "Não foi possível atualizar o estado. Tenta novamente.",
+      message: t("updateFailed"),
     };
   }
 

@@ -1,6 +1,7 @@
 "use client";
 
 import { ChevronDown, LoaderCircle } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useId, useState, useTransition } from "react";
 
 import { updateInterviewStatusAction } from "@/features/interviews/actions";
@@ -28,6 +29,8 @@ export function InterviewQuickStatusForm({
   status: InterviewStatusValue;
   className?: string;
 }) {
+  const t = useTranslations("Interviews");
+  const tStatus = useTranslations("Enums.interviewStatus");
   const errorId = useId();
   const [selectedStatus, setSelectedStatus] = useState(status);
   const [message, setMessage] = useState<StatusMessage | null>(null);
@@ -49,22 +52,20 @@ export function InterviewQuickStatusForm({
         if (result.status === "warning") {
           setMessage({
             tone: "warning",
-            text:
-              result.message ??
-              "A entrevista foi atualizada, mas a candidatura não.",
+            text: result.message ?? t("statusApplicationWarning"),
           });
           return;
         }
         setSelectedStatus(previousStatus);
         setMessage({
           tone: "error",
-          text: result.message ?? "Não foi possível atualizar o estado.",
+          text: result.message ?? t("statusUpdateFailed"),
         });
       } catch {
         setSelectedStatus(previousStatus);
         setMessage({
           tone: "error",
-          text: "Não foi possível atualizar o estado. Tenta novamente.",
+          text: t("statusUpdateRetry"),
         });
       }
     });
@@ -73,7 +74,7 @@ export function InterviewQuickStatusForm({
   return (
     <div className={cn("min-w-0", className)}>
       <label className="relative block min-w-0">
-        <span className="sr-only">Alterar estado da entrevista</span>
+        <span className="sr-only">{t("changeStatus")}</span>
         <select
           value={selectedStatus}
           disabled={pending}
@@ -89,7 +90,7 @@ export function InterviewQuickStatusForm({
         >
           {interviewStatusOptions.map((option) => (
             <option key={option.value} value={option.value}>
-              {option.label}
+              {tStatus(option.value)}
             </option>
           ))}
         </select>

@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { LoaderCircle, Trash2 } from "lucide-react";
 import { useActionState } from "react";
 
@@ -16,6 +18,7 @@ export function DeleteActionForm({
   description: string;
   returnToApplication?: boolean;
 }) {
+  const t = useTranslations("Tasks");
   const action = deleteActionAction.bind(null, actionId, returnToApplication);
   const [state, formAction, pending] = useActionState(
     action,
@@ -38,7 +41,7 @@ export function DeleteActionForm({
         variant="danger"
         disabled={pending}
         onClick={(event) => {
-          if (!window.confirm(`Eliminar “${description}”?`)) {
+          if (!window.confirm(t("deleteConfirm", { description }))) {
             event.preventDefault();
           }
         }}
@@ -48,7 +51,7 @@ export function DeleteActionForm({
         ) : (
           <Trash2 aria-hidden="true" className="size-4" />
         )}
-        {pending ? "A eliminar..." : "Eliminar tarefa"}
+        {pending ? t("deleting") : t("delete")}
       </Button>
     </form>
   );

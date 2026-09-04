@@ -38,6 +38,46 @@ recuperação de palavra-passe apresentaram:
 
 ## Matriz manual no browser
 
+### Idiomas PT-PT / EN-GB (implementação faseada)
+
+- [ ] alternar o idioma no cabeçalho, na autenticação e nas Definições;
+- [ ] confirmar a persistência após F5 e a manutenção das rotas e da sessão;
+- [ ] abrir uma candidatura e verificar resumo, contratos conhecidos, datas, salários, contagens e notas nos dois idiomas;
+- [ ] confirmar que nomes, textos importados, guiões e notas não são traduzidos nem modificados;
+- [ ] abrir a lista e o resumo de uma entrevista, filtrar e alterar rapidamente o estado;
+- [ ] criar e editar uma entrevista de teste, verificando as sugestões e os botões de guardar superior/inferior;
+- [ ] editar o guião e as perguntas, guardar e confirmar o resumo atualizado;
+- [ ] editar resultado/notas no modal e confirmar os textos e contadores no idioma selecionado;
+- [ ] criar, editar e eliminar uma nota de teste;
+- [ ] alternar PT/EN nas listas de Empresas e Recrutadores e confirmar contagens, pesquisa, filtros e estados vazios;
+- [ ] criar e editar uma empresa/contacto de teste, confirmando que nomes e notas não mudam ao alternar o idioma;
+- [ ] dentro de uma nova candidatura, criar uma empresa pelo modal, pesquisar um logótipo e confirmar a seleção sem perder os campos preenchidos;
+- [ ] pesquisar, selecionar e guardar logótipos em lote, verificando os totais e as mensagens de sucesso/erro;
+- [ ] provocar erros de validação em registos de teste (website inválido, logótipo sem HTTPS, email ou LinkedIn inválidos) e confirmar o idioma da mensagem;
+- [ ] verificar as confirmações de eliminação e cancelar, sem eliminar dados reais;
+- [ ] em Tarefas, combinar e limpar filtros de estado, prioridade, candidatura e prazo nos dois idiomas;
+- [ ] criar/editar uma tarefa de teste com e sem prazo, concluir, reabrir e eliminar, verificando confirmações e mensagens no idioma selecionado;
+- [ ] confirmar erros de descrição, prazo e seleção de candidatura sem modificar dados reais;
+- [ ] na Agenda, alternar filtros de tipo/período e verificar contagens, estados vazios, datas por extenso e indicadores Hoje/Amanhã/Em atraso em PT/EN;
+- [ ] confirmar que horas de entrevistas e datas dos prazos se mantêm ao mudar o idioma, tal como as descrições escritas pelo utilizador;
+- [ ] verificar os ecrãs de carregamento e os estados de registo não encontrado;
+- [ ] em PT/EN, provocar erros locais nos formulários de conta, perfil, candidatura, entrevista e nota; confirmar que a mensagem e os campos assinalados usam o idioma escolhido;
+- [ ] importar uma descrição com mais de 5 000 caracteres e confirmar o aviso antes de aplicar, tanto por link como por texto colado;
+- [ ] confirmar que erros de link inválido, vaga não selecionada e site indisponível são apresentados no idioma escolhido;
+- [ ] abrir um endereço inexistente e verificar o título, explicação e botão da página 404 nos dois idiomas;
+- [ ] numa simulação local de erro, verificar os botões de tentar novamente/regressar ao dashboard; no erro do layout raiz, confirmar o idioma após hidratação e a manutenção do tema;
+- [ ] repetir os fluxos a 375 px e nos temas claro/escuro, verificando texto longo e botões sem cortes.
+- [ ] a 320/375 px, confirmar que os controlos de idioma/tema não se sobrepõem ao logótipo no login/registo e que o seletor de idioma das Definições dispõe de espaço próprio;
+- [ ] em inglês, confirmar que o carregamento de Dashboard/Definições não mostra textos portugueses e que o limite do contador do importador aparece como `5,000`.
+
+Executar também `pnpm test:i18n`, `pnpm test:companies-recruiters` e
+`pnpm test:tasks-calendar`, `pnpm test:remaining-validation` e
+`pnpm test:job-import-messages`. Estes testes
+validam os dicionários e os validadores puros, mas não substituem a revisão visual
+e os testes autenticados. O teste do importador simula todos os acessos externos:
+não verifica a disponibilidade real do LinkedIn, Indeed ou Supabase. Consultar
+[ADR 018](decisions/018-idiomas-pt-en.md) para a cobertura e os textos ainda pendentes.
+
 ### Conta e sessão
 
 - [ ] iniciar e terminar sessão;
@@ -69,6 +109,10 @@ recuperação de palavra-passe apresentaram:
 - [ ] confirmar o fluxo candidatura enviada, entrevista agendada, a aguardar resposta e resultado final;
 - [ ] criar, editar e eliminar um recrutador;
 - [ ] criar, editar e eliminar uma entrevista;
+- [ ] criar entrevistas apenas em candidaturas enviadas (`applied`) ou a aguardar resposta (`awaiting_response`); confirmar que todos os outros estados ficam fora do seletor de criação e não apresentam atalhos de agendamento no detalhe/edição da candidatura;
+- [ ] com o formulário de nova entrevista aberto, rejeitar a candidatura noutro separador e confirmar que guardar é recusado com mensagem PT/EN;
+- [ ] confirmar que o filtro da lista de entrevistas continua a incluir candidaturas terminadas e que entrevistas antigas podem ser consultadas/editadas depois de uma rejeição;
+- [ ] sem candidaturas elegíveis, confirmar a explicação dos estados permitidos e a ligação para consultar candidaturas;
 - [ ] abrir uma entrevista pelo cartão, consultar o resumo e só depois entrar no modo de edição;
 - [ ] alterar o estado diretamente num cartão da lista e no resumo da entrevista, confirmando a atualização sem abrir o formulário completo;
 - [ ] marcar uma entrevista como “Concluída” pela alteração rápida e pelo formulário completo e confirmar que a candidatura passa automaticamente para “A aguardar resposta”, sem substituir estados finais como proposta, rejeitada ou retirada;

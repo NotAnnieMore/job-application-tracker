@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 
 import { AuthFormMessage } from "@/components/auth/auth-form-message";
@@ -17,13 +18,14 @@ export function LoginForm({
 }: {
   initialState?: AuthActionState;
 }) {
+  const t = useTranslations("Auth");
   const [state, formAction] = useActionState(loginAction, initialState);
 
   return (
     <form action={formAction} className="space-y-5">
       <AuthFormMessage state={state} />
       <FormField
-        label="Email"
+        label={t("email")}
         htmlFor="login-email"
         required
         error={state.fieldErrors?.email}
@@ -33,7 +35,7 @@ export function LoginForm({
           name="email"
           type="email"
           autoComplete="email"
-          placeholder="nome@exemplo.pt"
+          placeholder={t("emailPlaceholder")}
           className={fieldClassName}
           aria-invalid={Boolean(state.fieldErrors?.email)}
           aria-describedby={
@@ -43,7 +45,7 @@ export function LoginForm({
         />
       </FormField>
       <FormField
-        label="Palavra-passe"
+        label={t("password")}
         htmlFor="login-password"
         required
         error={state.fieldErrors?.password}
@@ -53,7 +55,7 @@ export function LoginForm({
           name="password"
           type="password"
           autoComplete="current-password"
-          placeholder="A tua palavra-passe"
+          placeholder={t("passwordPlaceholder")}
           className={fieldClassName}
           aria-invalid={Boolean(state.fieldErrors?.password)}
           aria-describedby={
@@ -67,13 +69,10 @@ export function LoginForm({
           href="/recuperar-password"
           className="text-sm font-semibold text-blue-600 hover:text-blue-700"
         >
-          Recuperar palavra-passe
+          {t("forgotPassword")}
         </Link>
       </div>
-      <AuthSubmitButton
-        label="Iniciar sessão"
-        pendingLabel="A iniciar sessão..."
-      />
+      <AuthSubmitButton label={t("login")} pendingLabel={t("loggingIn")} />
     </form>
   );
 }

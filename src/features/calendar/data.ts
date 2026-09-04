@@ -134,8 +134,7 @@ export async function getAgendaData(
           title: context.opportunity.title,
           companyName: context.company.name,
           companyLogoUrl: context.company.logo_url ?? "",
-          description:
-            application.next_action_summary || "Fazer follow-up da candidatura",
+          description: application.next_action_summary || "",
           date: application.follow_up_date,
           scheduledAt: "",
           timing: timingForDate(application.follow_up_date, today),

@@ -1,12 +1,12 @@
 import { AuthShell } from "@/components/auth/auth-shell";
 import { UpdatePasswordForm } from "@/components/auth/update-password-form";
+import { getTranslations } from "next-intl/server";
 
-export default function UpdatePasswordPage() {
+export default async function UpdatePasswordPage() {
+  const t = await getTranslations("Auth.updatePage");
+
   return (
-    <AuthShell
-      title="Definir nova palavra-passe"
-      description="Escolhe uma nova palavra-passe para voltares a aceder à tua conta."
-    >
+    <AuthShell title={t("title")} description={t("description")}>
       <UpdatePasswordForm />
     </AuthShell>
   );

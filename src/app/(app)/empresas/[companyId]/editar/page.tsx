@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { ArrowLeft } from "lucide-react";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -14,6 +15,7 @@ export default async function EditCompanyPage({
 }: {
   params: Promise<{ companyId: string }>;
 }) {
+  const t = await getTranslations("Companies");
   const { companyId } = await params;
   const company = await getCompanyById(companyId);
 
@@ -28,25 +30,23 @@ export default async function EditCompanyPage({
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        Voltar às empresas
+        {t("back")}
       </Link>
       <PageHeader
-        title={`Editar ${company.name}`}
-        description="Atualiza o contexto desta empresa."
+        title={t("editName", { name: company.name })}
+        description={t("editDescription")}
       />
       <CompanyForm
         action={action}
         initialValues={company}
-        submitLabel="Guardar alterações"
+        submitLabel={t("saveChanges")}
       />
 
       <Card className="border-red-200">
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Eliminar empresa</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              A eliminação é bloqueada quando existem vagas associadas.
-            </p>
+            <h2 className="font-bold text-slate-950">{t("delete")}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t("deleteHint")}</p>
           </div>
         </CardHeader>
         <CardContent>

@@ -1,9 +1,14 @@
+import type messages from "../../../messages/en-GB.json";
 import type { ActionActionState } from "@/features/actions/types";
 import type {
   ActionPriorityValue,
   ActionStatusValue,
 } from "@/types/database.types";
 import { isValidUuid } from "@/lib/validation";
+
+type ValidationTranslator = (
+  key: keyof typeof messages.TaskValidation,
+) => string;
 
 const datePattern = /^(\d{4})-(\d{2})-(\d{2})$/u;
 const actionStatuses = new Set<ActionStatusValue>([
@@ -34,7 +39,10 @@ function isValidDate(value: string) {
   );
 }
 
-export function validateActionForm(formData: FormData) {
+export function validateActionForm(
+  formData: FormData,
+  t: ValidationTranslator,
+) {
   const applicationId = readText(formData, "applicationId");
   const description = readText(formData, "description");
   const dueDate = readText(formData, "dueDate");
@@ -43,21 +51,21 @@ export function validateActionForm(formData: FormData) {
   const fieldErrors: NonNullable<ActionActionState["fieldErrors"]> = {};
 
   if (!isValidUuid(applicationId)) {
-    fieldErrors.applicationId = "Seleciona uma candidatura válida.";
+    fieldErrors.applicationId = t("invalidApplication");
   }
   if (!description) {
-    fieldErrors.description = "Descreve a tarefa a realizar.";
+    fieldErrors.description = t("requiredDescription");
   } else if (description.length > 500) {
-    fieldErrors.description = "A descrição pode ter no máximo 500 caracteres.";
+    fieldErrors.description = t("descriptionLength");
   }
   if (dueDate && !isValidDate(dueDate)) {
-    fieldErrors.dueDate = "Indica uma data válida.";
+    fieldErrors.dueDate = t("invalidDate");
   }
   if (!actionStatuses.has(status)) {
-    fieldErrors.status = "Seleciona um estado válido.";
+    fieldErrors.status = t("invalidStatus");
   }
   if (!actionPriorities.has(priority)) {
-    fieldErrors.priority = "Seleciona uma prioridade válida.";
+    fieldErrors.priority = t("invalidPriority");
   }
 
   return {

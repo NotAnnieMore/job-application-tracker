@@ -8,6 +8,7 @@ import {
   Save,
 } from "lucide-react";
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 
@@ -48,6 +49,7 @@ function formatLocalDateForInput(date: Date) {
 
 function SubmitButton({ label }: { label: string }) {
   const { pending } = useFormStatus();
+  const t = useTranslations("ApplicationForm");
 
   return (
     <Button type="submit" disabled={pending}>
@@ -56,7 +58,7 @@ function SubmitButton({ label }: { label: string }) {
       ) : (
         <Save aria-hidden="true" className="size-4" />
       )}
-      {pending ? "A guardar..." : label}
+      {pending ? t("saving") : label}
     </Button>
   );
 }
@@ -80,6 +82,9 @@ export function ApplicationForm({
   useBrowserDateDefault?: boolean;
   startWithJobImport?: boolean;
 }) {
+  const locale = useLocale();
+  const t = useTranslations("ApplicationForm");
+  const enums = useTranslations("Enums");
   const [state, formAction] = useActionState(
     action,
     initialApplicationActionState,
@@ -146,7 +151,7 @@ export function ApplicationForm({
   function addCompany(company: CompanyOption) {
     setCompanyOptions((current) =>
       [...current.filter((option) => option.id !== company.id), company].sort(
-        (left, right) => left.name.localeCompare(right.name, "pt-PT"),
+        (left, right) => left.name.localeCompare(right.name, locale),
       ),
     );
     changeCompany(company.id);
@@ -172,7 +177,7 @@ export function ApplicationForm({
 
     const existingCompany = companyOptions.find(
       (company) =>
-        company.name.localeCompare(data.companyName, "pt-PT", {
+        company.name.localeCompare(data.companyName, locale, {
           sensitivity: "base",
         }) === 0,
     );
@@ -228,9 +233,9 @@ export function ApplicationForm({
       <Card>
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Oportunidade</h2>
+            <h2 className="font-bold text-slate-950">{t("opportunity")}</h2>
             <p className="mt-1 text-sm text-slate-500">
-              Informação principal sobre a vaga.
+              {t("opportunityDescription")}
             </p>
           </div>
           <Button
@@ -238,8 +243,8 @@ export function ApplicationForm({
             variant="secondary"
             size="icon"
             className="shrink-0 sm:h-9 sm:w-auto sm:rounded-lg sm:px-3 sm:text-sm"
-            aria-label="Importar vaga"
-            title="Importar vaga"
+            aria-label={t("importJob")}
+            title={t("importJob")}
             onClick={() => {
               setJobImportInitialUrl(
                 jobUrlRef.current?.value ?? initialValues.jobUrl,
@@ -248,12 +253,12 @@ export function ApplicationForm({
             }}
           >
             <FileSearch aria-hidden="true" className="size-4" />
-            <span className="sr-only sm:not-sr-only">Importar vaga</span>
+            <span className="sr-only sm:not-sr-only">{t("importJob")}</span>
           </Button>
         </CardHeader>
         <CardContent className="grid gap-5 md:grid-cols-2">
           <FormField
-            label="Título da vaga"
+            label={t("jobTitle")}
             htmlFor="application-title"
             required
             error={state.fieldErrors?.title}
@@ -264,7 +269,7 @@ export function ApplicationForm({
               type="text"
               ref={titleRef}
               defaultValue={initialValues.title}
-              placeholder="Ex.: Application Support Engineer"
+              placeholder={t("jobTitlePlaceholder")}
               className={fieldClassName}
               maxLength={200}
               aria-invalid={Boolean(state.fieldErrors?.title)}
@@ -275,10 +280,10 @@ export function ApplicationForm({
             />
           </FormField>
           <FormField
-            label="Empresa"
+            label={t("company")}
             htmlFor="application-company"
             required
-            hint="Se não aparecer, cria-a aqui sem perder os dados da candidatura."
+            hint={t("companyHint")}
             error={state.fieldErrors?.companyId}
           >
             <div className="flex flex-col gap-2 sm:flex-row">
@@ -297,7 +302,7 @@ export function ApplicationForm({
                 required
               >
                 <option value="" disabled>
-                  Selecionar empresa
+                  {t("selectCompany")}
                 </option>
                 {companyOptions.map((company) => (
                   <option key={company.id} value={company.id}>
@@ -312,12 +317,12 @@ export function ApplicationForm({
                 onClick={() => setCompanyModalOpen(true)}
               >
                 <Plus aria-hidden="true" className="size-4" />
-                Criar empresa
+                {t("createCompany")}
               </Button>
             </div>
           </FormField>
           <FormField
-            label="Localização"
+            label={t("location")}
             htmlFor="application-location"
             error={state.fieldErrors?.location}
           >
@@ -327,7 +332,7 @@ export function ApplicationForm({
               type="text"
               ref={locationRef}
               defaultValue={initialValues.location}
-              placeholder="Ex.: Lisboa e Região"
+              placeholder={t("locationPlaceholder")}
               className={fieldClassName}
               maxLength={160}
               aria-invalid={Boolean(state.fieldErrors?.location)}
@@ -339,7 +344,7 @@ export function ApplicationForm({
             />
           </FormField>
           <FormField
-            label="Modalidade"
+            label={t("workMode")}
             htmlFor="application-work-mode"
             error={state.fieldErrors?.workMode}
           >
@@ -356,16 +361,16 @@ export function ApplicationForm({
                   : undefined
               }
             >
-              <option value="">Sem modalidade definida</option>
+              <option value="">{t("noWorkMode")}</option>
               {workModeOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {enums(`workMode.${option.value}`)}
                 </option>
               ))}
             </select>
           </FormField>
           <FormField
-            label="URL da vaga"
+            label={t("jobUrl")}
             htmlFor="application-job-url"
             error={state.fieldErrors?.jobUrl}
           >
@@ -388,7 +393,7 @@ export function ApplicationForm({
             />
           </FormField>
           <FormField
-            label="Tipo de contrato"
+            label={t("employmentType")}
             htmlFor="application-employment-type"
             error={state.fieldErrors?.employmentType}
           >
@@ -405,18 +410,22 @@ export function ApplicationForm({
                   : undefined
               }
             >
-              <option value="">Sem tipo definido</option>
-              <option value="Contrato sem termo">Contrato sem termo</option>
-              <option value="Contrato a termo">Contrato a termo</option>
-              <option value="Prestação de serviços">
-                Prestação de serviços
+              <option value="">{t("noEmploymentType")}</option>
+              <option value="Contrato sem termo">
+                {t("employment.permanent")}
               </option>
-              <option value="Estágio">Estágio</option>
-              <option value="Trainee">Trainee</option>
+              <option value="Contrato a termo">
+                {t("employment.fixedTerm")}
+              </option>
+              <option value="Prestação de serviços">
+                {t("employment.contractor")}
+              </option>
+              <option value="Estágio">{t("employment.internship")}</option>
+              <option value="Trainee">{t("employment.trainee")}</option>
             </select>
           </FormField>
           <FormField
-            label="Salário mínimo"
+            label={t("minimumSalary")}
             htmlFor="application-salary-min"
             error={state.fieldErrors?.salaryMin}
           >
@@ -440,7 +449,7 @@ export function ApplicationForm({
           </FormField>
           <div className="grid grid-cols-[1fr_6rem] gap-2">
             <FormField
-              label="Salário máximo"
+              label={t("maximumSalary")}
               htmlFor="application-salary-max"
               error={state.fieldErrors?.salaryMax}
             >
@@ -463,7 +472,7 @@ export function ApplicationForm({
               />
             </FormField>
             <FormField
-              label="Moeda"
+              label={t("currency")}
               htmlFor="application-currency"
               error={state.fieldErrors?.currency}
             >
@@ -485,9 +494,9 @@ export function ApplicationForm({
           </div>
           <div className="md:col-span-2">
             <FormField
-              label="Competências"
+              label={t("skills")}
               htmlFor="application-skills"
-              hint="Separa as competências com vírgulas."
+              hint={t("skillsHint")}
               error={state.fieldErrors?.skills}
             >
               <input
@@ -508,7 +517,7 @@ export function ApplicationForm({
           </div>
           <div className="md:col-span-2">
             <FormField
-              label="Resumo da vaga"
+              label={t("jobSummary")}
               htmlFor="application-opportunity-summary"
               error={state.fieldErrors?.opportunitySummary}
             >
@@ -518,7 +527,7 @@ export function ApplicationForm({
                 ref={opportunitySummaryRef}
                 rows={4}
                 defaultValue={initialValues.opportunitySummary}
-                placeholder="Responsabilidades, requisitos ou condições importantes..."
+                placeholder={t("jobSummaryPlaceholder")}
                 className={textareaClassName}
                 maxLength={5000}
                 aria-invalid={Boolean(state.fieldErrors?.opportunitySummary)}
@@ -536,15 +545,15 @@ export function ApplicationForm({
       <Card>
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Candidatura</h2>
+            <h2 className="font-bold text-slate-950">{t("application")}</h2>
             <p className="mt-1 text-sm text-slate-500">
-              Estado, datas e acompanhamento do processo.
+              {t("applicationDescription")}
             </p>
           </div>
         </CardHeader>
         <CardContent className="grid gap-5 md:grid-cols-2">
           <FormField
-            label="Estado"
+            label={t("status")}
             htmlFor="application-status"
             required
             error={state.fieldErrors?.status}
@@ -564,13 +573,13 @@ export function ApplicationForm({
             >
               {applicationStatusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {enums(`applicationStatus.${option.value}`)}
                 </option>
               ))}
             </select>
           </FormField>
           <FormField
-            label="Data da candidatura"
+            label={t("applicationDate")}
             htmlFor="application-date"
             required
             error={state.fieldErrors?.applicationDate}
@@ -592,7 +601,7 @@ export function ApplicationForm({
             />
           </FormField>
           <FormField
-            label="Fonte"
+            label={t("source")}
             htmlFor="application-source"
             error={state.fieldErrors?.source}
           >
@@ -602,7 +611,7 @@ export function ApplicationForm({
               type="text"
               ref={sourceRef}
               defaultValue={initialValues.source}
-              placeholder="Ex.: LinkedIn"
+              placeholder={t("sourcePlaceholder")}
               className={fieldClassName}
               maxLength={120}
               aria-invalid={Boolean(state.fieldErrors?.source)}
@@ -614,7 +623,7 @@ export function ApplicationForm({
             />
           </FormField>
           <FormField
-            label="Salário esperado"
+            label={t("expectedSalary")}
             htmlFor="application-expected-salary"
             error={state.fieldErrors?.expectedSalary}
           >
@@ -637,9 +646,9 @@ export function ApplicationForm({
             />
           </FormField>
           <FormField
-            label="Recrutador principal"
+            label={t("primaryRecruiter")}
             htmlFor="application-recruiter"
-            hint="Opcional. São mostrados os contactos sem empresa ou associados à empresa escolhida."
+            hint={t("primaryRecruiterHint")}
             error={state.fieldErrors?.primaryRecruiterId}
           >
             <div className="flex gap-2">
@@ -656,11 +665,11 @@ export function ApplicationForm({
                     : "application-recruiter-hint"
                 }
               >
-                <option value="">Sem recrutador principal</option>
+                <option value="">{t("noPrimaryRecruiter")}</option>
                 {availableRecruiters.map((recruiter) => (
                   <option key={recruiter.id} value={recruiter.id}>
                     {recruiter.name}
-                    {recruiter.companyId ? "" : " · Sem empresa"}
+                    {recruiter.companyId ? "" : ` · ${t("withoutCompany")}`}
                   </option>
                 ))}
               </select>
@@ -671,8 +680,8 @@ export function ApplicationForm({
                     : "/recrutadores/novo"
                 }
                 target="_blank"
-                aria-label="Criar contacto num novo separador"
-                title="Criar contacto num novo separador"
+                aria-label={t("createContactNewTab")}
+                title={t("createContactNewTab")}
                 className={buttonClassName({
                   variant: "secondary",
                   size: "icon",
@@ -683,7 +692,7 @@ export function ApplicationForm({
             </div>
           </FormField>
           <FormField
-            label="Próxima tarefa"
+            label={t("nextTask")}
             htmlFor="application-next-action"
             error={state.fieldErrors?.nextActionSummary}
           >
@@ -692,7 +701,7 @@ export function ApplicationForm({
               name="nextActionSummary"
               type="text"
               defaultValue={initialValues.nextActionSummary}
-              placeholder="Ex.: Enviar follow-up"
+              placeholder={t("nextTaskPlaceholder")}
               className={fieldClassName}
               maxLength={240}
               aria-invalid={Boolean(state.fieldErrors?.nextActionSummary)}
@@ -704,7 +713,7 @@ export function ApplicationForm({
             />
           </FormField>
           <FormField
-            label="Data de follow-up"
+            label={t("followUpDate")}
             htmlFor="application-follow-up"
             error={state.fieldErrors?.followUpDate}
           >
@@ -724,7 +733,7 @@ export function ApplicationForm({
           </FormField>
           <div className="md:col-span-2">
             <FormField
-              label="Notas"
+              label={t("notes")}
               htmlFor="application-notes"
               error={state.fieldErrors?.summaryNotes}
             >
@@ -733,7 +742,7 @@ export function ApplicationForm({
                 name="summaryNotes"
                 rows={5}
                 defaultValue={initialValues.summaryNotes}
-                placeholder="Estado do anúncio, atividade da empresa ou outro contexto..."
+                placeholder={t("notesPlaceholder")}
                 className={textareaClassName}
                 maxLength={5000}
                 aria-invalid={Boolean(state.fieldErrors?.summaryNotes)}
@@ -752,18 +761,18 @@ export function ApplicationForm({
         <CardHeader>
           <div>
             <h2 className="font-bold text-slate-950">
-              Preparação para entrevistas
+              {t("interviewPreparation")}
             </h2>
             <p className="mt-1 text-sm text-slate-500">
-              Deixa respostas e perguntas preparadas antes de serem necessárias.
+              {t("interviewPreparationDescription")}
             </p>
           </div>
         </CardHeader>
         <CardContent className="grid gap-5 lg:grid-cols-2">
           <FormField
-            label="Guião pessoal e CV"
+            label={t("personalScript")}
             htmlFor="application-interview-preparation"
-            hint="Questões comuns sobre ti, exemplos e pontos do CV a destacar."
+            hint={t("personalScriptHint")}
             error={state.fieldErrors?.interviewPreparation}
           >
             <textarea
@@ -771,7 +780,7 @@ export function ApplicationForm({
               name="interviewPreparation"
               rows={9}
               defaultValue={initialValues.interviewPreparation}
-              placeholder="Fala-me sobre ti...&#10;Porque estás interessado nesta vaga?..."
+              placeholder={t("personalScriptPlaceholder")}
               className={textareaClassName}
               maxLength={10000}
               aria-invalid={Boolean(state.fieldErrors?.interviewPreparation)}
@@ -783,9 +792,9 @@ export function ApplicationForm({
             />
           </FormField>
           <FormField
-            label="Perguntas para a empresa"
+            label={t("companyQuestions")}
             htmlFor="application-company-questions"
-            hint="Perguntas sobre equipa, função, desafios, cultura ou próximos passos."
+            hint={t("companyQuestionsHint")}
             error={state.fieldErrors?.questionsForCompany}
           >
             <textarea
@@ -793,7 +802,7 @@ export function ApplicationForm({
               name="questionsForCompany"
               rows={9}
               defaultValue={initialValues.questionsForCompany}
-              placeholder="Como é medido o sucesso nesta função?..."
+              placeholder={t("companyQuestionsPlaceholder")}
               className={textareaClassName}
               maxLength={10000}
               aria-invalid={Boolean(state.fieldErrors?.questionsForCompany)}
@@ -812,7 +821,7 @@ export function ApplicationForm({
           href={cancelHref}
           className={buttonClassName({ variant: "secondary" })}
         >
-          Cancelar
+          {t("cancel")}
         </Link>
         <SubmitButton label={submitLabel} />
       </div>

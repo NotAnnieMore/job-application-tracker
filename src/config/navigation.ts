@@ -11,18 +11,26 @@ import {
 } from "lucide-react";
 
 export interface NavigationItem {
-  label: string;
+  labelKey:
+    | "dashboard"
+    | "calendar"
+    | "applications"
+    | "companies"
+    | "recruiters"
+    | "interviews"
+    | "tasks"
+    | "settings";
   href: string;
   icon: LucideIcon;
 }
 
 export const mainNavigation: NavigationItem[] = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Agenda", href: "/agenda", icon: CalendarRange },
-  { label: "Candidaturas", href: "/candidaturas", icon: FileText },
-  { label: "Empresas", href: "/empresas", icon: Building2 },
-  { label: "Recrutadores", href: "/recrutadores", icon: Users },
-  { label: "Entrevistas", href: "/entrevistas", icon: CalendarDays },
-  { label: "Tarefas", href: "/acoes", icon: ListChecks },
-  { label: "Definições", href: "/definicoes", icon: Settings },
+  { labelKey: "dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { labelKey: "calendar", href: "/agenda", icon: CalendarRange },
+  { labelKey: "applications", href: "/candidaturas", icon: FileText },
+  { labelKey: "companies", href: "/empresas", icon: Building2 },
+  { labelKey: "recruiters", href: "/recrutadores", icon: Users },
+  { labelKey: "interviews", href: "/entrevistas", icon: CalendarDays },
+  { labelKey: "tasks", href: "/acoes", icon: ListChecks },
+  { labelKey: "settings", href: "/definicoes", icon: Settings },
 ];

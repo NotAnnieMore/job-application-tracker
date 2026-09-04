@@ -12,6 +12,7 @@ import type {
   DashboardInterview,
   DashboardTrendPoint,
 } from "@/features/dashboard/types";
+import type { AppLocale } from "@/i18n/config";
 import { requireCurrentUser } from "@/lib/auth/session";
 import { createClient } from "@/lib/supabase/server";
 import type { ApplicationStatusValue } from "@/types/database.types";
@@ -71,6 +72,7 @@ function getApplicationTrend(
   applications: DashboardApplication[],
   currentYear: number,
   currentMonth: number,
+  locale: AppLocale,
 ): DashboardTrendPoint[] {
   const currentMonthIndex = currentYear * 12 + currentMonth - 1;
   const values = Array.from({ length: 6 }, (_, index) => {
@@ -81,13 +83,13 @@ function getApplicationTrend(
 
     return {
       key,
-      label: new Intl.DateTimeFormat("pt-PT", {
+      label: new Intl.DateTimeFormat(locale, {
         month: "short",
         timeZone: "UTC",
       })
         .format(new Date(Date.UTC(year, month - 1, 1)))
         .replace(".", "")
-        .toLocaleUpperCase("pt-PT"),
+        .toLocaleUpperCase(locale),
       value: applications.filter((application) =>
         application.applicationDate.startsWith(key),
       ).length,
@@ -101,15 +103,8 @@ function getApplicationTrend(
   }));
 }
 
-function activityLabel(
-  createdAt: string,
-  updatedAt: string,
-  labels: {
-    created: string;
-    updated: string;
-  },
-) {
-  return createdAt === updatedAt ? labels.created : labels.updated;
+function activityChange(createdAt: string, updatedAt: string) {
+  return createdAt === updatedAt ? ("created" as const) : ("updated" as const);
 }
 
 function toDashboardApplication(
@@ -143,7 +138,9 @@ function toDashboardApplication(
   };
 }
 
-export async function getDashboardData(): Promise<DashboardData> {
+export async function getDashboardData(
+  locale: AppLocale,
+): Promise<DashboardData> {
   const user = await requireCurrentUser();
   const supabase = await createClient();
   const [
@@ -302,7 +299,6 @@ export async function getDashboardData(): Promise<DashboardData> {
     return [
       {
         status: option.value,
-        label: option.label,
         value,
         percentage:
           applications.length === 0
@@ -367,10 +363,10 @@ export async function getDashboardData(): Promise<DashboardData> {
         {
           id: `application-${application.id}`,
           kind: "application",
-          label: activityLabel(application.created_at, application.updated_at, {
-            created: "Candidatura criada",
-            updated: "Candidatura atualizada",
-          }),
+          change: activityChange(
+            application.created_at,
+            application.updated_at,
+          ),
           description: `${context.opportunity.title} · ${context.company.name}`,
           occurredAt: application.updated_at,
           href: "/candidaturas",
@@ -387,10 +383,7 @@ export async function getDashboardData(): Promise<DashboardData> {
       {
         id: `note-${note.id}`,
         kind: "note",
-        label: activityLabel(note.created_at, note.updated_at, {
-          created: "Nota adicionada",
-          updated: "Nota atualizada",
-        }),
+        change: activityChange(note.created_at, note.updated_at),
         description: `${excerpt}${note.content.length > 72 ? "…" : ""} · ${context.company.name}`,
         occurredAt: note.updated_at,
         href: `/candidaturas/${note.application_id}#notas`,
@@ -407,10 +400,7 @@ export async function getDashboardData(): Promise<DashboardData> {
         {
           id: `interview-${interview.id}`,
           kind: "interview",
-          label: activityLabel(interview.created_at, interview.updated_at, {
-            created: "Entrevista registada",
-            updated: "Entrevista atualizada",
-          }),
+          change: activityChange(interview.created_at, interview.updated_at),
           description: `${interview.interview_type} · ${context.company.name}`,
           occurredAt: interview.updated_at,
           href: "/entrevistas",
@@ -428,10 +418,7 @@ export async function getDashboardData(): Promise<DashboardData> {
         {
           id: `action-${action.id}`,
           kind: "action",
-          label: activityLabel(action.created_at, action.updated_at, {
-            created: "Tarefa criada",
-            updated: "Tarefa atualizada",
-          }),
+          change: activityChange(action.created_at, action.updated_at),
           description: `${action.description} · ${context.company.name}`,
           occurredAt: action.updated_at,
           href: "/acoes",
@@ -452,6 +439,7 @@ export async function getDashboardData(): Promise<DashboardData> {
     applications,
     todayParts.year,
     todayParts.month,
+    locale,
   );
   const sentApplications = applications.filter(
     (application) => application.status !== "interested",

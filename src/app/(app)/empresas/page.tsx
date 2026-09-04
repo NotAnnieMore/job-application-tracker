@@ -10,6 +10,7 @@ import {
   WandSparkles,
 } from "lucide-react";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 import { CompanyLogo } from "@/components/companies/company-logo";
 import { EmptyState } from "@/components/shared/empty-state";
@@ -18,25 +19,19 @@ import { SuccessToast } from "@/components/shared/success-toast";
 import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { getCompanies } from "@/features/companies/data";
-import type { WorkModeValue } from "@/types/database.types";
-
-const workModeLabels: Record<WorkModeValue, string> = {
-  remote: "Remoto",
-  hybrid: "Híbrido",
-  onsite: "Presencial",
-};
-
-const notices: Record<string, string> = {
-  "empresa-criada": "Empresa criada com sucesso.",
-  "empresa-atualizada": "Empresa atualizada com sucesso.",
-  "empresa-eliminada": "Empresa eliminada com sucesso.",
-};
 
 export default async function CompaniesPage({
   searchParams,
 }: {
   searchParams: Promise<{ estado?: string | string[] }>;
 }) {
+  const t = await getTranslations("Companies");
+  const tWorkMode = await getTranslations("Enums.workMode");
+  const notices: Record<string, string> = {
+    "empresa-criada": t("created"),
+    "empresa-atualizada": t("updated"),
+    "empresa-eliminada": t("deleted"),
+  };
   const companies = await getCompanies();
   const status = (await searchParams).estado;
   const notice = typeof status === "string" ? notices[status] : undefined;
@@ -47,8 +42,8 @@ export default async function CompaniesPage({
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Empresas"
-        description="Mantém o contexto das empresas associado às tuas oportunidades."
+        title={t("title")}
+        description={t("description")}
         action={
           <div className="flex flex-col gap-2 sm:flex-row">
             {missingLogoCount > 0 ? (
@@ -57,12 +52,12 @@ export default async function CompaniesPage({
                 className={buttonClassName({ variant: "secondary" })}
               >
                 <WandSparkles aria-hidden="true" className="size-4" />
-                Completar logótipos ({missingLogoCount})
+                {t("completeLogosCount", { count: missingLogoCount })}
               </Link>
             ) : null}
             <Link href="/empresas/nova" className={buttonClassName()}>
               <Plus aria-hidden="true" className="size-4" />
-              Nova empresa
+              {t("new")}
             </Link>
           </div>
         }
@@ -73,9 +68,9 @@ export default async function CompaniesPage({
       {companies.length === 0 ? (
         <EmptyState
           icon={Building2}
-          title="Ainda não tens empresas"
-          description="Cria a primeira empresa para começares a associar vagas, recrutadores e candidaturas."
-          actionLabel="Criar primeira empresa"
+          title={t("empty")}
+          description={t("emptyDescription")}
+          actionLabel={t("createFirst")}
           actionHref="/empresas/nova"
         />
       ) : (
@@ -90,12 +85,12 @@ export default async function CompaniesPage({
                       {company.name}
                     </h2>
                     <p className="mt-1 truncate text-sm text-slate-500">
-                      {company.industry || "Setor por definir"}
+                      {company.industry || t("noIndustry")}
                     </p>
                   </div>
                   <Link
                     href={`/empresas/${company.id}/editar`}
-                    aria-label={`Editar ${company.name}`}
+                    aria-label={t("editName", { name: company.name })}
                     className="flex size-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
                   >
                     <Pencil aria-hidden="true" className="size-4" />
@@ -107,9 +102,9 @@ export default async function CompaniesPage({
                       aria-hidden="true"
                       className="size-4 text-slate-400"
                     />
-                    {company.location || "Localização por definir"}
+                    {company.location || t("noLocation")}
                     {company.workMode
-                      ? ` · ${workModeLabels[company.workMode]}`
+                      ? ` · ${tWorkMode(company.workMode)}`
                       : ""}
                   </p>
                   <p className="flex items-center gap-2">
@@ -117,7 +112,7 @@ export default async function CompaniesPage({
                       aria-hidden="true"
                       className="size-4 text-slate-400"
                     />
-                    {company.applicationCount} candidatura(s)
+                    {t("applicationCount", { count: company.applicationCount })}
                   </p>
                   <Link
                     href={`/recrutadores?empresa=${company.id}`}
@@ -127,7 +122,7 @@ export default async function CompaniesPage({
                       aria-hidden="true"
                       className="size-4 text-slate-400"
                     />
-                    {company.recruiterCount} contacto(s)
+                    {t("contactCount", { count: company.recruiterCount })}
                   </Link>
                   {company.website ? (
                     <a
@@ -137,7 +132,7 @@ export default async function CompaniesPage({
                       className="flex items-center gap-2 font-medium text-blue-600 hover:text-blue-700"
                     >
                       <Globe2 aria-hidden="true" className="size-4" />
-                      Visitar website
+                      {t("visitWebsite")}
                       <ExternalLink aria-hidden="true" className="size-3.5" />
                     </a>
                   ) : null}

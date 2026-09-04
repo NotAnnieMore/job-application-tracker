@@ -1,10 +1,7 @@
+import { getTranslations } from "next-intl/server";
 import { PageSkeleton } from "@/components/shared/page-skeleton";
 
-export default function RecruitersLoading() {
-  return (
-    <PageSkeleton
-      title="Recrutadores"
-      description="Guarda os contactos envolvidos em cada processo."
-    />
-  );
+export default async function RecruitersLoading() {
+  const t = await getTranslations("Recruiters");
+  return <PageSkeleton title={t("title")} description={t("description")} />;
 }

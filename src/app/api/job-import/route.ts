@@ -1,3 +1,5 @@
+import { getTranslations } from "next-intl/server";
+import { JobImportError } from "@/features/job-import/errors";
 import { isIP } from "node:net";
 import { resolve4, resolve6 } from "node:dns/promises";
 
@@ -67,7 +69,7 @@ async function validatePublicUrl(rawUrl: string, normalizeJob = true) {
   try {
     url = new URL(candidate);
   } catch {
-    throw new Error("Introduz um endereço válido para a vaga.");
+    throw new JobImportError("invalidJobUrl");
   }
 
   if (
@@ -75,14 +77,14 @@ async function validatePublicUrl(rawUrl: string, normalizeJob = true) {
     url.username ||
     url.password
   ) {
-    throw new Error("Introduz um endereço HTTP ou HTTPS válido.");
+    throw new JobImportError("invalidProtocol");
   }
   if (
     !url.hostname.includes(".") ||
     url.hostname === "localhost" ||
     url.hostname.endsWith(".local")
   ) {
-    throw new Error("Esse endereço não pode ser consultado.");
+    throw new JobImportError("blockedAddress");
   }
 
   if (normalizeJob) url = normalizeJobUrl(url);
@@ -94,15 +96,14 @@ async function validatePublicUrl(rawUrl: string, normalizeJob = true) {
         ...(await resolve6(url.hostname).catch(() => [])),
       ];
   if (addresses.length === 0 || addresses.some(isPrivateAddress)) {
-    throw new Error("Não foi possível confirmar o endereço da vaga.");
+    throw new JobImportError("unverifiedAddress");
   }
   return url;
 }
 
 async function readLimitedText(response: Response) {
   const declaredLength = Number(response.headers.get("content-length") ?? "0");
-  if (declaredLength > maxHtmlBytes)
-    throw new Error("A página da vaga é demasiado grande.");
+  if (declaredLength > maxHtmlBytes) throw new JobImportError("pageTooLarge");
   if (!response.body) return "";
 
   const reader = response.body.getReader();
@@ -115,7 +116,7 @@ async function readLimitedText(response: Response) {
     total += value.byteLength;
     if (total > maxHtmlBytes) {
       await reader.cancel();
-      throw new Error("A página da vaga é demasiado grande.");
+      throw new JobImportError("pageTooLarge");
     }
     result += decoder.decode(value, { stream: true });
   }
@@ -140,29 +141,25 @@ async function fetchJobPage(initialUrl: URL, allowLinkedIn = false) {
     if (response.status >= 300 && response.status < 400) {
       const location = response.headers.get("location");
       if (!location || redirects === 3)
-        throw new Error("A página redirecionou demasiadas vezes.");
+        throw new JobImportError("tooManyRedirects");
       current = await validatePublicUrl(
         new URL(location, current).toString(),
         false,
       );
       if (!allowLinkedIn && isLinkedInHost(current.hostname.toLowerCase())) {
-        throw new Error(
-          "O LinkedIn só pode ser analisado através do texto colado.",
-        );
+        throw new JobImportError("linkedinTextRequired");
       }
       continue;
     }
-    if (!response.ok)
-      throw new Error("O site não permitiu consultar esta vaga.");
+    if (!response.ok) throw new JobImportError("accessDenied");
     const contentType = response.headers.get("content-type") ?? "";
-    if (!contentType.includes("text/html"))
-      throw new Error("O endereço não corresponde a uma página HTML.");
+    if (!contentType.includes("text/html")) throw new JobImportError("notHtml");
     return {
       html: await readLimitedText(response),
       finalUrl: current.toString(),
     };
   }
-  throw new Error("Não foi possível abrir a página da vaga.");
+  throw new JobImportError("pageFailed");
 }
 
 function indeedImportUrl(url: URL) {
@@ -176,38 +173,27 @@ function indeedImportUrl(url: URL) {
 }
 
 export async function POST(request: Request) {
+  const t = await getTranslations("JobImportMessages");
   const supabase = await createClient();
   const { data: claimsData, error: claimsError } =
     await supabase.auth.getClaims();
   if (claimsError || !claimsData?.claims?.sub) {
-    return jobImportResponse(
-      { message: "A tua sessão expirou. Volta a iniciar sessão." },
-      { status: 401 },
-    );
+    return jobImportResponse({ message: t("sessionExpired") }, { status: 401 });
   }
 
   let payload: { url?: unknown; text?: unknown };
   try {
     payload = (await request.json()) as { url?: unknown; text?: unknown };
   } catch {
-    return jobImportResponse(
-      { message: "O pedido não é válido." },
-      { status: 400 },
-    );
+    return jobImportResponse({ message: t("invalidRequest") }, { status: 400 });
   }
   const rawUrl = typeof payload.url === "string" ? payload.url.trim() : "";
   const text = typeof payload.text === "string" ? payload.text.trim() : "";
   if (!rawUrl && !text) {
-    return jobImportResponse(
-      { message: "Introduz o link ou cola o texto da vaga." },
-      { status: 400 },
-    );
+    return jobImportResponse({ message: t("inputRequired") }, { status: 400 });
   }
   if (rawUrl.length > 4_000 || text.length > maxTextLength) {
-    return jobImportResponse(
-      { message: "O link ou o texto ultrapassa o tamanho permitido." },
-      { status: 400 },
-    );
+    return jobImportResponse({ message: t("inputTooLong") }, { status: 400 });
   }
 
   try {
@@ -222,19 +208,13 @@ export async function POST(request: Request) {
         const page = await fetchJobPage(url, true);
         pageData = parseLinkedInJobHtml(page.html, page.finalUrl);
         if (!pageData) {
-          warnings.push(
-            "A estrutura pública do LinkedIn não foi reconhecida; revê os dados extraídos do texto.",
-          );
+          warnings.push(t("linkedinUnrecognised"));
         } else {
-          warnings.push(
-            "Dados obtidos da página pública do LinkedIn. Confirma sempre a modalidade e a descrição.",
-          );
+          warnings.push(t("linkedinReview"));
         }
       } catch (error) {
         if (!text) throw error;
-        warnings.push(
-          "O LinkedIn não permitiu a leitura pública; foram usados os dados do texto.",
-        );
+        warnings.push(t("linkedinFallback"));
       }
     } else if (url) {
       try {
@@ -243,22 +223,15 @@ export async function POST(request: Request) {
         pageData = indeed
           ? parseIndeedJobHtml(page.html, page.finalUrl)
           : parseJobPostingHtml(page.html, page.finalUrl);
-        if (!pageData)
-          warnings.push(
-            "O site não publicou dados estruturados; revê os campos extraídos do texto.",
-          );
+        if (!pageData) warnings.push(t("noStructuredData"));
       } catch (error) {
         if (!text) {
           if (isIndeedHost(url.hostname.toLowerCase())) {
-            throw new Error(
-              "O Indeed não permitiu a leitura automática desta vaga. Podes manter o link e colar também o texto do anúncio.",
-            );
+            throw new JobImportError("indeedBlocked");
           }
           throw error;
         }
-        warnings.push(
-          "O site não permitiu a importação automática; foram usados os dados do texto.",
-        );
+        warnings.push(t("textFallback"));
       }
     }
 
@@ -280,14 +253,13 @@ export async function POST(request: Request) {
         : importedData;
     if (descriptionLength > maxDescriptionLength) {
       warnings.push(
-        `A descrição original tinha ${descriptionLength.toLocaleString("pt-PT")} caracteres. Foram mantidos os primeiros ${maxDescriptionLength.toLocaleString("pt-PT")} para respeitar o limite da candidatura.`,
+        t("descriptionTruncated", { descriptionLength, maxDescriptionLength }),
       );
     }
     if (!data.title && !data.companyName && !data.description) {
       return jobImportResponse(
         {
-          message:
-            "Não foi possível reconhecer os dados. Cola também o texto completo da vaga.",
+          message: t("unrecognised"),
         },
         { status: 422 },
       );
@@ -297,9 +269,7 @@ export async function POST(request: Request) {
     return jobImportResponse(
       {
         message:
-          error instanceof Error
-            ? error.message
-            : "Não foi possível importar a vaga.",
+          error instanceof JobImportError ? t(error.key) : t("importFailed"),
       },
       { status: 422 },
     );

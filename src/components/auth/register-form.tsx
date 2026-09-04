@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 
 import { AuthFormMessage } from "@/components/auth/auth-form-message";
@@ -10,6 +11,7 @@ import { registerAction } from "@/features/auth/actions";
 import { initialAuthActionState } from "@/features/auth/types";
 
 export function RegisterForm() {
+  const t = useTranslations("Auth");
   const [state, formAction] = useActionState(
     registerAction,
     initialAuthActionState,
@@ -23,7 +25,7 @@ export function RegisterForm() {
           href="/login"
           className="flex h-11 w-full items-center justify-center rounded-xl bg-blue-600 px-4 text-sm font-semibold text-white transition hover:bg-blue-700"
         >
-          Voltar ao início de sessão
+          {t("backToLogin")}
         </Link>
       </div>
     );
@@ -33,7 +35,7 @@ export function RegisterForm() {
     <form action={formAction} className="space-y-5">
       <AuthFormMessage state={state} />
       <FormField
-        label="Nome"
+        label={t("name")}
         htmlFor="register-name"
         required
         error={state.fieldErrors?.name}
@@ -43,7 +45,7 @@ export function RegisterForm() {
           name="name"
           type="text"
           autoComplete="name"
-          placeholder="O teu nome"
+          placeholder={t("namePlaceholder")}
           className={fieldClassName}
           minLength={2}
           maxLength={120}
@@ -55,7 +57,7 @@ export function RegisterForm() {
         />
       </FormField>
       <FormField
-        label="Email"
+        label={t("email")}
         htmlFor="register-email"
         required
         error={state.fieldErrors?.email}
@@ -65,7 +67,7 @@ export function RegisterForm() {
           name="email"
           type="email"
           autoComplete="email"
-          placeholder="nome@exemplo.pt"
+          placeholder={t("emailPlaceholder")}
           className={fieldClassName}
           aria-invalid={Boolean(state.fieldErrors?.email)}
           aria-describedby={
@@ -75,10 +77,10 @@ export function RegisterForm() {
         />
       </FormField>
       <FormField
-        label="Palavra-passe"
+        label={t("password")}
         htmlFor="register-password"
         required
-        hint="Usa entre 12 e 128 caracteres. Uma frase longa é uma boa opção."
+        hint={t("passwordHint")}
         error={state.fieldErrors?.password}
       >
         <input
@@ -86,7 +88,7 @@ export function RegisterForm() {
           name="password"
           type="password"
           autoComplete="new-password"
-          placeholder="Criar palavra-passe"
+          placeholder={t("createPassword")}
           className={fieldClassName}
           minLength={12}
           maxLength={128}
@@ -100,7 +102,7 @@ export function RegisterForm() {
         />
       </FormField>
       <FormField
-        label="Confirmar palavra-passe"
+        label={t("confirmPassword")}
         htmlFor="register-confirm-password"
         required
         error={state.fieldErrors?.confirmPassword}
@@ -110,7 +112,7 @@ export function RegisterForm() {
           name="confirmPassword"
           type="password"
           autoComplete="new-password"
-          placeholder="Repetir palavra-passe"
+          placeholder={t("confirmPasswordPlaceholder")}
           className={fieldClassName}
           minLength={12}
           maxLength={128}
@@ -123,7 +125,10 @@ export function RegisterForm() {
           required
         />
       </FormField>
-      <AuthSubmitButton label="Criar conta" pendingLabel="A criar conta..." />
+      <AuthSubmitButton
+        label={t("createAccount")}
+        pendingLabel={t("creatingAccount")}
+      />
     </form>
   );
 }

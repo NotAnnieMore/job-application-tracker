@@ -1,6 +1,7 @@
 "use client";
 
 import { LoaderCircle, Trash2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -14,6 +15,7 @@ export function DeleteApplicationForm({
   applicationId: string;
   title: string;
 }) {
+  const t = useTranslations("Applications");
   const action = deleteApplicationAction.bind(null, applicationId);
   const [state, formAction, pending] = useActionState(
     action,
@@ -36,11 +38,7 @@ export function DeleteApplicationForm({
         variant="danger"
         disabled={pending}
         onClick={(event) => {
-          if (
-            !window.confirm(
-              `Eliminar a candidatura a ${title}? Entrevistas, notas e tarefas associadas também serão eliminadas.`,
-            )
-          ) {
+          if (!window.confirm(t("deleteConfirm", { title }))) {
             event.preventDefault();
           }
         }}
@@ -50,7 +48,7 @@ export function DeleteApplicationForm({
         ) : (
           <Trash2 aria-hidden="true" className="size-4" />
         )}
-        {pending ? "A eliminar..." : "Eliminar candidatura"}
+        {pending ? t("deleting") : t("delete")}
       </Button>
     </form>
   );

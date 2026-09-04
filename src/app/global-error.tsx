@@ -1,6 +1,28 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useSyncExternalStore } from "react";
+import ptMessages from "../../messages/pt-PT.json";
+import enMessages from "../../messages/en-GB.json";
+import { defaultLocale, isAppLocale, localeCookieName } from "@/i18n/config";
+
+// The root error boundary replaces the layout, so no translation provider is available.
+function subscribe() {
+  return () => {};
+}
+function readLocale() {
+  try {
+    const value = document.cookie
+      .split("; ")
+      .find((cookie) => cookie.startsWith(localeCookieName + "="))
+      ?.split("=")[1];
+    return isAppLocale(value) ? value : defaultLocale;
+  } catch {
+    return defaultLocale;
+  }
+}
+function serverLocale() {
+  return defaultLocale;
+}
 
 export default function GlobalError({
   error,
@@ -9,12 +31,14 @@ export default function GlobalError({
   error: Error & { digest?: string };
   unstable_retry: () => void;
 }) {
+  const locale = useSyncExternalStore(subscribe, readLocale, serverLocale);
+  const messages = locale === "en-GB" ? enMessages.Errors : ptMessages.Errors;
   useEffect(() => {
     console.error(error);
   }, [error]);
 
   return (
-    <html lang="pt-PT" data-theme="light" suppressHydrationWarning>
+    <html lang={locale} data-theme="light" suppressHydrationWarning>
       <head>
         <script
           dangerouslySetInnerHTML={{
@@ -49,9 +73,9 @@ export default function GlobalError({
             width: "100%",
           }}
         >
-          <title>Erro | Job Application Tracker</title>
+          <title>{messages.errorTitle}</title>
           <h1 style={{ fontSize: "24px", margin: 0 }}>
-            Não foi possível abrir a aplicação
+            {messages.globalHeading}
           </h1>
           <p
             style={{
@@ -60,7 +84,7 @@ export default function GlobalError({
               margin: "12px 0 0",
             }}
           >
-            Ocorreu um erro inesperado. Tenta carregar novamente.
+            {messages.globalDescription}
           </p>
           <button
             type="button"
@@ -78,7 +102,7 @@ export default function GlobalError({
               padding: "0 18px",
             }}
           >
-            Tentar novamente
+            {messages.retry}
           </button>
         </main>
       </body>

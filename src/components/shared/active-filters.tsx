@@ -1,12 +1,13 @@
 import { X } from "lucide-react";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 
 export type ActiveFilter = {
   label: string;
   value: string;
 };
 
-export function ActiveFilters({
+export async function ActiveFilters({
   filters,
   clearHref,
 }: {
@@ -14,11 +15,12 @@ export function ActiveFilters({
   clearHref: string;
 }) {
   if (filters.length === 0) return null;
+  const t = await getTranslations("Common");
 
   return (
     <div className="flex flex-wrap items-center gap-2 rounded-xl border border-blue-100 bg-blue-50/60 px-4 py-3">
       <span className="mr-1 text-xs font-bold tracking-wide text-blue-800 uppercase">
-        Filtros ativos
+        {t("activeFilters")}
       </span>
       {filters.map((filter) => (
         <span
@@ -34,7 +36,7 @@ export function ActiveFilters({
         className="ml-auto inline-flex items-center gap-1 text-xs font-semibold text-blue-700 hover:text-blue-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
       >
         <X aria-hidden="true" className="size-3.5" />
-        Limpar todos
+        {t("clearAll")}
       </Link>
     </div>
   );

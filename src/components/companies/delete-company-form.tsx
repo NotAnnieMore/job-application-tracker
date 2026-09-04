@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { LoaderCircle, Trash2 } from "lucide-react";
 import { useActionState } from "react";
 
@@ -14,6 +16,7 @@ export function DeleteCompanyForm({
   companyId: string;
   companyName: string;
 }) {
+  const t = useTranslations("Companies");
   const action = deleteCompanyAction.bind(null, companyId);
   const [state, formAction, pending] = useActionState(
     action,
@@ -36,11 +39,7 @@ export function DeleteCompanyForm({
         variant="danger"
         disabled={pending}
         onClick={(event) => {
-          if (
-            !window.confirm(
-              `Eliminar ${companyName}? Esta ação não pode ser anulada.`,
-            )
-          ) {
+          if (!window.confirm(t("deleteConfirm", { name: companyName }))) {
             event.preventDefault();
           }
         }}
@@ -50,7 +49,7 @@ export function DeleteCompanyForm({
         ) : (
           <Trash2 aria-hidden="true" className="size-4" />
         )}
-        {pending ? "A eliminar..." : "Eliminar empresa"}
+        {pending ? t("deleting") : t("delete")}
       </Button>
     </form>
   );

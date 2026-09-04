@@ -1,6 +1,7 @@
 "use client";
 
 import { CheckCircle2, X } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 
 export function SuccessToast({
@@ -10,6 +11,7 @@ export function SuccessToast({
   message?: string;
   queryParam?: string;
 }) {
+  const t = useTranslations("Common");
   const [visible, setVisible] = useState(Boolean(message));
 
   useEffect(() => {
@@ -45,7 +47,7 @@ export function SuccessToast({
       <button
         type="button"
         className="-m-1 flex size-8 shrink-0 items-center justify-center rounded-lg text-emerald-700 hover:bg-emerald-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-emerald-600"
-        aria-label="Fechar mensagem"
+        aria-label={t("closeMessage")}
         onClick={() => setVisible(false)}
       >
         <X aria-hidden="true" className="size-4" />

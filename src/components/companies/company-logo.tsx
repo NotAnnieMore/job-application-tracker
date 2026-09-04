@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { useState } from "react";
 
 import { cn } from "@/lib/utils";
@@ -46,6 +48,7 @@ function CompanyLogoImage({
   logoUrl: string;
   name: string;
 }) {
+  const t = useTranslations("CompanyLogo");
   const [failed, setFailed] = useState(false);
 
   if (failed) return null;
@@ -55,7 +58,7 @@ function CompanyLogoImage({
     // eslint-disable-next-line @next/next/no-img-element
     <img
       src={logoUrl}
-      alt={`Logótipo de ${name}`}
+      alt={t("alt", { name })}
       className="company-logo-surface absolute inset-0 size-full bg-white object-contain p-1"
       onError={() => setFailed(true)}
     />

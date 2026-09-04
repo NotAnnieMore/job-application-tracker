@@ -1,6 +1,7 @@
 "use client";
 
 import { Check, LoaderCircle, RotateCcw } from "lucide-react";
+import { useTranslations } from "next-intl";
 import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -18,6 +19,7 @@ export function ActionQuickStatusForm({
   actionId: string;
   status: ActionStatusValue;
 }) {
+  const t = useTranslations("TaskQuickStatus");
   const serverAction = (
     status === "completed" ? reopenActionAction : completeActionAction
   ).bind(null, actionId);
@@ -36,8 +38,8 @@ export function ActionQuickStatusForm({
         variant={completed ? "secondary" : "primary"}
         size="sm"
         disabled={pending}
-        title={completed ? "Reabrir tarefa" : "Marcar como concluída"}
-        aria-label={completed ? "Reabrir tarefa" : "Marcar como concluída"}
+        title={completed ? t("reopenTask") : t("markCompleted")}
+        aria-label={completed ? t("reopenTask") : t("markCompleted")}
       >
         {pending ? (
           <LoaderCircle aria-hidden="true" className="size-4 animate-spin" />
@@ -47,7 +49,7 @@ export function ActionQuickStatusForm({
           <Check aria-hidden="true" className="size-4" />
         )}
         <span className="hidden sm:inline">
-          {completed ? "Reabrir" : "Concluir"}
+          {completed ? t("reopen") : t("complete")}
         </span>
       </Button>
       {state.message ? (

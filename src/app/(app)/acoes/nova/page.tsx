@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { ArrowLeft, BriefcaseBusiness } from "lucide-react";
 import Link from "next/link";
 
@@ -13,6 +14,7 @@ export default async function NewActionPage({
 }: {
   searchParams: Promise<{ candidatura?: string | string[] }>;
 }) {
+  const t = await getTranslations("Tasks");
   const applications = await getActionApplicationOptions();
   const applicationParam = (await searchParams).candidatura;
   const applicationId =
@@ -28,18 +30,15 @@ export default async function NewActionPage({
         className="inline-flex items-center gap-2 text-sm font-semibold text-slate-600 hover:text-slate-950"
       >
         <ArrowLeft aria-hidden="true" className="size-4" />
-        Voltar às tarefas
+        {t("back")}
       </Link>
-      <PageHeader
-        title="Nova tarefa"
-        description="Regista uma tarefa concreta e o respetivo prazo."
-      />
+      <PageHeader title={t("new")} description={t("newDescription")} />
       {applications.length === 0 ? (
         <EmptyState
           icon={BriefcaseBusiness}
-          title="Cria primeiro uma candidatura"
-          description="Cada tarefa precisa de estar associada a uma candidatura existente."
-          actionLabel="Criar candidatura"
+          title={t("createApplicationFirst")}
+          description={t("createApplicationFirstDescription")}
+          actionLabel={t("createApplication")}
           actionHref="/candidaturas/nova"
         />
       ) : (
@@ -47,7 +46,7 @@ export default async function NewActionPage({
           action={createActionAction}
           applications={applications}
           initialValues={{ ...emptyActionFormValues, applicationId }}
-          submitLabel="Guardar tarefa"
+          submitLabel={t("save")}
         />
       )}
     </div>

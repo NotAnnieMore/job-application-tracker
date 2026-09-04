@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { Check, LoaderCircle, Search, Trash2 } from "lucide-react";
 import { useState } from "react";
 
@@ -33,6 +35,7 @@ export function CompanyLogoField({
   initialLogoUrl: string;
   error?: string;
 }) {
+  const t = useTranslations("CompanyLogo");
   const [logoUrl, setLogoUrl] = useState(initialLogoUrl);
   const [searchState, setSearchState] = useState<SearchState>({
     status: "idle",
@@ -44,7 +47,7 @@ export function CompanyLogoField({
     if (query.length < 2) {
       setSearchState({
         status: "error",
-        message: "Escreve primeiro o nome da empresa.",
+        message: t("nameRequired"),
       });
       return;
     }
@@ -63,7 +66,7 @@ export function CompanyLogoField({
       if (!response.ok) {
         setSearchState({
           status: "error",
-          message: payload.message ?? "Não foi possível procurar logótipos.",
+          message: payload.message ?? t("searchFailed"),
         });
         return;
       }
@@ -72,7 +75,7 @@ export function CompanyLogoField({
     } catch {
       setSearchState({
         status: "error",
-        message: "Não foi possível contactar o serviço de logótipos.",
+        message: t("connectionFailed"),
       });
     }
   }
@@ -88,15 +91,15 @@ export function CompanyLogoField({
       <div className="rounded-2xl border border-slate-200 bg-slate-50/70 p-4 sm:p-5">
         <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
           <CompanyLogo
-            name={companyName || "Empresa"}
+            name={companyName || t("company")}
             logoUrl={logoUrl}
             size="lg"
           />
           <div className="min-w-0 flex-1">
             <FormField
-              label="Logótipo"
+              label={t("label")}
               htmlFor="company-logo-url"
-              hint="Procura automaticamente ou cola um endereço HTTPS. Se ficar vazio, serão mostradas as iniciais."
+              hint={t("hint")}
               error={error}
             >
               <div className="flex flex-col gap-2 sm:flex-row">
@@ -131,16 +134,16 @@ export function CompanyLogoField({
                     <Search aria-hidden="true" className="size-4" />
                   )}
                   {searchState.status === "loading"
-                    ? "A procurar..."
-                    : "Encontrar logótipo"}
+                    ? t("searching")
+                    : t("findLogo")}
                 </Button>
                 {logoUrl ? (
                   <Button
                     type="button"
                     variant="ghost"
                     size="icon"
-                    title="Remover logótipo"
-                    aria-label="Remover logótipo"
+                    title={t("remove")}
+                    aria-label={t("remove")}
                     className="shrink-0"
                     onClick={() => setLogoUrl("")}
                   >
@@ -164,14 +167,11 @@ export function CompanyLogoField({
         {searchState.status === "success" ? (
           <div className="mt-4 border-t border-slate-200 pt-4">
             {searchState.results.length === 0 ? (
-              <p className="text-sm text-slate-600">
-                Não foram encontrados resultados. Podes colar o endereço
-                manualmente ou manter as iniciais.
-              </p>
+              <p className="text-sm text-slate-600">{t("noResults")}</p>
             ) : (
               <>
                 <p className="mb-3 text-xs font-semibold tracking-wide text-slate-500 uppercase">
-                  Confirma a empresa correta
+                  {t("confirmCompany")}
                 </p>
                 <div className="grid gap-2 sm:grid-cols-2">
                   {searchState.results.map((result) => (

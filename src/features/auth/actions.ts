@@ -1,4 +1,5 @@
 "use server";
+import { getTranslations } from "next-intl/server";
 
 import { redirect } from "next/navigation";
 
@@ -13,12 +14,13 @@ import {
 import { getSiteUrl } from "@/lib/auth/site-url";
 import { createClient } from "@/lib/supabase/server";
 
-function validationError(
+async function validationError(
   fieldErrors: NonNullable<AuthActionState["fieldErrors"]>,
-): AuthActionState {
+): Promise<AuthActionState> {
+  const t = await getTranslations("AuthActions");
   return {
     status: "error",
-    message: "Revê os campos assinalados.",
+    message: t("reviewFields"),
     fieldErrors,
   };
 }
@@ -27,7 +29,11 @@ export async function loginAction(
   _previousState: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
-  const { email, password, fieldErrors } = validateEmailPassword(formData);
+  const t = await getTranslations("AuthActions");
+  const { email, password, fieldErrors } = validateEmailPassword(
+    formData,
+    await getTranslations("AuthValidation"),
+  );
 
   if (hasFieldErrors(fieldErrors)) {
     return validationError(fieldErrors);
@@ -39,7 +45,7 @@ export async function loginAction(
   if (error) {
     return {
       status: "error",
-      message: "Email ou palavra-passe incorretos.",
+      message: t("invalidCredentials"),
     };
   }
 
@@ -50,7 +56,11 @@ export async function registerAction(
   _previousState: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
-  const { name, email, password, fieldErrors } = validateRegistration(formData);
+  const t = await getTranslations("AuthActions");
+  const { name, email, password, fieldErrors } = validateRegistration(
+    formData,
+    await getTranslations("AuthValidation"),
+  );
 
   if (hasFieldErrors(fieldErrors)) {
     return validationError(fieldErrors);
@@ -69,8 +79,7 @@ export async function registerAction(
   if (error) {
     return {
       status: "error",
-      message:
-        "Não foi possível criar a conta. Confirma os dados e tenta novamente.",
+      message: t("registerFailed"),
     };
   }
 
@@ -80,8 +89,7 @@ export async function registerAction(
 
   return {
     status: "success",
-    message:
-      "Conta criada. Consulta o teu email e confirma o endereço antes de iniciares sessão.",
+    message: t("registered"),
   };
 }
 
@@ -89,7 +97,11 @@ export async function requestPasswordResetAction(
   _previousState: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
-  const { email, fieldErrors } = validateResetRequest(formData);
+  const t = await getTranslations("AuthActions");
+  const { email, fieldErrors } = validateResetRequest(
+    formData,
+    await getTranslations("AuthValidation"),
+  );
 
   if (hasFieldErrors(fieldErrors)) {
     return validationError(fieldErrors);
@@ -102,8 +114,7 @@ export async function requestPasswordResetAction(
 
   return {
     status: "success",
-    message:
-      "Se existir uma conta com esse email, receberás uma ligação para alterar a palavra-passe.",
+    message: t("resetRequested"),
   };
 }
 
@@ -111,7 +122,11 @@ export async function updatePasswordAction(
   _previousState: AuthActionState,
   formData: FormData,
 ): Promise<AuthActionState> {
-  const { password, fieldErrors } = validatePasswordUpdate(formData);
+  const t = await getTranslations("AuthActions");
+  const { password, fieldErrors } = validatePasswordUpdate(
+    formData,
+    await getTranslations("AuthValidation"),
+  );
 
   if (hasFieldErrors(fieldErrors)) {
     return validationError(fieldErrors);
@@ -124,7 +139,7 @@ export async function updatePasswordAction(
   if (claimsError || !claimsData?.claims?.sub) {
     return {
       status: "error",
-      message: "A ligação expirou. Pede uma nova recuperação de palavra-passe.",
+      message: t("expiredLink"),
     };
   }
 
@@ -133,7 +148,7 @@ export async function updatePasswordAction(
   if (error) {
     return {
       status: "error",
-      message: "Não foi possível atualizar a palavra-passe. Tenta novamente.",
+      message: t("updateFailed"),
     };
   }
 

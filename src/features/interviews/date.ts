@@ -33,33 +33,33 @@ export function lisbonOffsetForInstant(isoValue: string) {
   return Math.round((date.getTime() - localAsUtc) / 60_000).toString();
 }
 
-export function formatInterviewDateTime(isoValue: string) {
-  return new Intl.DateTimeFormat("pt-PT", {
+export function formatInterviewDateTime(isoValue: string, locale = "pt-PT") {
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: "medium",
     timeStyle: "short",
     timeZone: lisbonTimeZone,
   }).format(new Date(isoValue));
 }
 
-export function formatInterviewDay(isoValue: string) {
-  return new Intl.DateTimeFormat("pt-PT", {
+export function formatInterviewDay(isoValue: string, locale = "pt-PT") {
+  return new Intl.DateTimeFormat(locale, {
     day: "2-digit",
     timeZone: lisbonTimeZone,
   }).format(new Date(isoValue));
 }
 
-export function formatInterviewMonth(isoValue: string) {
-  return new Intl.DateTimeFormat("pt-PT", {
+export function formatInterviewMonth(isoValue: string, locale = "pt-PT") {
+  return new Intl.DateTimeFormat(locale, {
     month: "short",
     timeZone: lisbonTimeZone,
   })
     .format(new Date(isoValue))
     .replace(".", "")
-    .toLocaleUpperCase("pt-PT");
+    .toLocaleUpperCase(locale);
 }
 
-export function formatInterviewTime(isoValue: string) {
-  return new Intl.DateTimeFormat("pt-PT", {
+export function formatInterviewTime(isoValue: string, locale = "pt-PT") {
+  return new Intl.DateTimeFormat(locale, {
     hour: "2-digit",
     minute: "2-digit",
     timeZone: lisbonTimeZone,

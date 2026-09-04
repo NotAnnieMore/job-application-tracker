@@ -1,16 +1,18 @@
+import { getTranslations } from "next-intl/server";
 import { ListX } from "lucide-react";
 
 import { EmptyState } from "@/components/shared/empty-state";
 
-export default function ActionNotFound() {
+export default async function ActionNotFound() {
+  const t = await getTranslations("Tasks");
   return (
     <>
-      <title>Tarefa não encontrada | Job Application Tracker</title>
+      <title>{t("notFoundMetadata")}</title>
       <EmptyState
         icon={ListX}
-        title="Tarefa não encontrada"
-        description="Esta tarefa não existe ou já foi eliminada."
-        actionLabel="Voltar às tarefas"
+        title={t("notFound")}
+        description={t("notFoundDescription")}
+        actionLabel={t("back")}
         actionHref="/acoes"
         headingLevel="h1"
       />

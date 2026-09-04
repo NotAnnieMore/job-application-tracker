@@ -1,9 +1,17 @@
+import type messages from "../../../messages/en-GB.json";
+type ValidationTranslator = (
+  key: keyof typeof messages.ProfileValidation,
+  values?: Record<string, string | number>,
+) => string;
 import type { ProfileActionState } from "@/features/profile/types";
 
 export const avatarMaxSize = 2 * 1024 * 1024;
 export const avatarMimeTypes = ["image/jpeg", "image/png", "image/webp"];
 
-export function validateProfileForm(formData: FormData) {
+export function validateProfileForm(
+  formData: FormData,
+  t: ValidationTranslator,
+) {
   const fieldErrors: NonNullable<ProfileActionState["fieldErrors"]> = {};
   const nameValue = formData.get("name");
   const name = typeof nameValue === "string" ? nameValue.trim() : "";
@@ -12,15 +20,15 @@ export function validateProfileForm(formData: FormData) {
     avatarValue instanceof File && avatarValue.size > 0 ? avatarValue : null;
 
   if (!name) {
-    fieldErrors.name = "Indica o teu nome.";
+    fieldErrors.name = t("requiredName");
   } else if (name.length > 120) {
-    fieldErrors.name = "O nome pode ter no máximo 120 caracteres.";
+    fieldErrors.name = t("nameLength");
   }
 
   if (avatar && !avatarMimeTypes.includes(avatar.type)) {
-    fieldErrors.avatar = "Escolhe uma imagem JPG, PNG ou WebP.";
+    fieldErrors.avatar = t("avatarType");
   } else if (avatar && avatar.size > avatarMaxSize) {
-    fieldErrors.avatar = "A imagem não pode ultrapassar 2 MB.";
+    fieldErrors.avatar = t("avatarSize");
   }
 
   return {

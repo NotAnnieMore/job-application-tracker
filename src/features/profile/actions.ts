@@ -1,4 +1,5 @@
 "use server";
+import { getTranslations } from "next-intl/server";
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
@@ -16,12 +17,16 @@ export async function updateProfileAction(
   _previousState: ProfileActionState,
   formData: FormData,
 ): Promise<ProfileActionState> {
-  const { values, fieldErrors } = validateProfileForm(formData);
+  const t = await getTranslations("ProfileActions");
+  const { values, fieldErrors } = validateProfileForm(
+    formData,
+    await getTranslations("ProfileValidation"),
+  );
 
   if (hasProfileFieldErrors(fieldErrors)) {
     return {
       status: "error",
-      message: "Revê os campos assinalados.",
+      message: t("reviewFields"),
       fieldErrors,
     };
   }
@@ -29,9 +34,9 @@ export async function updateProfileAction(
   if (values.avatar && !(await avatarMatchesMimeType(values.avatar))) {
     return {
       status: "error",
-      message: "Revê os campos assinalados.",
+      message: t("reviewFields"),
       fieldErrors: {
-        avatar: "O ficheiro não corresponde a uma imagem válida.",
+        avatar: t("invalidImage"),
       },
     };
   }
@@ -53,7 +58,7 @@ export async function updateProfileAction(
     if (error) {
       return {
         status: "error",
-        message: "Não foi possível guardar a fotografia. Tenta novamente.",
+        message: t("uploadFailed"),
       };
     }
 
@@ -66,7 +71,7 @@ export async function updateProfileAction(
     if (error) {
       return {
         status: "error",
-        message: "Não foi possível remover a fotografia. Tenta novamente.",
+        message: t("removeFailed"),
       };
     }
 
@@ -87,7 +92,7 @@ export async function updateProfileAction(
   if (error || !data) {
     return {
       status: "error",
-      message: "Não foi possível guardar o perfil. Tenta novamente.",
+      message: t("saveFailed"),
     };
   }
 

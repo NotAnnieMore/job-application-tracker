@@ -1,5 +1,10 @@
+import type messages from "../../../messages/en-GB.json";
 import type { RecruiterActionState } from "@/features/recruiters/types";
 import { isValidUuid } from "@/lib/validation";
+
+type ValidationTranslator = (
+  key: keyof typeof messages.RecruiterValidation,
+) => string;
 
 const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/u;
 const phonePattern = /^[+\d\s()./-]+$/u;
@@ -9,7 +14,7 @@ function readText(formData: FormData, field: string) {
   return typeof value === "string" ? value.trim() : "";
 }
 
-function normalizeLinkedInUrl(value: string) {
+function normalizeLinkedInUrl(value: string, t: ValidationTranslator) {
   if (!value) return { linkedinUrl: "" };
   const candidate = /^https?:\/\//i.test(value) ? value : `https://${value}`;
 
@@ -23,7 +28,7 @@ function normalizeLinkedInUrl(value: string) {
     ) {
       return {
         linkedinUrl: "",
-        error: "Introduz um endereço válido do LinkedIn.",
+        error: t("invalidLinkedin"),
       };
     }
 
@@ -31,12 +36,15 @@ function normalizeLinkedInUrl(value: string) {
   } catch {
     return {
       linkedinUrl: "",
-      error: "Introduz um endereço válido do LinkedIn.",
+      error: t("invalidLinkedin"),
     };
   }
 }
 
-export function validateRecruiterForm(formData: FormData) {
+export function validateRecruiterForm(
+  formData: FormData,
+  t: ValidationTranslator,
+) {
   const companyId = readText(formData, "companyId");
   const name = readText(formData, "name");
   const email = readText(formData, "email").toLocaleLowerCase("en-US");
@@ -47,41 +55,43 @@ export function validateRecruiterForm(formData: FormData) {
   const fieldErrors: NonNullable<RecruiterActionState["fieldErrors"]> = {};
 
   if (companyId && !isValidUuid(companyId)) {
-    fieldErrors.companyId = "Seleciona uma empresa válida.";
+    fieldErrors.companyId = t("invalidCompany");
   }
 
   if (!name) {
-    fieldErrors.name = "Introduz o nome do contacto.";
+    fieldErrors.name = t("requiredName");
   } else if (name.length > 160) {
-    fieldErrors.name = "O nome pode ter no máximo 160 caracteres.";
+    fieldErrors.name = t("nameLength");
   }
 
   if (email.length > 254) {
-    fieldErrors.email = "O email pode ter no máximo 254 caracteres.";
+    fieldErrors.email = t("emailLength");
   } else if (email && !emailPattern.test(email)) {
-    fieldErrors.email = "Introduz um email válido.";
+    fieldErrors.email = t("invalidEmail");
   }
 
   if (phone.length > 50) {
-    fieldErrors.phone = "O telefone pode ter no máximo 50 caracteres.";
+    fieldErrors.phone = t("phoneLength");
   } else if (phone && !phonePattern.test(phone)) {
-    fieldErrors.phone = "Introduz um número de telefone válido.";
+    fieldErrors.phone = t("invalidPhone");
   }
 
   if (jobTitle.length > 160) {
-    fieldErrors.jobTitle = "O cargo pode ter no máximo 160 caracteres.";
+    fieldErrors.jobTitle = t("jobTitleLength");
   }
 
-  const { linkedinUrl, error: linkedinError } =
-    normalizeLinkedInUrl(rawLinkedinUrl);
+  const { linkedinUrl, error: linkedinError } = normalizeLinkedInUrl(
+    rawLinkedinUrl,
+    t,
+  );
   if (rawLinkedinUrl.length > 500) {
-    fieldErrors.linkedinUrl = "O endereço pode ter no máximo 500 caracteres.";
+    fieldErrors.linkedinUrl = t("linkedinLength");
   } else if (linkedinError) {
     fieldErrors.linkedinUrl = linkedinError;
   }
 
   if (notes.length > 4000) {
-    fieldErrors.notes = "As notas podem ter no máximo 4000 caracteres.";
+    fieldErrors.notes = t("notesLength");
   }
 
   return {

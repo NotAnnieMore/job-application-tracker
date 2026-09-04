@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { LoaderCircle, Save } from "lucide-react";
 import Link from "next/link";
 import { useActionState, useState } from "react";
@@ -24,6 +26,7 @@ const textareaClassName =
   "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-3 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-50";
 
 function SubmitButton({ label }: { label: string }) {
+  const t = useTranslations("CompanyForm");
   const { pending } = useFormStatus();
 
   return (
@@ -33,7 +36,7 @@ function SubmitButton({ label }: { label: string }) {
       ) : (
         <Save aria-hidden="true" className="size-4" />
       )}
-      {pending ? "A guardar..." : label}
+      {pending ? t("saving") : label}
     </Button>
   );
 }
@@ -47,7 +50,9 @@ export function CompanyForm({
   initialValues: CompanyFormValues;
   submitLabel: string;
 }) {
+  const t = useTranslations("CompanyForm");
   const [state, formAction] = useActionState(action, initialCompanyActionState);
+  const tWorkMode = useTranslations("Enums.workMode");
   const [companyName, setCompanyName] = useState(initialValues.name);
   const [website, setWebsite] = useState(initialValues.website);
 
@@ -66,16 +71,13 @@ export function CompanyForm({
       <Card>
         <CardHeader>
           <div>
-            <h2 className="font-bold text-slate-950">Informação da empresa</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              Apenas o nome é obrigatório. Podes completar o restante mais
-              tarde.
-            </p>
+            <h2 className="font-bold text-slate-950">{t("information")}</h2>
+            <p className="mt-1 text-sm text-slate-500">{t("description")}</p>
           </div>
         </CardHeader>
         <CardContent className="grid gap-5 md:grid-cols-2">
           <FormField
-            label="Nome"
+            label={t("name")}
             htmlFor="company-name"
             required
             error={state.fieldErrors?.name}
@@ -87,7 +89,7 @@ export function CompanyForm({
               autoComplete="organization"
               value={companyName}
               onChange={(event) => setCompanyName(event.target.value)}
-              placeholder="Ex.: Motiva"
+              placeholder={t("namePlaceholder")}
               className={fieldClassName}
               maxLength={160}
               aria-invalid={Boolean(state.fieldErrors?.name)}
@@ -98,9 +100,9 @@ export function CompanyForm({
             />
           </FormField>
           <FormField
-            label="Website"
+            label={t("website")}
             htmlFor="company-website"
-            hint="Podes escrever apenas o domínio, por exemplo empresa.pt."
+            hint={t("websiteHint")}
             error={state.fieldErrors?.website}
           >
             <input
@@ -111,7 +113,7 @@ export function CompanyForm({
               autoComplete="url"
               value={website}
               onChange={(event) => setWebsite(event.target.value)}
-              placeholder="empresa.pt"
+              placeholder={t("websitePlaceholder")}
               className={fieldClassName}
               maxLength={500}
               aria-invalid={Boolean(state.fieldErrors?.website)}
@@ -130,7 +132,7 @@ export function CompanyForm({
             error={state.fieldErrors?.logoUrl}
           />
           <FormField
-            label="Localização"
+            label={t("location")}
             htmlFor="company-location"
             error={state.fieldErrors?.location}
           >
@@ -139,7 +141,7 @@ export function CompanyForm({
               name="location"
               type="text"
               defaultValue={initialValues.location}
-              placeholder="Ex.: Lisboa, Portugal"
+              placeholder={t("locationPlaceholder")}
               className={fieldClassName}
               maxLength={160}
               aria-invalid={Boolean(state.fieldErrors?.location)}
@@ -151,7 +153,7 @@ export function CompanyForm({
             />
           </FormField>
           <FormField
-            label="Setor"
+            label={t("industry")}
             htmlFor="company-industry"
             error={state.fieldErrors?.industry}
           >
@@ -160,7 +162,7 @@ export function CompanyForm({
               name="industry"
               type="text"
               defaultValue={initialValues.industry}
-              placeholder="Ex.: Tecnologias de informação"
+              placeholder={t("industryPlaceholder")}
               className={fieldClassName}
               maxLength={160}
               aria-invalid={Boolean(state.fieldErrors?.industry)}
@@ -172,7 +174,7 @@ export function CompanyForm({
             />
           </FormField>
           <FormField
-            label="Modalidade habitual"
+            label={t("workMode")}
             htmlFor="company-work-mode"
             error={state.fieldErrors?.workMode}
           >
@@ -188,17 +190,17 @@ export function CompanyForm({
                   : undefined
               }
             >
-              <option value="">Sem modalidade definida</option>
-              <option value="remote">Remoto</option>
-              <option value="hybrid">Híbrido</option>
-              <option value="onsite">Presencial</option>
+              <option value="">{t("noWorkMode")}</option>
+              <option value="remote">{tWorkMode("remote")}</option>
+              <option value="hybrid">{tWorkMode("hybrid")}</option>
+              <option value="onsite">{tWorkMode("onsite")}</option>
             </select>
           </FormField>
           <div className="md:col-span-2">
             <FormField
-              label="Notas"
+              label={t("notes")}
               htmlFor="company-notes"
-              hint="Informação útil sobre cultura, produtos ou contexto da empresa."
+              hint={t("notesHint")}
               error={state.fieldErrors?.notes}
             >
               <textarea
@@ -206,7 +208,7 @@ export function CompanyForm({
                 name="notes"
                 rows={5}
                 defaultValue={initialValues.notes}
-                placeholder="Contexto relevante sobre a empresa..."
+                placeholder={t("notesPlaceholder")}
                 className={textareaClassName}
                 maxLength={4000}
                 aria-invalid={Boolean(state.fieldErrors?.notes)}
@@ -226,7 +228,7 @@ export function CompanyForm({
           href="/empresas"
           className={buttonClassName({ variant: "secondary" })}
         >
-          Cancelar
+          {t("cancel")}
         </Link>
         <SubmitButton label={submitLabel} />
       </div>

@@ -1,5 +1,8 @@
+"use client";
+
+import { useTranslations } from "next-intl";
+
 import { Badge } from "@/components/ui/badge";
-import { interviewStatusLabels } from "@/features/interviews/constants";
 import type { InterviewStatusValue } from "@/types/database.types";
 
 const variants: Record<InterviewStatusValue, "blue" | "green" | "neutral"> = {
@@ -13,7 +16,7 @@ export function InterviewStatusBadge({
 }: {
   status: InterviewStatusValue;
 }) {
-  return (
-    <Badge variant={variants[status]}>{interviewStatusLabels[status]}</Badge>
-  );
+  const t = useTranslations("Enums.interviewStatus");
+
+  return <Badge variant={variants[status]}>{t(status)}</Badge>;
 }

@@ -1,5 +1,7 @@
 "use client";
 
+import { useTranslations } from "next-intl";
+
 import { Building2, LoaderCircle, Save, X } from "lucide-react";
 import { useActionState, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
@@ -32,6 +34,8 @@ export function QuickCompanyModal({
   onClose: () => void;
   onCreated: (company: CreatedCompany) => void;
 }) {
+  const t = useTranslations("QuickCompany");
+  const tWorkMode = useTranslations("Enums.workMode");
   const [state, formAction, pending] = useActionState(
     createQuickCompanyAction,
     initialQuickCompanyActionState,
@@ -105,10 +109,10 @@ export function QuickCompanyModal({
             </span>
             <div>
               <h2 id="quick-company-title" className="font-bold text-slate-950">
-                Criar empresa
+                {t("title")}
               </h2>
               <p className="mt-1 text-sm leading-5 text-slate-500">
-                Adiciona os dados essenciais e continua a candidatura.
+                {t("description")}
               </p>
             </div>
           </div>
@@ -116,8 +120,8 @@ export function QuickCompanyModal({
             type="button"
             variant="ghost"
             size="icon"
-            aria-label="Fechar"
-            title="Fechar"
+            aria-label={t("close")}
+            title={t("close")}
             disabled={pending}
             onClick={onClose}
           >
@@ -142,7 +146,7 @@ export function QuickCompanyModal({
 
           <div className="grid gap-5 sm:grid-cols-2">
             <FormField
-              label="Nome"
+              label={t("name")}
               htmlFor="quick-company-name"
               required
               error={state.fieldErrors?.name}
@@ -154,7 +158,7 @@ export function QuickCompanyModal({
                 autoComplete="organization"
                 value={companyName}
                 onChange={(event) => setCompanyName(event.target.value)}
-                placeholder="Ex.: Empresa Exemplo"
+                placeholder={t("namePlaceholder")}
                 className={fieldClassName}
                 maxLength={160}
                 aria-invalid={Boolean(state.fieldErrors?.name)}
@@ -162,9 +166,9 @@ export function QuickCompanyModal({
               />
             </FormField>
             <FormField
-              label="Website"
+              label={t("website")}
               htmlFor="quick-company-website"
-              hint="Opcional. Também ajuda a encontrar o logótipo correto."
+              hint={t("websiteHint")}
               error={state.fieldErrors?.website}
             >
               <input
@@ -175,7 +179,7 @@ export function QuickCompanyModal({
                 autoComplete="url"
                 value={website}
                 onChange={(event) => setWebsite(event.target.value)}
-                placeholder="empresa.pt"
+                placeholder={t("websitePlaceholder")}
                 className={fieldClassName}
                 maxLength={500}
                 aria-invalid={Boolean(state.fieldErrors?.website)}
@@ -189,7 +193,7 @@ export function QuickCompanyModal({
               error={state.fieldErrors?.logoUrl}
             />
             <FormField
-              label="Localização"
+              label={t("location")}
               htmlFor="quick-company-location"
               error={state.fieldErrors?.location}
             >
@@ -198,13 +202,13 @@ export function QuickCompanyModal({
                 name="location"
                 type="text"
                 defaultValue={initialValues?.location ?? ""}
-                placeholder="Ex.: Lisboa"
+                placeholder={t("locationPlaceholder")}
                 className={fieldClassName}
                 maxLength={160}
               />
             </FormField>
             <FormField
-              label="Modalidade habitual"
+              label={t("workMode")}
               htmlFor="quick-company-work-mode"
               error={state.fieldErrors?.workMode}
             >
@@ -214,10 +218,10 @@ export function QuickCompanyModal({
                 defaultValue={initialValues?.workMode ?? ""}
                 className={fieldClassName}
               >
-                <option value="">Sem modalidade definida</option>
+                <option value="">{t("noWorkMode")}</option>
                 {workModeOptions.map((option) => (
                   <option key={option.value} value={option.value}>
-                    {option.label}
+                    {tWorkMode(option.value)}
                   </option>
                 ))}
               </select>
@@ -231,7 +235,7 @@ export function QuickCompanyModal({
               disabled={pending}
               onClick={onClose}
             >
-              Cancelar
+              {t("cancel")}
             </Button>
             <Button type="submit" disabled={pending}>
               {pending ? (
@@ -242,7 +246,7 @@ export function QuickCompanyModal({
               ) : (
                 <Save aria-hidden="true" className="size-4" />
               )}
-              {pending ? "A guardar..." : "Guardar e selecionar"}
+              {pending ? t("saving") : t("saveAndSelect")}
             </Button>
           </div>
         </form>

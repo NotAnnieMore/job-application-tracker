@@ -12,6 +12,7 @@ import {
   X,
 } from "lucide-react";
 import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { AutoSubmitSelect } from "@/components/applications/auto-submit-select";
 import { CompanyLogo } from "@/components/companies/company-logo";
@@ -26,23 +27,17 @@ import {
 } from "@/features/recruiters/data";
 import { isValidUuid } from "@/lib/validation";
 
-const notices: Record<string, string> = {
-  "contacto-criado": "Contacto criado com sucesso.",
-  "contacto-atualizado": "Contacto atualizado com sucesso.",
-  "contacto-eliminado": "Contacto eliminado com sucesso.",
-};
-
 function singleValue(value: string | string[] | undefined) {
   return typeof value === "string" ? value : "";
 }
 
-function recruiterInitials(name: string) {
+function recruiterInitials(name: string, locale: string) {
   return (
     name
       .split(/\s+/)
       .filter(Boolean)
       .slice(0, 2)
-      .map((part) => part[0]?.toLocaleUpperCase("pt-PT"))
+      .map((part) => part[0]?.toLocaleUpperCase(locale))
       .join("") || "?"
   );
 }
@@ -52,6 +47,13 @@ export default async function RecruitersPage({
 }: {
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
+  const locale = await getLocale();
+  const t = await getTranslations("Recruiters");
+  const notices: Record<string, string> = {
+    "contacto-criado": t("created"),
+    "contacto-atualizado": t("updated"),
+    "contacto-eliminado": t("deleted"),
+  };
   const params = await searchParams;
   const query = singleValue(params.q).slice(0, 100);
   const rawCompanyId = singleValue(params.empresa);
@@ -69,12 +71,12 @@ export default async function RecruitersPage({
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Recrutadores"
-        description="Guarda os contactos envolvidos em cada processo."
+        title={t("title")}
+        description={t("description")}
         action={
           <Link href="/recrutadores/novo" className={buttonClassName()}>
             <Plus aria-hidden="true" className="size-4" />
-            Novo contacto
+            {t("new")}
           </Link>
         }
       />
@@ -88,7 +90,7 @@ export default async function RecruitersPage({
           className="grid gap-3 p-4 md:grid-cols-[minmax(15rem,1fr)_16rem_auto]"
         >
           <label className="relative min-w-0">
-            <span className="sr-only">Pesquisar contactos</span>
+            <span className="sr-only">{t("searchContacts")}</span>
             <Search
               aria-hidden="true"
               className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
@@ -97,18 +99,18 @@ export default async function RecruitersPage({
               name="q"
               type="search"
               defaultValue={query}
-              placeholder="Pesquisar nome, cargo, email ou empresa..."
+              placeholder={t("searchPlaceholder")}
               className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pr-3 pl-10 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-3 focus:ring-blue-100"
             />
           </label>
           <label>
-            <span className="sr-only">Filtrar por empresa</span>
+            <span className="sr-only">{t("filterCompany")}</span>
             <AutoSubmitSelect
               name="empresa"
               defaultValue={companyId}
               className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
             >
-              <option value="">Todas as empresas</option>
+              <option value="">{t("allCompanies")}</option>
               {companies.map((company) => (
                 <option key={company.id} value={company.id}>
                   {company.name}
@@ -122,13 +124,13 @@ export default async function RecruitersPage({
               className={buttonClassName({ size: "sm", className: "flex-1" })}
             >
               <Search aria-hidden="true" className="size-4" />
-              Pesquisar
+              {t("search")}
             </button>
             {hasFilters ? (
               <Link
                 href="/recrutadores"
-                aria-label="Limpar filtros"
-                title="Limpar filtros"
+                aria-label={t("clearFilters")}
+                title={t("clearFilters")}
                 className={buttonClassName({
                   variant: "secondary",
                   size: "icon",
@@ -144,17 +146,11 @@ export default async function RecruitersPage({
       {recruiters.length === 0 ? (
         <EmptyState
           icon={hasFilters ? Search : Users}
-          title={
-            hasFilters
-              ? "Nenhum contacto encontrado"
-              : "Ainda não existem contactos"
-          }
+          title={hasFilters ? t("emptyFiltered") : t("empty")}
           description={
-            hasFilters
-              ? "Altera ou limpa os filtros para voltares a ver todos os contactos."
-              : "Adiciona um recrutador ou outro contacto para o associares a empresas e candidaturas."
+            hasFilters ? t("emptyFilteredDescription") : t("emptyDescription")
           }
-          actionLabel={hasFilters ? "Limpar filtros" : "Adicionar contacto"}
+          actionLabel={hasFilters ? t("clearFilters") : t("addContact")}
           actionHref={hasFilters ? "/recrutadores" : "/recrutadores/novo"}
         />
       ) : (
@@ -164,19 +160,19 @@ export default async function RecruitersPage({
               <CardContent>
                 <div className="flex items-start gap-3">
                   <span className="flex size-11 shrink-0 items-center justify-center rounded-xl bg-violet-600 text-xs font-bold text-white">
-                    {recruiterInitials(recruiter.name)}
+                    {recruiterInitials(recruiter.name, locale)}
                   </span>
                   <div className="min-w-0 flex-1">
                     <h2 className="truncate font-bold text-slate-950">
                       {recruiter.name}
                     </h2>
                     <p className="mt-1 truncate text-sm text-slate-500">
-                      {recruiter.jobTitle || "Cargo por definir"}
+                      {recruiter.jobTitle || t("noJobTitle")}
                     </p>
                   </div>
                   <Link
                     href={`/recrutadores/${recruiter.id}/editar`}
-                    aria-label={`Editar ${recruiter.name}`}
+                    aria-label={t("editName", { name: recruiter.name })}
                     className="flex size-9 shrink-0 items-center justify-center rounded-lg text-slate-500 transition hover:bg-slate-100 hover:text-slate-950 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
                   >
                     <Pencil aria-hidden="true" className="size-4" />
@@ -202,7 +198,7 @@ export default async function RecruitersPage({
                         aria-hidden="true"
                         className="size-4 text-slate-400"
                       />
-                      Sem empresa associada
+                      {t("noCompany")}
                     </p>
                   )}
                   {recruiter.email ? (
@@ -237,7 +233,7 @@ export default async function RecruitersPage({
                       className="flex items-center gap-2 font-medium text-blue-600 hover:text-blue-700"
                     >
                       <Link2 aria-hidden="true" className="size-4" />
-                      Abrir LinkedIn
+                      {t("openLinkedin")}
                       <ExternalLink aria-hidden="true" className="size-3.5" />
                     </a>
                   ) : null}
@@ -249,7 +245,9 @@ export default async function RecruitersPage({
                       aria-hidden="true"
                       className="size-4 text-slate-400"
                     />
-                    {recruiter.applicationCount} candidatura(s)
+                    {t("applicationCount", {
+                      count: recruiter.applicationCount,
+                    })}
                   </Link>
                 </div>
 

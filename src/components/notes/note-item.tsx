@@ -1,6 +1,7 @@
 "use client";
 
 import { LoaderCircle, Pencil, Save, Trash2 } from "lucide-react";
+import { useLocale, useTranslations } from "next-intl";
 import { useActionState } from "react";
 
 import { Button } from "@/components/ui/button";
@@ -11,8 +12,8 @@ import { initialNoteActionState } from "@/features/notes/types";
 const textareaClassName =
   "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm leading-6 text-slate-800 outline-none transition focus:border-blue-400 focus:ring-3 focus:ring-blue-100";
 
-function formatNoteDate(value: string) {
-  return new Intl.DateTimeFormat("pt-PT", {
+function formatNoteDate(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
     dateStyle: "medium",
     timeStyle: "short",
     timeZone: "Europe/Lisbon",
@@ -20,6 +21,8 @@ function formatNoteDate(value: string) {
 }
 
 export function NoteItem({ note }: { note: ApplicationNote }) {
+  const locale = useLocale();
+  const t = useTranslations("Notes");
   const updateAction = updateNoteAction.bind(null, note.applicationId, note.id);
   const deleteAction = deleteNoteAction.bind(null, note.applicationId, note.id);
   const [updateState, updateFormAction, updatePending] = useActionState(
@@ -40,8 +43,8 @@ export function NoteItem({ note }: { note: ApplicationNote }) {
             {note.content}
           </p>
           <p className="mt-3 text-xs text-slate-500">
-            {formatNoteDate(note.createdAt)}
-            {wasEdited ? " · editada" : ""}
+            {formatNoteDate(note.createdAt, locale)}
+            {wasEdited ? ` · ${t("edited")}` : ""}
           </p>
         </div>
       </div>
@@ -49,11 +52,11 @@ export function NoteItem({ note }: { note: ApplicationNote }) {
       <details className="group mt-3 border-t border-slate-200 pt-3">
         <summary className="inline-flex cursor-pointer list-none items-center gap-1.5 text-xs font-semibold text-slate-500 hover:text-slate-900">
           <Pencil aria-hidden="true" className="size-3.5" />
-          Editar nota
+          {t("edit")}
         </summary>
         <form action={updateFormAction} className="mt-3 space-y-3">
           <label htmlFor={`note-${note.id}`} className="sr-only">
-            Conteúdo da nota
+            {t("content")}
           </label>
           <textarea
             id={`note-${note.id}`}
@@ -80,7 +83,7 @@ export function NoteItem({ note }: { note: ApplicationNote }) {
               ) : (
                 <Save aria-hidden="true" className="size-4" />
               )}
-              {updatePending ? "A guardar..." : "Guardar nota"}
+              {updatePending ? t("saving") : t("save")}
             </Button>
           </div>
         </form>
@@ -92,7 +95,7 @@ export function NoteItem({ note }: { note: ApplicationNote }) {
             disabled={deletePending}
             className="text-red-600 hover:bg-red-50 hover:text-red-700"
             onClick={(event) => {
-              if (!window.confirm("Eliminar esta nota?")) {
+              if (!window.confirm(t("deleteConfirm"))) {
                 event.preventDefault();
               }
             }}
@@ -105,7 +108,7 @@ export function NoteItem({ note }: { note: ApplicationNote }) {
             ) : (
               <Trash2 aria-hidden="true" className="size-4" />
             )}
-            Eliminar
+            {t("delete")}
           </Button>
           {deleteState.message ? (
             <p role="alert" className="mt-2 text-sm font-medium text-red-600">

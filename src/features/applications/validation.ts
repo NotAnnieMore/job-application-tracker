@@ -1,3 +1,8 @@
+import type messages from "../../../messages/en-GB.json";
+type ValidationTranslator = (
+  key: keyof typeof messages.ApplicationValidation,
+  values?: Record<string, string | number>,
+) => string;
 import type {
   ApplicationActionState,
   ApplicationField,
@@ -27,9 +32,10 @@ function optionalText(
   field: ApplicationField,
   label: string,
   errors: NonNullable<ApplicationActionState["fieldErrors"]>,
+  t: ValidationTranslator,
 ) {
   if (value.length > maxLength) {
-    errors[field] = `${label} pode ter no máximo ${maxLength} caracteres.`;
+    errors[field] = t("textLength", { label, maxLength });
   }
   return value || null;
 }
@@ -39,12 +45,13 @@ function parseOptionalNumber(
   field: ApplicationField,
   label: string,
   errors: NonNullable<ApplicationActionState["fieldErrors"]>,
+  t: ValidationTranslator,
 ) {
   if (!value) return null;
   const parsed = Number(value.replace(",", "."));
 
   if (!Number.isFinite(parsed) || parsed < 0) {
-    errors[field] = `${label} deve ser um valor positivo.`;
+    errors[field] = t("positiveNumber", { label });
     return null;
   }
 
@@ -61,10 +68,11 @@ function normalizeUrl(
   value: string,
   field: ApplicationField,
   errors: NonNullable<ApplicationActionState["fieldErrors"]>,
+  t: ValidationTranslator,
 ) {
   if (!value) return null;
   if (value.length > 1000) {
-    errors[field] = "O endereço pode ter no máximo 1000 caracteres.";
+    errors[field] = t("urlLength");
     return null;
   }
 
@@ -73,17 +81,20 @@ function normalizeUrl(
   try {
     const url = new URL(candidate);
     if (!url.hostname || !["http:", "https:"].includes(url.protocol)) {
-      errors[field] = "Introduz um endereço web válido.";
+      errors[field] = t("invalidUrl");
       return null;
     }
     return url.toString();
   } catch {
-    errors[field] = "Introduz um endereço web válido.";
+    errors[field] = t("invalidUrl");
     return null;
   }
 }
 
-export function validateApplicationForm(formData: FormData) {
+export function validateApplicationForm(
+  formData: FormData,
+  t: ValidationTranslator,
+) {
   const fieldErrors: NonNullable<ApplicationActionState["fieldErrors"]> = {};
   const companyId = readText(formData, "companyId");
   const primaryRecruiterId = readText(formData, "primaryRecruiterId");
@@ -108,17 +119,17 @@ export function validateApplicationForm(formData: FormData) {
   const questionsForCompany = readText(formData, "questionsForCompany");
 
   if (!isValidUuid(companyId)) {
-    fieldErrors.companyId = "Seleciona uma empresa válida.";
+    fieldErrors.companyId = t("invalidCompany");
   }
 
   if (primaryRecruiterId && !isValidUuid(primaryRecruiterId)) {
-    fieldErrors.primaryRecruiterId = "Seleciona um recrutador válido.";
+    fieldErrors.primaryRecruiterId = t("invalidRecruiter");
   }
 
   if (!title) {
-    fieldErrors.title = "Introduz o título da vaga.";
+    fieldErrors.title = t("requiredTitle");
   } else if (title.length > 200) {
-    fieldErrors.title = "O título pode ter no máximo 200 caracteres.";
+    fieldErrors.title = t("titleLength");
   }
 
   let workMode: WorkModeValue | null = null;
@@ -126,30 +137,31 @@ export function validateApplicationForm(formData: FormData) {
     if (workModeValues.has(rawWorkMode as WorkModeValue)) {
       workMode = rawWorkMode as WorkModeValue;
     } else {
-      fieldErrors.workMode = "Seleciona uma modalidade válida.";
+      fieldErrors.workMode = t("invalidWorkMode");
     }
   }
 
   const salaryMin = parseOptionalNumber(
     rawSalaryMin,
     "salaryMin",
-    "O salário mínimo",
+    t("salaryMin"),
     fieldErrors,
+    t,
   );
   const salaryMax = parseOptionalNumber(
     rawSalaryMax,
     "salaryMax",
-    "O salário máximo",
+    t("salaryMax"),
     fieldErrors,
+    t,
   );
 
   if (salaryMin !== null && salaryMax !== null && salaryMin > salaryMax) {
-    fieldErrors.salaryMax =
-      "O salário máximo deve ser igual ou superior ao mínimo.";
+    fieldErrors.salaryMax = t("salaryRange");
   }
 
   if (!/^[A-Z]{3}$/.test(currency)) {
-    fieldErrors.currency = "Usa um código de moeda com três letras, como EUR.";
+    fieldErrors.currency = t("invalidCurrency");
   }
 
   const skills = Array.from(
@@ -161,30 +173,30 @@ export function validateApplicationForm(formData: FormData) {
     ),
   );
   if (skills.length > 30 || skills.some((skill) => skill.length > 80)) {
-    fieldErrors.skills =
-      "Usa no máximo 30 competências, com até 80 caracteres cada.";
+    fieldErrors.skills = t("skillsLength");
   }
 
   let status: ApplicationStatusValue = "applied";
   if (statusValues.has(rawStatus as ApplicationStatusValue)) {
     status = rawStatus as ApplicationStatusValue;
   } else {
-    fieldErrors.status = "Seleciona um estado válido.";
+    fieldErrors.status = t("invalidStatus");
   }
 
   if (!isValidDate(applicationDate)) {
-    fieldErrors.applicationDate = "Introduz uma data válida.";
+    fieldErrors.applicationDate = t("invalidDate");
   }
 
   if (followUpDate && !isValidDate(followUpDate)) {
-    fieldErrors.followUpDate = "Introduz uma data válida.";
+    fieldErrors.followUpDate = t("invalidDate");
   }
 
   const expectedSalary = parseOptionalNumber(
     rawExpectedSalary,
     "expectedSalary",
-    "O salário esperado",
+    t("expectedSalary"),
     fieldErrors,
+    t,
   );
 
   const values: ApplicationTransactionArgs = {
@@ -195,61 +207,68 @@ export function validateApplicationForm(formData: FormData) {
       location,
       160,
       "location",
-      "A localização",
+      t("location"),
       fieldErrors,
+      t,
     ),
     p_work_mode: workMode,
     p_employment_type: optionalText(
       employmentType,
       120,
       "employmentType",
-      "O tipo de contrato",
+      t("employmentType"),
       fieldErrors,
+      t,
     ),
     p_salary_min: salaryMin,
     p_salary_max: salaryMax,
     p_currency: currency,
-    p_job_url: normalizeUrl(jobUrl, "jobUrl", fieldErrors),
+    p_job_url: normalizeUrl(jobUrl, "jobUrl", fieldErrors, t),
     p_skills: skills,
     p_opportunity_summary: optionalText(
       opportunitySummary,
       5000,
       "opportunitySummary",
-      "O resumo da vaga",
+      t("opportunitySummary"),
       fieldErrors,
+      t,
     ),
     p_status: status,
     p_application_date: applicationDate,
-    p_source: optionalText(source, 120, "source", "A fonte", fieldErrors),
+    p_source: optionalText(source, 120, "source", t("source"), fieldErrors, t),
     p_expected_salary: expectedSalary,
     p_summary_notes: optionalText(
       summaryNotes,
       5000,
       "summaryNotes",
-      "As notas",
+      t("summaryNotes"),
       fieldErrors,
+      t,
     ),
     p_next_action_summary: optionalText(
       nextActionSummary,
       240,
       "nextActionSummary",
-      "A próxima tarefa",
+      t("nextActionSummary"),
       fieldErrors,
+      t,
     ),
     p_follow_up_date: followUpDate || null,
     p_interview_preparation: optionalText(
       interviewPreparation,
       10000,
       "interviewPreparation",
-      "O guião de preparação",
+      t("interviewPreparation"),
       fieldErrors,
+      t,
     ),
     p_questions_for_company: optionalText(
       questionsForCompany,
       10000,
       "questionsForCompany",
-      "As perguntas para a empresa",
+      t("questionsForCompany"),
       fieldErrors,
+      t,
     ),
   };
 

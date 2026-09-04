@@ -1,22 +1,22 @@
 "use client";
 
 import { Moon, Sun } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { useTheme } from "@/components/theme/theme-provider";
 
 export function ThemeSettings() {
   const { theme, toggleTheme } = useTheme();
+  const t = useTranslations("Theme");
   const dark = theme === "dark";
 
   return (
     <Card>
       <CardHeader>
         <div>
-          <h2 className="font-bold text-slate-950">Aparência</h2>
-          <p className="mt-1 text-sm text-slate-500">
-            Escolhe o tema utilizado neste browser.
-          </p>
+          <h2 className="font-bold text-slate-950">{t("title")}</h2>
+          <p className="mt-1 text-sm text-slate-500">{t("description")}</p>
         </div>
       </CardHeader>
       <CardContent>
@@ -37,10 +37,10 @@ export function ThemeSettings() {
             </span>
             <span>
               <span className="block text-sm font-semibold text-slate-900">
-                Modo escuro
+                {t("darkMode")}
               </span>
               <span className="mt-0.5 block text-sm text-slate-500">
-                {dark ? "Ativo neste browser" : "Desativado neste browser"}
+                {dark ? t("active") : t("inactive")}
               </span>
             </span>
           </span>

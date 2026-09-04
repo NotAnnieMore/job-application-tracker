@@ -10,6 +10,7 @@ import {
   Video,
 } from "lucide-react";
 import Link from "next/link";
+import { getLocale, getTranslations } from "next-intl/server";
 
 import { AutoSubmitSelect } from "@/components/applications/auto-submit-select";
 import { CompanyLogo } from "@/components/companies/company-logo";
@@ -23,10 +24,7 @@ import { PageHeader } from "@/components/shared/page-header";
 import { SuccessToast } from "@/components/shared/success-toast";
 import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import {
-  interviewFormatLabels,
-  interviewStatusOptions,
-} from "@/features/interviews/constants";
+import { interviewStatusOptions } from "@/features/interviews/constants";
 import {
   formatInterviewDay,
   formatInterviewMonth,
@@ -39,12 +37,6 @@ import {
 import type { InterviewListItem } from "@/features/interviews/types";
 import { isValidUuid } from "@/lib/validation";
 import type { InterviewStatusValue } from "@/types/database.types";
-
-const notices: Record<string, string> = {
-  "entrevista-criada": "Entrevista criada com sucesso.",
-  "entrevista-atualizada": "Entrevista atualizada com sucesso.",
-  "entrevista-eliminada": "Entrevista eliminada com sucesso.",
-};
 
 function singleValue(value: string | string[] | undefined) {
   return typeof value === "string" ? value : "";
@@ -63,8 +55,8 @@ function validDate(value: string) {
   );
 }
 
-function formatDate(value: string) {
-  return new Intl.DateTimeFormat("pt-PT", {
+function formatDate(value: string, locale: string) {
+  return new Intl.DateTimeFormat(locale, {
     day: "2-digit",
     month: "2-digit",
     year: "numeric",
@@ -76,23 +68,29 @@ function isExternalLocation(value: string) {
   return /^https:\/\//iu.test(value);
 }
 
-function InterviewCard({ interview }: { interview: InterviewListItem }) {
+async function InterviewCard({ interview }: { interview: InterviewListItem }) {
+  const [locale, t, tFormat] = await Promise.all([
+    getLocale(),
+    getTranslations("Interviews"),
+    getTranslations("Enums.interviewFormat"),
+  ]);
+
   return (
     <Card className="group relative transition hover:border-blue-200 hover:shadow-md">
       <Link
         href={`/entrevistas/${interview.id}`}
         className="absolute inset-0 rounded-2xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 focus-visible:ring-offset-2"
-        aria-label={`Ver resumo de ${interview.interviewType}`}
+        aria-label={t("viewSummaryFor", { type: interview.interviewType })}
       >
-        <span className="sr-only">Ver resumo da entrevista</span>
+        <span className="sr-only">{t("viewSummary")}</span>
       </Link>
       <CardContent className="pointer-events-none flex flex-col gap-5 sm:flex-row sm:items-start">
         <div className="flex size-16 shrink-0 flex-col items-center justify-center rounded-2xl border border-slate-200 bg-slate-50">
           <span className="text-xl leading-none font-bold text-slate-950">
-            {formatInterviewDay(interview.scheduledAt)}
+            {formatInterviewDay(interview.scheduledAt, locale)}
           </span>
           <span className="mt-1 text-[10px] font-bold tracking-wide text-slate-500">
-            {formatInterviewMonth(interview.scheduledAt)}
+            {formatInterviewMonth(interview.scheduledAt, locale)}
           </span>
         </div>
 
@@ -123,12 +121,12 @@ function InterviewCard({ interview }: { interview: InterviewListItem }) {
           <div className="mt-4 flex flex-wrap gap-x-5 gap-y-2 text-sm text-slate-500">
             <span className="flex items-center gap-2">
               <Clock3 aria-hidden="true" className="size-4" />
-              {formatInterviewTime(interview.scheduledAt)} ·{" "}
-              {interview.durationMinutes} min
+              {formatInterviewTime(interview.scheduledAt, locale)} ·{" "}
+              {t("minutesShort", { count: interview.durationMinutes })}
             </span>
             <span className="flex items-center gap-2">
               <Video aria-hidden="true" className="size-4" />
-              {interviewFormatLabels[interview.format]}
+              {tFormat(interview.format)}
             </span>
             {interview.recruiterName ? (
               <span className="flex items-center gap-2">
@@ -145,7 +143,7 @@ function InterviewCard({ interview }: { interview: InterviewListItem }) {
                   className="pointer-events-auto relative z-10 flex items-center gap-2 font-medium text-blue-600 hover:text-blue-700"
                 >
                   <ExternalLink aria-hidden="true" className="size-4" />
-                  Abrir ligação
+                  {t("openLink")}
                 </a>
               ) : (
                 <span className="flex items-center gap-2">
@@ -166,7 +164,7 @@ function InterviewCard({ interview }: { interview: InterviewListItem }) {
           })}
         >
           <Pencil aria-hidden="true" className="size-4" />
-          Editar
+          {t("edit")}
         </Link>
       </CardContent>
     </Card>
@@ -179,6 +177,11 @@ export default async function InterviewsPage({
   searchParams: Promise<Record<string, string | string[] | undefined>>;
 }) {
   const params = await searchParams;
+  const [locale, t, tStatus] = await Promise.all([
+    getLocale(),
+    getTranslations("Interviews"),
+    getTranslations("Enums.interviewStatus"),
+  ]);
   const rawStatus = singleValue(params.estado);
   const status = validStatus(rawStatus) ? rawStatus : undefined;
   const rawApplicationId = singleValue(params.candidatura);
@@ -196,45 +199,53 @@ export default async function InterviewsPage({
     }),
     getInterviewApplicationOptions(),
   ]);
-  const notice = notices[singleValue(params.aviso)];
+  const noticeKey = singleValue(params.aviso);
+  const notice =
+    noticeKey === "entrevista-criada"
+      ? t("created")
+      : noticeKey === "entrevista-atualizada"
+        ? t("updated")
+        : noticeKey === "entrevista-eliminada"
+          ? t("deleted")
+          : undefined;
   const upcoming = interviews.filter((interview) => interview.isUpcoming);
   const history = interviews.filter((interview) => !interview.isUpcoming);
   const activeFilters: ActiveFilter[] = [
     ...(status
       ? [
           {
-            label: "Estado",
-            value:
-              interviewStatusOptions.find((option) => option.value === status)
-                ?.label ?? status,
+            label: t("status"),
+            value: tStatus(status),
           },
         ]
       : []),
     ...(applicationId
       ? [
           {
-            label: "Candidatura",
+            label: t("application"),
             value:
               applications.find(
                 (application) => application.id === applicationId,
-              )?.title ?? "Desconhecida",
+              )?.title ?? t("unknown"),
           },
         ]
       : []),
-    ...(dateFrom ? [{ label: "Desde", value: formatDate(dateFrom) }] : []),
-    ...(dateTo ? [{ label: "Até", value: formatDate(dateTo) }] : []),
+    ...(dateFrom
+      ? [{ label: t("from"), value: formatDate(dateFrom, locale) }]
+      : []),
+    ...(dateTo ? [{ label: t("to"), value: formatDate(dateTo, locale) }] : []),
   ];
   const hasFilters = activeFilters.length > 0;
 
   return (
     <div className="space-y-6">
       <PageHeader
-        title="Entrevistas"
-        description="Prepara, acompanha e regista o resultado de todas as conversas."
+        title={t("title")}
+        description={t("description")}
         action={
           <Link href="/entrevistas/nova" className={buttonClassName()}>
             <Plus aria-hidden="true" className="size-4" />
-            Nova entrevista
+            {t("new")}
           </Link>
         }
       />
@@ -248,28 +259,28 @@ export default async function InterviewsPage({
           className="grid items-end gap-3 p-4 md:grid-cols-2 xl:grid-cols-[12rem_minmax(16rem,1fr)_12rem_12rem_auto]"
         >
           <label>
-            <span className="sr-only">Filtrar por estado</span>
+            <span className="sr-only">{t("filterStatus")}</span>
             <AutoSubmitSelect
               name="estado"
               defaultValue={status ?? ""}
               className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
             >
-              <option value="">Todos os estados</option>
+              <option value="">{t("allStatuses")}</option>
               {interviewStatusOptions.map((option) => (
                 <option key={option.value} value={option.value}>
-                  {option.label}
+                  {tStatus(option.value)}
                 </option>
               ))}
             </AutoSubmitSelect>
           </label>
           <label>
-            <span className="sr-only">Filtrar por candidatura</span>
+            <span className="sr-only">{t("filterApplication")}</span>
             <AutoSubmitSelect
               name="candidatura"
               defaultValue={applicationId}
               className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
             >
-              <option value="">Todas as candidaturas</option>
+              <option value="">{t("allApplications")}</option>
               {applications.map((application) => (
                 <option key={application.id} value={application.id}>
                   {application.companyName} — {application.title}
@@ -279,7 +290,7 @@ export default async function InterviewsPage({
           </label>
           <label>
             <span className="mb-1 block text-xs font-semibold text-slate-500">
-              Entrevistas desde
+              {t("interviewsFrom")}
             </span>
             <input
               name="desde"
@@ -291,7 +302,7 @@ export default async function InterviewsPage({
           </label>
           <label>
             <span className="mb-1 block text-xs font-semibold text-slate-500">
-              Entrevistas até
+              {t("interviewsTo")}
             </span>
             <input
               name="ate"
@@ -303,7 +314,7 @@ export default async function InterviewsPage({
           </label>
           <button type="submit" className={buttonClassName({ size: "sm" })}>
             <Filter aria-hidden="true" className="size-4" />
-            Aplicar datas
+            {t("applyDates")}
           </button>
         </form>
       </Card>
@@ -313,17 +324,11 @@ export default async function InterviewsPage({
       {interviews.length === 0 ? (
         <EmptyState
           icon={CalendarDays}
-          title={
-            hasFilters
-              ? "Nenhuma entrevista encontrada"
-              : "Ainda não existem entrevistas"
-          }
+          title={hasFilters ? t("emptyFiltered") : t("empty")}
           description={
-            hasFilters
-              ? "Altera ou limpa os filtros para voltares a ver todas as entrevistas."
-              : "Agenda a primeira entrevista para preparares cada etapa num único lugar."
+            hasFilters ? t("emptyFilteredDescription") : t("emptyDescription")
           }
-          actionLabel={hasFilters ? "Limpar filtros" : "Agendar entrevista"}
+          actionLabel={hasFilters ? t("clearFilters") : t("scheduleInterview")}
           actionHref={hasFilters ? "/entrevistas" : "/entrevistas/nova"}
         />
       ) : (
@@ -332,10 +337,10 @@ export default async function InterviewsPage({
             <section className="space-y-4">
               <div>
                 <h2 className="text-lg font-bold text-slate-950">
-                  Próximas entrevistas
+                  {t("upcoming")}
                 </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Ordenadas pela data mais próxima.
+                  {t("upcomingDescription")}
                 </p>
               </div>
               {upcoming.map((interview) => (
@@ -347,9 +352,11 @@ export default async function InterviewsPage({
           {history.length > 0 ? (
             <section className="space-y-4">
               <div>
-                <h2 className="text-lg font-bold text-slate-950">Histórico</h2>
+                <h2 className="text-lg font-bold text-slate-950">
+                  {t("history")}
+                </h2>
                 <p className="mt-1 text-sm text-slate-500">
-                  Entrevistas anteriores, concluídas ou canceladas.
+                  {t("historyDescription")}
                 </p>
               </div>
               {history.map((interview) => (
