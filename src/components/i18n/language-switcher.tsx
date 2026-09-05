@@ -2,7 +2,6 @@
 
 import { Languages, LoaderCircle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
-import { useRouter } from "next/navigation";
 import { useState } from "react";
 
 import { setLocaleAction } from "@/i18n/actions";
@@ -18,7 +17,6 @@ export function LanguageSwitcher({
 }) {
   const currentLocale = useLocale() as AppLocale;
   const t = useTranslations("LocaleSwitcher");
-  const router = useRouter();
   const [pendingLocale, setPendingLocale] = useState<AppLocale | null>(null);
   const changingLocale =
     pendingLocale !== null && pendingLocale !== currentLocale;
@@ -30,7 +28,6 @@ export function LanguageSwitcher({
 
     try {
       await setLocaleAction(locale);
-      router.refresh();
     } catch {
       setPendingLocale(null);
     }

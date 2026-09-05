@@ -1,6 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
+import { refresh } from "next/cache";
 
 import { isAppLocale, localeCookieName } from "@/i18n/config";
 
@@ -14,4 +15,6 @@ export async function setLocaleAction(locale: string) {
     sameSite: "lax",
     secure: process.env.NODE_ENV === "production",
   });
+
+  refresh();
 }
