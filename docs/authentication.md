@@ -51,6 +51,8 @@ NEXT_PUBLIC_SITE_URL=http://localhost:3000
 
 `NEXT_PUBLIC_SITE_URL` é usado nas ligações enviadas por email. Em produção deve ser substituído pelo domínio final HTTPS.
 
+No deployment oficial, o valor é `https://jobs.ivocamacho.com`.
+
 ## Configuração no Supabase
 
 Em **Authentication → URL Configuration**:
@@ -109,11 +111,10 @@ Este teste foi executado com duas contas e concluiu sem erros na Fase 4.
 
 O pedido é feito em `/recuperar-password`. A ligação recebida troca o código por uma sessão em `/auth/callback` e segue para `/atualizar-password`. Depois da alteração, a sessão local termina e o utilizador inicia sessão com a nova palavra-passe.
 
-## Produção
+## Configuração de produção
 
-Antes da publicação será necessário:
+No ambiente publicado:
 
-- alterar Site URL e Redirect URLs para o domínio da Vercel;
-- configurar um serviço SMTP próprio;
-- rever limites de envio de email e proteção contra abuso;
+- definir o **Site URL** como `https://jobs.ivocamacho.com` e permitir `https://jobs.ivocamacho.com/**` em **Redirect URLs**;
+- manter o serviço SMTP personalizado configurado e monitorizar os limites de envio e a proteção contra abuso;
 - repetir os testes com duas contas no ambiente de produção.

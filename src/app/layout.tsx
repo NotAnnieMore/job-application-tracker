@@ -7,6 +7,9 @@ import { ThemeProvider } from "@/components/theme/theme-provider";
 
 import "./globals.css";
 
+const applicationName = "Job Application Tracker";
+const officialUrl = new URL("https://jobs.ivocamacho.com");
+
 const geistSans = Geist({
   variable: "--font-geist-sans",
   subsets: ["latin"],
@@ -19,8 +22,37 @@ const geistMono = Geist_Mono({
 
 export async function generateMetadata(): Promise<Metadata> {
   const t = await getTranslations("Metadata");
+  const description = t("description");
 
-  return { description: t("description") };
+  return {
+    metadataBase: officialUrl,
+    title: applicationName,
+    description,
+    alternates: {
+      canonical: "/",
+    },
+    openGraph: {
+      title: applicationName,
+      description,
+      url: "/",
+      siteName: applicationName,
+      type: "website",
+      images: [
+        {
+          url: "/opengraph-image",
+          width: 1200,
+          height: 630,
+          alt: applicationName,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: applicationName,
+      description,
+      images: ["/opengraph-image"],
+    },
+  };
 }
 
 export default async function RootLayout({

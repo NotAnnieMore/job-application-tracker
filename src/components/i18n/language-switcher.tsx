@@ -3,7 +3,7 @@
 import { Languages, LoaderCircle } from "lucide-react";
 import { useLocale, useTranslations } from "next-intl";
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState } from "react";
 
 import { setLocaleAction } from "@/i18n/actions";
 import { locales, type AppLocale } from "@/i18n/config";
@@ -19,16 +19,21 @@ export function LanguageSwitcher({
   const currentLocale = useLocale() as AppLocale;
   const t = useTranslations("LocaleSwitcher");
   const router = useRouter();
-  const [pending, startTransition] = useTransition();
+  const [pendingLocale, setPendingLocale] = useState<AppLocale | null>(null);
+  const changingLocale =
+    pendingLocale !== null && pendingLocale !== currentLocale;
 
-  function changeLocale(locale: AppLocale) {
-    if (locale === currentLocale || pending) return;
+  async function changeLocale(locale: AppLocale) {
+    if (locale === currentLocale || changingLocale) return;
 
-    startTransition(async () => {
+    setPendingLocale(locale);
+
+    try {
       await setLocaleAction(locale);
-      document.documentElement.lang = locale;
       router.refresh();
-    });
+    } catch {
+      setPendingLocale(null);
+    }
   }
 
   return (
@@ -72,8 +77,8 @@ export function LanguageSwitcher({
               aria-pressed={selected}
               aria-label={t(locale === "pt-PT" ? "portuguese" : "english")}
               title={t(locale === "pt-PT" ? "portuguese" : "english")}
-              disabled={pending}
-              onClick={() => changeLocale(locale)}
+              disabled={changingLocale}
+              onClick={() => void changeLocale(locale)}
               className={cn(
                 "flex h-8 min-w-9 items-center justify-center rounded-lg px-2 text-xs font-bold transition focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600",
                 selected
@@ -81,7 +86,7 @@ export function LanguageSwitcher({
                   : "text-slate-500 hover:text-slate-900",
               )}
             >
-              {pending && !selected ? (
+              {changingLocale && pendingLocale === locale ? (
                 <LoaderCircle
                   aria-hidden="true"
                   className="size-3.5 animate-spin"

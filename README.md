@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://job-application-tracker-cyan-tau.vercel.app/"><strong>Abrir aplicação</strong></a>
+  <a href="https://jobs.ivocamacho.com"><strong>Abrir aplicação</strong></a>
 </p>
 
 <p align="center">
@@ -31,7 +31,7 @@ O Job Application Tracker foi criado para substituir folhas de cálculo e notas 
 A aplicação encontra-se publicada na Vercel e utiliza o Supabase para autenticação, base de dados e armazenamento. Cada conta acede exclusivamente aos seus próprios registos através de políticas de Row Level Security (RLS).
 
 > [!NOTE]
-> A aplicação está online e exige autenticação. Enquanto o projeto utilizar o serviço de email de teste do Supabase, a confirmação de novos registos externos pode estar limitada. Para disponibilizar o registo ao público é necessário configurar um serviço SMTP próprio.
+> A aplicação está online, exige autenticação e utiliza um serviço SMTP personalizado para enviar confirmações de registo e ligações de recuperação de palavra-passe.
 
 ## Funcionalidades
 
