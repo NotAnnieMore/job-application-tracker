@@ -11,6 +11,7 @@ Data: 2 de agosto de 2026
 | Login                   | `/login`              | Iniciar sessão.                                                      |
 | Registo                 | `/registo`            | Criar uma conta.                                                     |
 | Recuperar palavra-passe | `/recuperar-password` | Pedir a recuperação da palavra-passe.                                |
+| Privacidade             | `/privacidade`        | Explicar os dados tratados, finalidades, fornecedores e direitos.    |
 
 ## Área privada
 

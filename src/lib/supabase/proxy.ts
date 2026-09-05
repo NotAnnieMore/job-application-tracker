@@ -8,6 +8,7 @@ const PUBLIC_ROUTES = new Set([
   "/login",
   "/registo",
   "/recuperar-password",
+  "/privacidade",
   "/api/health",
 ]);
 

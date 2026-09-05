@@ -2,6 +2,64 @@
   "Metadata": {
     "description": "Organize as suas candidaturas, entrevistas, contactos de recrutadores e ações de acompanhamento num só lugar."
   },
+  "Privacy": {
+    "linkLabel": "Privacidade",
+    "metadata": {
+      "title": "Privacidade | Job Application Tracker",
+      "description": "Saiba que dados são tratados pelo Job Application Tracker, para que fins e quais são os seus direitos."
+    },
+    "eyebrow": "Informação de privacidade",
+    "title": "Privacidade e dados pessoais",
+    "introduction": "Esta página explica, de forma simples, que dados o Job Application Tracker utiliza para prestar o serviço e como podes gerir a informação associada à tua conta.",
+    "lastUpdated": "Última atualização: 5 de setembro de 2026",
+    "backToApp": "Voltar à aplicação",
+    "controller": {
+      "title": "Responsável pelo tratamento",
+      "description": "O responsável pelo tratamento é o operador do Job Application Tracker, serviço disponibilizado em jobs.ivocamacho.com.",
+      "contact": "Não existe atualmente um endereço público dedicado a privacidade. Os controlos disponíveis na conta são o meio de gestão direta dos dados; será acrescentado um canal próprio quando estiver disponível."
+    },
+    "data": {
+      "title": "Dados que tratamos",
+      "intro": "A aplicação trata apenas a informação necessária para criar a conta e organizar a procura de emprego:",
+      "account": "Dados da conta: email, nome apresentado, avatar e informação necessária à autenticação.",
+      "jobSearch": "Conteúdo introduzido pelo utilizador: candidaturas, empresas, vagas, recrutadores, entrevistas, tarefas, notas e guiões.",
+      "technical": "Dados técnicos essenciais para sessão, segurança e diagnóstico, incluindo cookies de autenticação e registos técnicos mantidos pelos fornecedores.",
+      "imports": "Quando pedes a importação de uma vaga, o endereço e o conteúdo público da página são processados para preencher o formulário."
+    },
+    "purposes": {
+      "title": "Finalidades e fundamentos",
+      "description": "Os dados são utilizados para criar e proteger a conta, prestar as funcionalidades pedidas, guardar preferências, enviar mensagens transacionais de autenticação e diagnosticar falhas. O tratamento necessário ao serviço baseia-se na sua prestação a pedido do utilizador; a segurança e prevenção de abuso assentam no interesse legítimo do operador, quando aplicável.",
+      "noProfiling": "Os dados não são vendidos, não são usados para publicidade e não existe tomada de decisões automatizada ou definição de perfis com efeitos sobre o utilizador."
+    },
+    "providers": {
+      "title": "Serviços técnicos envolvidos",
+      "intro": "Para funcionar, a aplicação recorre aos seguintes fornecedores e serviços:",
+      "supabase": "Supabase, para autenticação, base de dados e armazenamento de avatares.",
+      "vercel": "Vercel, para alojamento e execução da aplicação.",
+      "ovh": "OVHcloud, para o envio de emails transacionais através do SMTP configurado.",
+      "optionalServices": "Serviços públicos de vagas e pesquisa de logótipos apenas quando o utilizador pede explicitamente uma importação ou pesquisa."
+    },
+    "storage": {
+      "title": "Cookies e armazenamento local",
+      "description": "São utilizados cookies essenciais para manter a sessão e a preferência de idioma. O tema claro ou escuro é guardado localmente no browser.",
+      "analytics": "A aplicação não utiliza atualmente cookies de publicidade nem ferramentas próprias de acompanhamento comportamental."
+    },
+    "retention": {
+      "title": "Conservação",
+      "description": "Os dados da conta e da procura de emprego são conservados enquanto a conta permanecer ativa ou até o utilizador eliminar os registos disponíveis na aplicação.",
+      "backups": "Registos técnicos e cópias de segurança podem permanecer durante os períodos limitados definidos pelos fornecedores, quando necessários para segurança, recuperação ou cumprimento de obrigações legais."
+    },
+    "rights": {
+      "title": "Os teus direitos",
+      "description": "Podes consultar e corrigir os teus dados, eliminar registos e, nos termos aplicáveis, pedir acesso, retificação, apagamento, limitação, oposição ou portabilidade. O exercício destes direitos é gratuito, sem prejuízo das exceções previstas na lei.",
+      "accountDeletion": "A eliminação integral da conta ainda não está disponível nesta versão. Está prevista uma opção protegida por confirmação reforçada nas Definições; até lá, os registos podem ser geridos individualmente na aplicação."
+    },
+    "authority": {
+      "title": "Autoridade de controlo",
+      "description": "Se considerares que os teus dados não estão a ser tratados corretamente, tens o direito de apresentar uma reclamação à Comissão Nacional de Proteção de Dados (CNPD).",
+      "link": "Consultar os direitos na CNPD"
+    }
+  },
   "LocaleSwitcher": {
     "title": "Idioma",
     "description": "Escolhe o idioma utilizado na aplicação.",
@@ -115,6 +173,12 @@
       "name": "Nome",
       "email": "Email",
       "emailHint": "O email identifica a tua conta e não pode ser alterado aqui."
+    },
+    "privacy": {
+      "title": "Privacidade e dados",
+      "description": "Consulta como os teus dados são utilizados e protegidos.",
+      "summary": "Informação sobre dados, fornecedores, conservação e direitos.",
+      "open": "Ver privacidade"
     }
   },
   "Enums": {

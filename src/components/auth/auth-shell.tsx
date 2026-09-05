@@ -16,6 +16,7 @@ export async function AuthShell({
   children: React.ReactNode;
 }) {
   const t = await getTranslations("Auth");
+  const privacy = await getTranslations("Privacy");
 
   return (
     <main className="relative grid min-h-screen bg-slate-50 lg:grid-cols-[minmax(0,1fr)_minmax(520px,0.85fr)]">
@@ -58,6 +59,14 @@ export async function AuthShell({
           </h1>
           <p className="mt-2 leading-7 text-slate-500">{description}</p>
           <div className="mt-8">{children}</div>
+          <p className="mt-8 text-center text-sm text-slate-500">
+            <Link
+              href="/privacidade"
+              className="font-semibold text-blue-600 hover:text-blue-700"
+            >
+              {privacy("linkLabel")}
+            </Link>
+          </p>
         </div>
       </section>
     </main>

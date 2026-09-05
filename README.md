@@ -10,6 +10,8 @@
 
 <p align="center">
   <a href="https://jobs.ivocamacho.com"><strong>Abrir aplicação</strong></a>
+  ·
+  <a href="https://jobs.ivocamacho.com/privacidade"><strong>Privacidade</strong></a>
 </p>
 
 <p align="center">
@@ -205,6 +207,7 @@ pnpm build
 - [Autenticação e segurança](docs/authentication.md)
 - [Testes e validação](docs/testing.md)
 - [Interface PT/EN: cobertura e decisões](docs/decisions/018-idiomas-pt-en.md)
+- [Privacidade e transparência](docs/decisions/019-privacidade.md)
 - [Decisões técnicas e funcionais](docs/decisions)
 
 Os documentos de contexto usados durante a conceção permanecem apenas na pasta local ignorada `context/` e não fazem parte do repositório.

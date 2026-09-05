@@ -2,6 +2,64 @@
   "Metadata": {
     "description": "Organize your job applications, interviews, recruiter contacts and follow-up actions in one place."
   },
+  "Privacy": {
+    "linkLabel": "Privacy",
+    "metadata": {
+      "title": "Privacy | Job Application Tracker",
+      "description": "Learn what data the Job Application Tracker processes, why it is used and what your rights are."
+    },
+    "eyebrow": "Privacy information",
+    "title": "Privacy and personal data",
+    "introduction": "This page explains in plain language what data the Job Application Tracker uses to provide the service and how you can manage the information linked to your account.",
+    "lastUpdated": "Last updated: 5 September 2026",
+    "backToApp": "Back to the app",
+    "controller": {
+      "title": "Data controller",
+      "description": "The data controller is the operator of the Job Application Tracker, a service available at jobs.ivocamacho.com.",
+      "contact": "There is currently no public email address dedicated to privacy. The controls available in your account are the direct way to manage your data; a dedicated contact channel will be added when available."
+    },
+    "data": {
+      "title": "Data we process",
+      "intro": "The app processes only the information required to create an account and organise a job search:",
+      "account": "Account data: email, display name, avatar and information required for authentication.",
+      "jobSearch": "Content entered by the user: applications, companies, jobs, recruiters, interviews, tasks, notes and talking points.",
+      "technical": "Technical data required for sessions, security and diagnostics, including authentication cookies and technical logs kept by providers.",
+      "imports": "When you request a job import, the URL and public page content are processed to fill in the form."
+    },
+    "purposes": {
+      "title": "Purposes and legal bases",
+      "description": "Data is used to create and protect your account, provide the requested features, save preferences, send transactional authentication messages and diagnose faults. Processing required for the service is based on providing it at the user's request; security and abuse prevention rely on the operator's legitimate interests where applicable.",
+      "noProfiling": "Data is not sold, is not used for advertising, and there is no automated decision-making or profiling with effects on the user."
+    },
+    "providers": {
+      "title": "Technical services involved",
+      "intro": "The app relies on the following providers and services:",
+      "supabase": "Supabase, for authentication, database and avatar storage.",
+      "vercel": "Vercel, for hosting and running the application.",
+      "ovh": "OVHcloud, for sending transactional email through the configured SMTP service.",
+      "optionalServices": "Public job sites and logo-search services only when the user explicitly requests an import or search."
+    },
+    "storage": {
+      "title": "Cookies and local storage",
+      "description": "Essential cookies are used to maintain the session and language preference. The light or dark theme is stored locally in the browser.",
+      "analytics": "The app does not currently use advertising cookies or its own behavioural tracking tools."
+    },
+    "retention": {
+      "title": "Retention",
+      "description": "Account and job-search data is kept while the account remains active or until the user deletes records available in the app.",
+      "backups": "Technical logs and backups may remain for the limited periods set by providers when required for security, recovery or compliance with legal obligations."
+    },
+    "rights": {
+      "title": "Your rights",
+      "description": "You can view and correct your data, delete records and, where applicable, request access, rectification, erasure, restriction, objection or portability. Exercising these rights is free, subject to exceptions provided by law.",
+      "accountDeletion": "Full account deletion is not yet available in this version. A protected option with reinforced confirmation is planned for Settings; until then, records can be managed individually in the app."
+    },
+    "authority": {
+      "title": "Supervisory authority",
+      "description": "If you believe your data is not being handled correctly, you have the right to lodge a complaint with the Portuguese Data Protection Authority (CNPD).",
+      "link": "Read about your rights at the CNPD"
+    }
+  },
   "LocaleSwitcher": {
     "title": "Language",
     "description": "Choose the language used in the app.",
@@ -115,6 +173,12 @@
       "name": "Name",
       "email": "Email",
       "emailHint": "Your email identifies your account and cannot be changed here."
+    },
+    "privacy": {
+      "title": "Privacy and data",
+      "description": "See how your data is used and protected.",
+      "summary": "Information about data, providers, retention and your rights.",
+      "open": "View privacy"
     }
   },
   "Enums": {
