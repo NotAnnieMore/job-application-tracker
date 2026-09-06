@@ -203,13 +203,13 @@ export default async function ApplicationsPage({
 
       <SuccessToast message={notice} />
 
-      <Card>
+      <Card data-tour="applications">
         <form
           action="/candidaturas"
           method="get"
-          className="grid gap-3 p-4 md:grid-cols-2 xl:grid-cols-4"
+          className="grid items-end gap-3 p-4 md:grid-cols-2 xl:grid-cols-12"
         >
-          <label className="relative min-w-0 md:col-span-2">
+          <label className="relative min-w-0 md:col-span-2 xl:col-span-6">
             <span className="sr-only">{t("search")}</span>
             <Search
               aria-hidden="true"
@@ -223,7 +223,7 @@ export default async function ApplicationsPage({
               className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pr-3 pl-10 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-3 focus:ring-blue-100"
             />
           </label>
-          <label>
+          <label className="xl:col-span-3">
             <span className="sr-only">{t("filterStatus")}</span>
             <AutoSubmitSelect
               name="status"
@@ -238,7 +238,7 @@ export default async function ApplicationsPage({
               ))}
             </AutoSubmitSelect>
           </label>
-          <label>
+          <label className="xl:col-span-3">
             <span className="sr-only">{t("filterRecruiter")}</span>
             <AutoSubmitSelect
               name="recrutador"
@@ -253,7 +253,7 @@ export default async function ApplicationsPage({
               ))}
             </AutoSubmitSelect>
           </label>
-          <label>
+          <label className="xl:col-span-2">
             <span className="sr-only">{t("filterCompany")}</span>
             <AutoSubmitSelect
               name="empresa"
@@ -268,7 +268,7 @@ export default async function ApplicationsPage({
               ))}
             </AutoSubmitSelect>
           </label>
-          <label>
+          <label className="xl:col-span-2">
             <span className="sr-only">{t("filterWorkMode")}</span>
             <AutoSubmitSelect
               name="modalidade"
@@ -283,7 +283,7 @@ export default async function ApplicationsPage({
               ))}
             </AutoSubmitSelect>
           </label>
-          <label>
+          <label className="xl:col-span-2">
             <span className="mb-1 block text-xs font-semibold text-slate-500">
               {t("from")}
             </span>
@@ -295,7 +295,7 @@ export default async function ApplicationsPage({
               className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
             />
           </label>
-          <label>
+          <label className="xl:col-span-2">
             <span className="mb-1 block text-xs font-semibold text-slate-500">
               {t("to")}
             </span>
@@ -307,7 +307,7 @@ export default async function ApplicationsPage({
               className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
             />
           </label>
-          <label>
+          <label className="xl:col-span-2">
             <span className="sr-only">{t("sort")}</span>
             <AutoSubmitSelect
               name="ordem"
@@ -321,7 +321,10 @@ export default async function ApplicationsPage({
           </label>
           <button
             type="submit"
-            className={buttonClassName({ size: "sm", className: "self-end" })}
+            className={buttonClassName({
+              size: "sm",
+              className: "self-end xl:col-span-2",
+            })}
           >
             <Filter aria-hidden="true" className="size-4" />
             {t("applySearch")}

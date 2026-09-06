@@ -1,7 +1,11 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { getRequestConfig } from "next-intl/server";
 
-import { defaultLocale, isAppLocale, localeCookieName } from "@/i18n/config";
+import {
+  isAppLocale,
+  localeCookieName,
+  localeFromAcceptLanguage,
+} from "@/i18n/config";
 
 const messages = {
   "pt-PT": () =>
@@ -13,7 +17,9 @@ const messages = {
 export default getRequestConfig(async () => {
   const cookieStore = await cookies();
   const requestedLocale = cookieStore.get(localeCookieName)?.value;
-  const locale = isAppLocale(requestedLocale) ? requestedLocale : defaultLocale;
+  const locale = isAppLocale(requestedLocale)
+    ? requestedLocale
+    : localeFromAcceptLanguage((await headers()).get("accept-language"));
 
   return {
     locale,

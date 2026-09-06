@@ -1,6 +1,7 @@
 @import "tailwindcss";
 
 :root {
+  --app-font-scale: 1;
   --background: #f7f9fc;
   --foreground: #172033;
   --surface: #ffffff;
@@ -18,6 +19,19 @@
   --app-slate-800: #1e293b;
   --app-slate-900: #0f172a;
   --app-slate-950: #020617;
+  --text-xs: calc(0.75rem * var(--app-font-scale));
+  --text-sm: calc(0.875rem * var(--app-font-scale));
+  --text-base: calc(1rem * var(--app-font-scale));
+  --text-lg: calc(1.125rem * var(--app-font-scale));
+  --text-xl: calc(1.25rem * var(--app-font-scale));
+  --text-2xl: calc(1.5rem * var(--app-font-scale));
+  --text-3xl: calc(1.875rem * var(--app-font-scale));
+  --text-4xl: calc(2.25rem * var(--app-font-scale));
+  --text-5xl: calc(3rem * var(--app-font-scale));
+  --text-6xl: calc(3.75rem * var(--app-font-scale));
+  --text-7xl: calc(4.5rem * var(--app-font-scale));
+  --text-8xl: calc(6rem * var(--app-font-scale));
+  --text-9xl: calc(8rem * var(--app-font-scale));
 }
 
 [data-theme="dark"] {
@@ -68,6 +82,7 @@
 
 body {
   margin: 0;
+  font-size: calc(1rem * var(--app-font-scale));
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
@@ -340,6 +355,160 @@ a {
 ::selection {
   background: #dbeafe;
   color: #1e3a8a;
+}
+
+.driver-popover.job-tracker-tour {
+  width: min(360px, calc(100vw - 24px));
+  max-width: min(360px, calc(100vw - 24px));
+  padding: 1.25rem;
+  border: 1px solid #e2e8f0;
+  border-radius: 1rem;
+  background: #ffffff;
+  color: #0f172a;
+  box-shadow: 0 24px 64px rgb(15 23 42 / 24%);
+}
+
+.driver-popover.job-tracker-tour .driver-popover-title {
+  padding-right: 1.5rem;
+  font-size: var(--text-base);
+  font-weight: 700;
+  line-height: 1.4;
+}
+
+.driver-popover.job-tracker-tour .driver-popover-description {
+  margin-top: 0.45rem;
+  color: #475569;
+  font-size: var(--text-sm);
+  line-height: 1.55;
+}
+
+.driver-popover.job-tracker-tour .driver-popover-close-btn {
+  top: 0.8rem;
+  right: 0.8rem;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 0.6rem;
+  color: #64748b;
+  transition:
+    color 150ms ease,
+    background-color 150ms ease;
+}
+
+.driver-popover.job-tracker-tour .driver-popover-close-btn:hover,
+.driver-popover.job-tracker-tour .driver-popover-close-btn:focus-visible {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+.driver-popover.job-tracker-tour .driver-popover-footer {
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 1.15rem;
+}
+
+.driver-popover.job-tracker-tour .driver-popover-progress-text {
+  color: #64748b;
+  font-size: var(--text-xs);
+  font-weight: 600;
+}
+
+.driver-popover.job-tracker-tour .driver-popover-navigation-btns {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.45rem;
+}
+
+.driver-popover.job-tracker-tour .driver-popover-footer-btn,
+.driver-popover.job-tracker-tour .job-tracker-tour-skip {
+  min-height: 2.25rem;
+  margin: 0;
+  padding: 0.45rem 0.75rem;
+  border: 1px solid #cbd5e1;
+  border-radius: 0.6rem;
+  background: #ffffff;
+  color: #334155;
+  font-size: calc(0.8125rem * var(--app-font-scale));
+  font-weight: 650;
+  line-height: 1;
+  text-shadow: none;
+}
+
+.driver-popover.job-tracker-tour .driver-popover-next-btn {
+  border-color: #1447e6;
+  background: #1447e6;
+  color: #ffffff;
+}
+
+.driver-popover.job-tracker-tour .driver-popover-footer-btn:hover,
+.driver-popover.job-tracker-tour .driver-popover-footer-btn:focus-visible,
+.driver-popover.job-tracker-tour .job-tracker-tour-skip:hover,
+.driver-popover.job-tracker-tour .job-tracker-tour-skip:focus-visible {
+  border-color: #93c5fd;
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.driver-popover.job-tracker-tour .driver-popover-next-btn:hover,
+.driver-popover.job-tracker-tour .driver-popover-next-btn:focus-visible {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+  color: #ffffff;
+}
+
+.driver-popover.job-tracker-tour :focus-visible {
+  outline: 2px solid #2563eb;
+  outline-offset: 2px;
+}
+
+.job-tracker-tour-navigation {
+  position: fixed !important;
+  z-index: 10001 !important;
+  margin: 0 !important;
+  pointer-events: none !important;
+}
+
+html[data-theme="dark"] .driver-popover.job-tracker-tour {
+  border-color: #334155;
+  background: #111927;
+  color: #f8fafc;
+  box-shadow: 0 24px 64px rgb(0 0 0 / 55%);
+}
+
+html[data-theme="dark"]
+  .driver-popover.job-tracker-tour
+  .driver-popover-description,
+html[data-theme="dark"]
+  .driver-popover.job-tracker-tour
+  .driver-popover-progress-text {
+  color: #a8b4c5;
+}
+
+html[data-theme="dark"]
+  .driver-popover.job-tracker-tour
+  :is(.driver-popover-footer-btn, .job-tracker-tour-skip) {
+  border-color: #475569;
+  background: #182235;
+  color: #e2e8f0;
+}
+
+html[data-theme="dark"]
+  .driver-popover.job-tracker-tour
+  .driver-popover-next-btn {
+  border-color: #2563eb;
+  background: #2563eb;
+  color: #ffffff;
+}
+
+@media (max-width: 420px) {
+  .driver-popover.job-tracker-tour .driver-popover-footer {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .driver-popover.job-tracker-tour .driver-popover-navigation-btns {
+    width: 100%;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {

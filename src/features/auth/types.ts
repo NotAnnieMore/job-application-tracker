@@ -11,6 +11,7 @@ export interface CurrentUser {
   email: string;
   fullName: string;
   avatarUrl: string;
+  onboardingVersion: number;
 }
 
 export const initialAuthActionState: AuthActionState = {

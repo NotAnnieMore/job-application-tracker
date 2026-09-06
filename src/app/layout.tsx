@@ -5,6 +5,7 @@ import { getLocale, getMessages, getTranslations } from "next-intl/server";
 
 import { ThemeProvider } from "@/components/theme/theme-provider";
 
+import "driver.js/dist/driver.css";
 import "./globals.css";
 
 const applicationName = "Job Application Tracker";
@@ -67,6 +68,7 @@ export default async function RootLayout({
     <html
       lang={locale}
       data-theme="light"
+      data-font-scale="100"
       suppressHydrationWarning
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
@@ -74,7 +76,7 @@ export default async function RootLayout({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'try{var theme=localStorage.getItem("job-tracker-theme")==="dark"?"dark":"light";document.documentElement.dataset.theme=theme;document.documentElement.style.colorScheme=theme}catch(e){document.documentElement.dataset.theme="light"}',
+              'try{var root=document.documentElement;var theme=localStorage.getItem("job-tracker-theme")==="dark"?"dark":"light";var storedScale=localStorage.getItem("job-tracker-font-scale");var scale=["90","95","100","105","110"].includes(storedScale)?storedScale:"100";root.dataset.theme=theme;root.style.colorScheme=theme;root.dataset.fontScale=scale;root.style.setProperty("--app-font-scale",String(Number(scale)/100))}catch(e){document.documentElement.dataset.theme="light";document.documentElement.dataset.fontScale="100"}',
           }}
         />
       </head>

@@ -19,11 +19,14 @@
     "test:tasks-calendar": "node scripts/check-tasks-calendar.mjs",
     "test:remaining-validation": "node scripts/check-remaining-validation.mjs",
     "test:job-import-messages": "node scripts/check-job-import-messages.mjs",
-    "test:interview-eligibility": "node scripts/check-interview-eligibility.mjs"
+    "test:interview-eligibility": "node scripts/check-interview-eligibility.mjs",
+    "test:onboarding-ui": "node scripts/check-onboarding-ui.mjs",
+    "test:preferences": "node scripts/check-display-preferences.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.12.4",
     "@supabase/supabase-js": "^2.111.0",
+    "driver.js": "1.8.0",
     "lucide-react": "^1.28.0",
     "next": "16.2.12",
     "next-intl": "^4.14.2",

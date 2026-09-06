@@ -1,11 +1,12 @@
 "use client";
 
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
+import { ChevronLeft, ChevronRight, CircleHelp, X } from "lucide-react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
 
 import { AppLogo } from "@/components/shared/app-logo";
+import { useOnboarding } from "@/components/onboarding/onboarding-provider";
 import { Button } from "@/components/ui/button";
 import { mainNavigation } from "@/config/navigation";
 import { cn } from "@/lib/utils";
@@ -25,6 +26,8 @@ export function AppSidebar({
 }: AppSidebarProps) {
   const pathname = usePathname();
   const t = useTranslations("Navigation");
+  const onboarding = useTranslations("Onboarding");
+  const { startTour } = useOnboarding();
   const compact = collapsed && !mobile;
 
   return (
@@ -81,6 +84,7 @@ export function AppSidebar({
             <Link
               key={item.href}
               href={item.href}
+              data-navigation-href={item.href}
               aria-current={isActive ? "page" : undefined}
               title={compact ? t(item.labelKey) : undefined}
               onClick={onClose}
@@ -100,6 +104,20 @@ export function AppSidebar({
       </nav>
 
       <div className="border-t border-slate-100 p-3">
+        <Button
+          variant="ghost"
+          size={compact ? "icon" : "sm"}
+          className={cn("mb-1 w-full", !compact && "justify-start")}
+          aria-label={compact ? onboarding("takeTour") : undefined}
+          title={compact ? onboarding("takeTour") : undefined}
+          onClick={() => {
+            onClose?.();
+            startTour();
+          }}
+        >
+          <CircleHelp aria-hidden="true" className="size-4" />
+          {!compact ? onboarding("takeTour") : null}
+        </Button>
         {!mobile ? (
           <Button
             variant="ghost"

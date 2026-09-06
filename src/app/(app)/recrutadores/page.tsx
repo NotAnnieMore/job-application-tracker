@@ -70,78 +70,80 @@ export default async function RecruitersPage({
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={t("title")}
-        description={t("description")}
-        action={
-          <Link href="/recrutadores/novo" className={buttonClassName()}>
-            <Plus aria-hidden="true" className="size-4" />
-            {t("new")}
-          </Link>
-        }
-      />
+      <div className="space-y-6" data-tour="recruiters">
+        <PageHeader
+          title={t("title")}
+          description={t("description")}
+          action={
+            <Link href="/recrutadores/novo" className={buttonClassName()}>
+              <Plus aria-hidden="true" className="size-4" />
+              {t("new")}
+            </Link>
+          }
+        />
 
-      <SuccessToast message={notice} />
+        <SuccessToast message={notice} />
 
-      <Card>
-        <form
-          action="/recrutadores"
-          method="get"
-          className="grid gap-3 p-4 md:grid-cols-[minmax(15rem,1fr)_16rem_auto]"
-        >
-          <label className="relative min-w-0">
-            <span className="sr-only">{t("searchContacts")}</span>
-            <Search
-              aria-hidden="true"
-              className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
-            />
-            <input
-              name="q"
-              type="search"
-              defaultValue={query}
-              placeholder={t("searchPlaceholder")}
-              className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pr-3 pl-10 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-3 focus:ring-blue-100"
-            />
-          </label>
-          <label>
-            <span className="sr-only">{t("filterCompany")}</span>
-            <AutoSubmitSelect
-              name="empresa"
-              defaultValue={companyId}
-              className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
-            >
-              <option value="">{t("allCompanies")}</option>
-              {companies.map((company) => (
-                <option key={company.id} value={company.id}>
-                  {company.name}
-                </option>
-              ))}
-            </AutoSubmitSelect>
-          </label>
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className={buttonClassName({ size: "sm", className: "flex-1" })}
-            >
-              <Search aria-hidden="true" className="size-4" />
-              {t("search")}
-            </button>
-            {hasFilters ? (
-              <Link
-                href="/recrutadores"
-                aria-label={t("clearFilters")}
-                title={t("clearFilters")}
-                className={buttonClassName({
-                  variant: "secondary",
-                  size: "icon",
-                })}
+        <Card>
+          <form
+            action="/recrutadores"
+            method="get"
+            className="grid gap-3 p-4 md:grid-cols-[minmax(15rem,1fr)_16rem_auto]"
+          >
+            <label className="relative min-w-0">
+              <span className="sr-only">{t("searchContacts")}</span>
+              <Search
+                aria-hidden="true"
+                className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-slate-400"
+              />
+              <input
+                name="q"
+                type="search"
+                defaultValue={query}
+                placeholder={t("searchPlaceholder")}
+                className="h-10 w-full rounded-xl border border-slate-200 bg-slate-50 pr-3 pl-10 text-sm outline-none focus:border-blue-400 focus:bg-white focus:ring-3 focus:ring-blue-100"
+              />
+            </label>
+            <label>
+              <span className="sr-only">{t("filterCompany")}</span>
+              <AutoSubmitSelect
+                name="empresa"
+                defaultValue={companyId}
+                className="h-10 w-full rounded-xl border border-slate-200 bg-white px-3 text-sm text-slate-700 outline-none focus:border-blue-400 focus:ring-3 focus:ring-blue-100"
               >
-                <X aria-hidden="true" className="size-4" />
-              </Link>
-            ) : null}
-          </div>
-        </form>
-      </Card>
+                <option value="">{t("allCompanies")}</option>
+                {companies.map((company) => (
+                  <option key={company.id} value={company.id}>
+                    {company.name}
+                  </option>
+                ))}
+              </AutoSubmitSelect>
+            </label>
+            <div className="flex gap-2">
+              <button
+                type="submit"
+                className={buttonClassName({ size: "sm", className: "flex-1" })}
+              >
+                <Search aria-hidden="true" className="size-4" />
+                {t("search")}
+              </button>
+              {hasFilters ? (
+                <Link
+                  href="/recrutadores"
+                  aria-label={t("clearFilters")}
+                  title={t("clearFilters")}
+                  className={buttonClassName({
+                    variant: "secondary",
+                    size: "icon",
+                  })}
+                >
+                  <X aria-hidden="true" className="size-4" />
+                </Link>
+              ) : null}
+            </div>
+          </form>
+        </Card>
+      </div>
 
       {recruiters.length === 0 ? (
         <EmptyState

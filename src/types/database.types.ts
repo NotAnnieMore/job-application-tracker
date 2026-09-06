@@ -18,6 +18,7 @@ export type ProfileRow = {
   id: string;
   full_name: string;
   avatar_path: string | null;
+  onboarding_version: number;
   created_at: string;
   updated_at: string;
 };
@@ -26,6 +27,7 @@ export type ProfileInsert = {
   id: string;
   full_name: string;
   avatar_path?: string | null;
+  onboarding_version?: number;
   created_at?: string;
   updated_at?: string;
 };

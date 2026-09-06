@@ -41,7 +41,7 @@
     },
     "storage": {
       "title": "Cookies and local storage",
-      "description": "Essential cookies are used to maintain the session and language preference. The light or dark theme is stored locally in the browser.",
+      "description": "Essential cookies are used to maintain the session and language preference. The theme and text size are stored locally in the browser.",
       "analytics": "The app does not currently use advertising cookies or its own behavioural tracking tools."
     },
     "retention": {
@@ -85,6 +85,56 @@
     "skipToContent": "Skip to content",
     "mainNavigation": "Main navigation",
     "closeNavigation": "Close navigation"
+  },
+  "Onboarding": {
+    "welcomeTitle": "Welcome to Job Application Tracker",
+    "welcomeDescription": "Take a quick tour to learn where everything is.",
+    "startTour": "Start tour",
+    "takeTour": "Help and guided tour",
+    "skip": "Skip",
+    "previous": "Previous",
+    "next": "Next",
+    "finish": "Finish",
+    "close": "Close guided tour",
+    "progress": "{current} of {total}",
+    "steps": {
+      "dashboard": {
+        "title": "Your starting point",
+        "description": "The dashboard brings together your job search progress and your next priorities."
+      },
+      "addApplication": {
+        "title": "Add an application",
+        "description": "We'll open the application form so you can see both ways to add a job."
+      },
+      "applicationForm": {
+        "title": "Enter or import the job",
+        "description": "Complete the main fields manually or use Import job. After saving, you return to the applications list."
+      },
+      "applications": {
+        "title": "Organise your applications",
+        "description": "Search, filter and track every opportunity from one place."
+      },
+      "interviews": {
+        "title": "Prepare for interviews",
+        "description": "Review your interviews here or open a new one with the New interview button."
+      },
+      "interviewForm": {
+        "title": "Schedule every detail",
+        "description": "Choose the application, type, date, format and participants before saving the interview."
+      },
+      "recruiters": {
+        "title": "Keep your contacts together",
+        "description": "Link recruiters to the right companies and applications."
+      },
+      "tasks": {
+        "title": "Stay on top of next tasks",
+        "description": "Track follow-ups, deadlines and other tasks so no application is left behind."
+      },
+      "statistics": {
+        "title": "See how you are progressing",
+        "description": "These indicators give you a quick view of active processes, responses and outcomes."
+      }
+    }
   },
   "Header": {
     "searchLabel": "Search applications",
@@ -157,7 +207,17 @@
     "profileUpdated": "Profile updated successfully.",
     "language": {
       "title": "Language",
-      "description": "Your preference is saved in this browser."
+      "description": "On your first visit, we use your browser language. Your choice is then saved."
+    },
+    "fontSize": {
+      "title": "Text size",
+      "description": "Adjust readability in this browser without changing the app layout.",
+      "label": "Text size: {value}%",
+      "smaller": "Smaller",
+      "default": "Default",
+      "larger": "Larger",
+      "preview": "Sample text to check your chosen size.",
+      "reset": "Reset size"
     },
     "profile": {
       "title": "Account profile",
@@ -364,7 +424,10 @@
     "personalScriptPlaceholder": "Tell me about yourself...\nWhy are you interested in this role?...",
     "companyQuestions": "Questions for the company",
     "companyQuestionsHint": "Questions about the team, role, challenges, culture or next steps.",
-    "companyQuestionsPlaceholder": "How is success measured in this role?..."
+    "companyQuestionsPlaceholder": "How is success measured in this role?...",
+    "moreDetails": "Add more details",
+    "hideMoreDetails": "Hide additional details",
+    "moreDetailsDescription": "Status, dates, salary, contact, follow-up and preparation."
   },
   "JobImport": {
     "title": "Import job",

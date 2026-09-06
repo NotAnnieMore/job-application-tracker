@@ -42,15 +42,17 @@ export default async function NewInterviewPage({
         <ArrowLeft aria-hidden="true" className="size-4" />
         {t("back")}
       </Link>
-      <PageHeader title={t("new")} description={t("newDescription")} />
       {applications.length === 0 ? (
-        <EmptyState
-          icon={BriefcaseBusiness}
-          title={t("noEligibleApplications")}
-          description={t("creationEligibility")}
-          actionLabel={t("viewApplications")}
-          actionHref="/candidaturas"
-        />
+        <div className="space-y-6" data-tour="interview-form">
+          <PageHeader title={t("new")} description={t("newDescription")} />
+          <EmptyState
+            icon={BriefcaseBusiness}
+            title={t("noEligibleApplications")}
+            description={t("creationEligibility")}
+            actionLabel={t("viewApplications")}
+            actionHref="/candidaturas"
+          />
+        </div>
       ) : (
         <InterviewForm
           action={createInterviewAction}
@@ -63,6 +65,8 @@ export default async function NewInterviewPage({
             recruiterId: selectedApplication?.primaryRecruiterId ?? "",
           }}
           submitLabel={t("saveInterview")}
+          headerTitle={t("new")}
+          headerDescription={t("newDescription")}
         />
       )}
     </div>

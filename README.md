@@ -56,7 +56,8 @@ A aplicação encontra-se publicada na Vercel e utiliza o Supabase para autentic
 - Criação rápida de uma empresa durante o registo de uma candidatura, sem abandonar o formulário.
 - Perfil com nome e avatar guardado no Supabase Storage.
 - Modo claro e escuro com preferência persistente por browser.
-- Interface em português de Portugal e inglês, com seleção no cabeçalho, autenticação e Definições. A preferência é guardada no browser; datas, contagens e mensagens acompanham o idioma.
+- Tamanho do texto ajustável entre 90% e 110%, com aplicação imediata e persistência por browser.
+- Interface em português de Portugal e inglês, com seleção no cabeçalho, autenticação e Definições. Na primeira visita, PT-PT/PT-BR usam português e os restantes idiomas usam inglês; a escolha manual fica guardada.
 - Interface responsiva para computador e telemóvel.
 - Estados de carregamento com títulos reais e feedback imediato durante a navegação.
 - Registo, login, logout e recuperação de palavra-passe.
@@ -208,6 +209,7 @@ pnpm build
 - [Testes e validação](docs/testing.md)
 - [Interface PT/EN: cobertura e decisões](docs/decisions/018-idiomas-pt-en.md)
 - [Privacidade e transparência](docs/decisions/019-privacidade.md)
+- [Preferências visuais e idioma inicial](docs/decisions/021-preferencias-visuais-e-idioma-inicial.md)
 - [Decisões técnicas e funcionais](docs/decisions)
 
 Os documentos de contexto usados durante a conceção permanecem apenas na pasta local ignorada `context/` e não fazem parte do repositório.

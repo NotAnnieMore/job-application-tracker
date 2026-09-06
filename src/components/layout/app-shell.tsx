@@ -12,6 +12,7 @@ import { useTranslations } from "next-intl";
 
 import { AppHeader } from "@/components/layout/app-header";
 import { AppSidebar } from "@/components/layout/app-sidebar";
+import { OnboardingProvider } from "@/components/onboarding/onboarding-provider";
 import type { CurrentUser } from "@/features/auth/types";
 
 const MOBILE_SWIPE_EDGE_PX = 32;
@@ -24,6 +25,20 @@ type MobileSwipe = {
 };
 
 export function AppShell({
+  children,
+  user,
+}: {
+  children: ReactNode;
+  user: CurrentUser;
+}) {
+  return (
+    <OnboardingProvider onboardingVersion={user.onboardingVersion}>
+      <AppShellContent user={user}>{children}</AppShellContent>
+    </OnboardingProvider>
+  );
+}
+
+function AppShellContent({
   children,
   user,
 }: {

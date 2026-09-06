@@ -7,7 +7,7 @@ import { useState } from "react";
 import { cn } from "@/lib/utils";
 
 const sizeClasses = {
-  sm: "size-8 rounded-lg text-[10px]",
+  sm: "size-8 rounded-lg text-[calc(0.625rem*var(--app-font-scale))]",
   md: "size-11 rounded-xl text-xs",
   lg: "size-16 rounded-2xl text-base",
 };

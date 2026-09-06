@@ -3,7 +3,6 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 
 import { ApplicationForm } from "@/components/applications/application-form";
-import { PageHeader } from "@/components/shared/page-header";
 import { createApplicationAction } from "@/features/applications/actions";
 import {
   getCompanyOptions,
@@ -33,7 +32,6 @@ export default async function NewApplicationPage({
         <ArrowLeft aria-hidden="true" className="size-4" />
         {t("back")}
       </Link>
-      <PageHeader title={t("title")} description={t("description")} />
       <ApplicationForm
         action={createApplicationAction}
         companies={companies}
@@ -42,6 +40,9 @@ export default async function NewApplicationPage({
         submitLabel={t("save")}
         useBrowserDateDefault
         startWithJobImport={startWithJobImport}
+        progressiveDisclosure
+        headerTitle={t("title")}
+        headerDescription={t("description")}
       />
     </div>
   );

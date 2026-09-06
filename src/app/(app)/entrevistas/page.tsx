@@ -89,7 +89,7 @@ async function InterviewCard({ interview }: { interview: InterviewListItem }) {
           <span className="text-xl leading-none font-bold text-slate-950">
             {formatInterviewDay(interview.scheduledAt, locale)}
           </span>
-          <span className="mt-1 text-[10px] font-bold tracking-wide text-slate-500">
+          <span className="mt-1 text-[calc(0.625rem*var(--app-font-scale))] font-bold tracking-wide text-slate-500">
             {formatInterviewMonth(interview.scheduledAt, locale)}
           </span>
         </div>
@@ -239,16 +239,18 @@ export default async function InterviewsPage({
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={t("title")}
-        description={t("description")}
-        action={
-          <Link href="/entrevistas/nova" className={buttonClassName()}>
-            <Plus aria-hidden="true" className="size-4" />
-            {t("new")}
-          </Link>
-        }
-      />
+      <div data-tour="interviews-header">
+        <PageHeader
+          title={t("title")}
+          description={t("description")}
+          action={
+            <Link href="/entrevistas/nova" className={buttonClassName()}>
+              <Plus aria-hidden="true" className="size-4" />
+              {t("new")}
+            </Link>
+          }
+        />
+      </div>
 
       <SuccessToast message={notice} queryParam="aviso" />
 

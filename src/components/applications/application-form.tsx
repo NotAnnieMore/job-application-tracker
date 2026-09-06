@@ -1,6 +1,7 @@
 "use client";
 
 import {
+  ChevronDown,
   ExternalLink,
   FileSearch,
   LoaderCircle,
@@ -14,6 +15,7 @@ import { useFormStatus } from "react-dom";
 
 import { QuickCompanyModal } from "@/components/companies/quick-company-modal";
 import { JobImportModal } from "@/components/applications/job-import-modal";
+import { PageHeader } from "@/components/shared/page-header";
 import { Button, buttonClassName } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FormField, fieldClassName } from "@/components/ui/form-field";
@@ -30,11 +32,29 @@ import type {
 import { initialApplicationActionState } from "@/features/applications/types";
 import type { ImportedJobData } from "@/features/job-import/types";
 import type { WorkModeValue } from "@/types/database.types";
+import { cn } from "@/lib/utils";
 
 type ApplicationFormAction = (
   state: ApplicationActionState,
   formData: FormData,
 ) => Promise<ApplicationActionState>;
+
+const advancedApplicationFields = [
+  "salaryMin",
+  "salaryMax",
+  "currency",
+  "skills",
+  "status",
+  "applicationDate",
+  "source",
+  "expectedSalary",
+  "primaryRecruiterId",
+  "nextActionSummary",
+  "followUpDate",
+  "summaryNotes",
+  "interviewPreparation",
+  "questionsForCompany",
+] as const;
 
 const textareaClassName =
   "w-full rounded-xl border border-slate-200 bg-white px-3.5 py-3 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-3 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-50";
@@ -72,6 +92,9 @@ export function ApplicationForm({
   cancelHref = "/candidaturas",
   useBrowserDateDefault = false,
   startWithJobImport = false,
+  progressiveDisclosure = false,
+  headerTitle,
+  headerDescription,
 }: {
   action: ApplicationFormAction;
   companies: CompanyOption[];
@@ -81,6 +104,9 @@ export function ApplicationForm({
   cancelHref?: string;
   useBrowserDateDefault?: boolean;
   startWithJobImport?: boolean;
+  progressiveDisclosure?: boolean;
+  headerTitle?: string;
+  headerDescription?: string;
 }) {
   const locale = useLocale();
   const t = useTranslations("ApplicationForm");
@@ -98,6 +124,7 @@ export function ApplicationForm({
   const [jobImportInitialUrl, setJobImportInitialUrl] = useState(
     initialValues.jobUrl,
   );
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const [companyInitialValues, setCompanyInitialValues] = useState<{
     name?: string;
     website?: string;
@@ -128,6 +155,11 @@ export function ApplicationForm({
     const timeout = window.setTimeout(() => setJobImportOpen(true), 0);
     return () => window.clearTimeout(timeout);
   }, [startWithJobImport]);
+
+  const showAdvancedDetails =
+    advancedOpen ||
+    (progressiveDisclosure &&
+      advancedApplicationFields.some((field) => state.fieldErrors?.[field]));
 
   const availableRecruiters = recruiters.filter(
     (recruiter) =>
@@ -216,9 +248,27 @@ export function ApplicationForm({
         />
       ) : null}
 
-      <div className="flex justify-end">
-        <SubmitButton label={submitLabel} />
-      </div>
+      {headerTitle ? (
+        <PageHeader
+          title={headerTitle}
+          description={headerDescription}
+          action={
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href={cancelHref}
+                className={buttonClassName({ variant: "secondary" })}
+              >
+                {t("cancel")}
+              </Link>
+              <SubmitButton label={submitLabel} />
+            </div>
+          }
+        />
+      ) : (
+        <div className="flex justify-end">
+          <SubmitButton label={submitLabel} />
+        </div>
+      )}
 
       {state.message ? (
         <p
@@ -230,7 +280,7 @@ export function ApplicationForm({
         </p>
       ) : null}
 
-      <Card>
+      <Card data-tour="application-form">
         <CardHeader>
           <div>
             <h2 className="font-bold text-slate-950">{t("opportunity")}</h2>
@@ -370,29 +420,6 @@ export function ApplicationForm({
             </select>
           </FormField>
           <FormField
-            label={t("jobUrl")}
-            htmlFor="application-job-url"
-            error={state.fieldErrors?.jobUrl}
-          >
-            <input
-              id="application-job-url"
-              name="jobUrl"
-              type="text"
-              ref={jobUrlRef}
-              inputMode="url"
-              defaultValue={initialValues.jobUrl}
-              placeholder="linkedin.com/jobs/view/..."
-              className={fieldClassName}
-              maxLength={1000}
-              aria-invalid={Boolean(state.fieldErrors?.jobUrl)}
-              aria-describedby={
-                state.fieldErrors?.jobUrl
-                  ? "application-job-url-error"
-                  : undefined
-              }
-            />
-          </FormField>
-          <FormField
             label={t("employmentType")}
             htmlFor="application-employment-type"
             error={state.fieldErrors?.employmentType}
@@ -425,9 +452,36 @@ export function ApplicationForm({
             </select>
           </FormField>
           <FormField
+            label={t("jobUrl")}
+            htmlFor="application-job-url"
+            error={state.fieldErrors?.jobUrl}
+          >
+            <input
+              id="application-job-url"
+              name="jobUrl"
+              type="text"
+              ref={jobUrlRef}
+              inputMode="url"
+              defaultValue={initialValues.jobUrl}
+              placeholder="linkedin.com/jobs/view/..."
+              className={fieldClassName}
+              maxLength={1000}
+              aria-invalid={Boolean(state.fieldErrors?.jobUrl)}
+              aria-describedby={
+                state.fieldErrors?.jobUrl
+                  ? "application-job-url-error"
+                  : undefined
+              }
+            />
+          </FormField>
+          <FormField
             label={t("minimumSalary")}
             htmlFor="application-salary-min"
             error={state.fieldErrors?.salaryMin}
+            className={cn(
+              progressiveDisclosure && "order-3",
+              progressiveDisclosure && !showAdvancedDetails && "hidden",
+            )}
           >
             <input
               id="application-salary-min"
@@ -447,7 +501,13 @@ export function ApplicationForm({
               }
             />
           </FormField>
-          <div className="grid grid-cols-[1fr_6rem] gap-2">
+          <div
+            className={cn(
+              "grid grid-cols-[1fr_6rem] gap-2",
+              progressiveDisclosure && "order-3",
+              progressiveDisclosure && !showAdvancedDetails && "hidden",
+            )}
+          >
             <FormField
               label={t("maximumSalary")}
               htmlFor="application-salary-max"
@@ -492,7 +552,13 @@ export function ApplicationForm({
               />
             </FormField>
           </div>
-          <div className="md:col-span-2">
+          <div
+            className={cn(
+              "md:col-span-2",
+              progressiveDisclosure && "order-3",
+              progressiveDisclosure && !showAdvancedDetails && "hidden",
+            )}
+          >
             <FormField
               label={t("skills")}
               htmlFor="application-skills"
@@ -539,292 +605,333 @@ export function ApplicationForm({
               />
             </FormField>
           </div>
+          {progressiveDisclosure ? (
+            <div className="order-2 md:col-span-2">
+              <button
+                type="button"
+                aria-expanded={showAdvancedDetails}
+                aria-controls="application-more-details"
+                onClick={() => setAdvancedOpen((open) => !open)}
+                className="flex w-full items-center justify-between gap-4 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-left transition hover:border-blue-200 hover:bg-blue-50/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-600"
+              >
+                <span className="min-w-0">
+                  <span className="block text-sm font-semibold text-slate-800">
+                    {showAdvancedDetails
+                      ? t("hideMoreDetails")
+                      : t("moreDetails")}
+                  </span>
+                  <span className="mt-0.5 block text-xs leading-5 text-slate-500">
+                    {t("moreDetailsDescription")}
+                  </span>
+                </span>
+                <ChevronDown
+                  aria-hidden="true"
+                  className={cn(
+                    "size-5 shrink-0 text-slate-500 transition-transform",
+                    showAdvancedDetails && "rotate-180",
+                  )}
+                />
+              </button>
+            </div>
+          ) : null}
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <div>
-            <h2 className="font-bold text-slate-950">{t("application")}</h2>
-            <p className="mt-1 text-sm text-slate-500">
-              {t("applicationDescription")}
-            </p>
-          </div>
-        </CardHeader>
-        <CardContent className="grid gap-5 md:grid-cols-2">
-          <FormField
-            label={t("status")}
-            htmlFor="application-status"
-            required
-            error={state.fieldErrors?.status}
-          >
-            <select
-              id="application-status"
-              name="status"
-              defaultValue={initialValues.status}
-              className={fieldClassName}
-              aria-invalid={Boolean(state.fieldErrors?.status)}
-              aria-describedby={
-                state.fieldErrors?.status
-                  ? "application-status-error"
-                  : undefined
-              }
+      <div
+        id={progressiveDisclosure ? "application-more-details" : undefined}
+        className={cn(
+          "space-y-6",
+          progressiveDisclosure && !showAdvancedDetails && "hidden",
+        )}
+      >
+        <Card>
+          <CardHeader>
+            <div>
+              <h2 className="font-bold text-slate-950">{t("application")}</h2>
+              <p className="mt-1 text-sm text-slate-500">
+                {t("applicationDescription")}
+              </p>
+            </div>
+          </CardHeader>
+          <CardContent className="grid gap-5 md:grid-cols-2">
+            <FormField
+              label={t("status")}
+              htmlFor="application-status"
               required
+              error={state.fieldErrors?.status}
             >
-              {applicationStatusOptions.map((option) => (
-                <option key={option.value} value={option.value}>
-                  {enums(`applicationStatus.${option.value}`)}
-                </option>
-              ))}
-            </select>
-          </FormField>
-          <FormField
-            label={t("applicationDate")}
-            htmlFor="application-date"
-            required
-            error={state.fieldErrors?.applicationDate}
-          >
-            <input
-              id="application-date"
-              name="applicationDate"
-              type="date"
-              ref={applicationDateRef}
-              defaultValue={initialValues.applicationDate}
-              className={fieldClassName}
-              aria-invalid={Boolean(state.fieldErrors?.applicationDate)}
-              aria-describedby={
-                state.fieldErrors?.applicationDate
-                  ? "application-date-error"
-                  : undefined
-              }
-              required
-            />
-          </FormField>
-          <FormField
-            label={t("source")}
-            htmlFor="application-source"
-            error={state.fieldErrors?.source}
-          >
-            <input
-              id="application-source"
-              name="source"
-              type="text"
-              ref={sourceRef}
-              defaultValue={initialValues.source}
-              placeholder={t("sourcePlaceholder")}
-              className={fieldClassName}
-              maxLength={120}
-              aria-invalid={Boolean(state.fieldErrors?.source)}
-              aria-describedby={
-                state.fieldErrors?.source
-                  ? "application-source-error"
-                  : undefined
-              }
-            />
-          </FormField>
-          <FormField
-            label={t("expectedSalary")}
-            htmlFor="application-expected-salary"
-            error={state.fieldErrors?.expectedSalary}
-          >
-            <input
-              id="application-expected-salary"
-              name="expectedSalary"
-              type="number"
-              inputMode="decimal"
-              min="0"
-              step="0.01"
-              defaultValue={initialValues.expectedSalary}
-              placeholder="0"
-              className={fieldClassName}
-              aria-invalid={Boolean(state.fieldErrors?.expectedSalary)}
-              aria-describedby={
-                state.fieldErrors?.expectedSalary
-                  ? "application-expected-salary-error"
-                  : undefined
-              }
-            />
-          </FormField>
-          <FormField
-            label={t("primaryRecruiter")}
-            htmlFor="application-recruiter"
-            hint={t("primaryRecruiterHint")}
-            error={state.fieldErrors?.primaryRecruiterId}
-          >
-            <div className="flex gap-2">
               <select
-                id="application-recruiter"
-                name="primaryRecruiterId"
-                value={selectedRecruiterId}
-                onChange={(event) => setSelectedRecruiterId(event.target.value)}
+                id="application-status"
+                name="status"
+                defaultValue={initialValues.status}
                 className={fieldClassName}
-                aria-invalid={Boolean(state.fieldErrors?.primaryRecruiterId)}
+                aria-invalid={Boolean(state.fieldErrors?.status)}
                 aria-describedby={
-                  state.fieldErrors?.primaryRecruiterId
-                    ? "application-recruiter-error"
-                    : "application-recruiter-hint"
+                  state.fieldErrors?.status
+                    ? "application-status-error"
+                    : undefined
                 }
+                required
               >
-                <option value="">{t("noPrimaryRecruiter")}</option>
-                {availableRecruiters.map((recruiter) => (
-                  <option key={recruiter.id} value={recruiter.id}>
-                    {recruiter.name}
-                    {recruiter.companyId ? "" : ` · ${t("withoutCompany")}`}
+                {applicationStatusOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {enums(`applicationStatus.${option.value}`)}
                   </option>
                 ))}
               </select>
-              <Link
-                href={
-                  selectedCompanyId
-                    ? `/recrutadores/novo?empresa=${selectedCompanyId}`
-                    : "/recrutadores/novo"
-                }
-                target="_blank"
-                aria-label={t("createContactNewTab")}
-                title={t("createContactNewTab")}
-                className={buttonClassName({
-                  variant: "secondary",
-                  size: "icon",
-                })}
-              >
-                <ExternalLink aria-hidden="true" className="size-4" />
-              </Link>
-            </div>
-          </FormField>
-          <FormField
-            label={t("nextTask")}
-            htmlFor="application-next-action"
-            error={state.fieldErrors?.nextActionSummary}
-          >
-            <input
-              id="application-next-action"
-              name="nextActionSummary"
-              type="text"
-              defaultValue={initialValues.nextActionSummary}
-              placeholder={t("nextTaskPlaceholder")}
-              className={fieldClassName}
-              maxLength={240}
-              aria-invalid={Boolean(state.fieldErrors?.nextActionSummary)}
-              aria-describedby={
-                state.fieldErrors?.nextActionSummary
-                  ? "application-next-action-error"
-                  : undefined
-              }
-            />
-          </FormField>
-          <FormField
-            label={t("followUpDate")}
-            htmlFor="application-follow-up"
-            error={state.fieldErrors?.followUpDate}
-          >
-            <input
-              id="application-follow-up"
-              name="followUpDate"
-              type="date"
-              defaultValue={initialValues.followUpDate}
-              className={fieldClassName}
-              aria-invalid={Boolean(state.fieldErrors?.followUpDate)}
-              aria-describedby={
-                state.fieldErrors?.followUpDate
-                  ? "application-follow-up-error"
-                  : undefined
-              }
-            />
-          </FormField>
-          <div className="md:col-span-2">
+            </FormField>
             <FormField
-              label={t("notes")}
-              htmlFor="application-notes"
-              error={state.fieldErrors?.summaryNotes}
+              label={t("applicationDate")}
+              htmlFor="application-date"
+              required
+              error={state.fieldErrors?.applicationDate}
             >
-              <textarea
-                id="application-notes"
-                name="summaryNotes"
-                rows={5}
-                defaultValue={initialValues.summaryNotes}
-                placeholder={t("notesPlaceholder")}
-                className={textareaClassName}
-                maxLength={5000}
-                aria-invalid={Boolean(state.fieldErrors?.summaryNotes)}
+              <input
+                id="application-date"
+                name="applicationDate"
+                type="date"
+                ref={applicationDateRef}
+                defaultValue={initialValues.applicationDate}
+                className={fieldClassName}
+                aria-invalid={Boolean(state.fieldErrors?.applicationDate)}
                 aria-describedby={
-                  state.fieldErrors?.summaryNotes
-                    ? "application-notes-error"
+                  state.fieldErrors?.applicationDate
+                    ? "application-date-error"
+                    : undefined
+                }
+                required
+              />
+            </FormField>
+            <FormField
+              label={t("source")}
+              htmlFor="application-source"
+              error={state.fieldErrors?.source}
+            >
+              <input
+                id="application-source"
+                name="source"
+                type="text"
+                ref={sourceRef}
+                defaultValue={initialValues.source}
+                placeholder={t("sourcePlaceholder")}
+                className={fieldClassName}
+                maxLength={120}
+                aria-invalid={Boolean(state.fieldErrors?.source)}
+                aria-describedby={
+                  state.fieldErrors?.source
+                    ? "application-source-error"
                     : undefined
                 }
               />
             </FormField>
-          </div>
-        </CardContent>
-      </Card>
+            <FormField
+              label={t("expectedSalary")}
+              htmlFor="application-expected-salary"
+              error={state.fieldErrors?.expectedSalary}
+            >
+              <input
+                id="application-expected-salary"
+                name="expectedSalary"
+                type="number"
+                inputMode="decimal"
+                min="0"
+                step="0.01"
+                defaultValue={initialValues.expectedSalary}
+                placeholder="0"
+                className={fieldClassName}
+                aria-invalid={Boolean(state.fieldErrors?.expectedSalary)}
+                aria-describedby={
+                  state.fieldErrors?.expectedSalary
+                    ? "application-expected-salary-error"
+                    : undefined
+                }
+              />
+            </FormField>
+            <FormField
+              label={t("primaryRecruiter")}
+              htmlFor="application-recruiter"
+              hint={t("primaryRecruiterHint")}
+              error={state.fieldErrors?.primaryRecruiterId}
+            >
+              <div className="flex gap-2">
+                <select
+                  id="application-recruiter"
+                  name="primaryRecruiterId"
+                  value={selectedRecruiterId}
+                  onChange={(event) =>
+                    setSelectedRecruiterId(event.target.value)
+                  }
+                  className={fieldClassName}
+                  aria-invalid={Boolean(state.fieldErrors?.primaryRecruiterId)}
+                  aria-describedby={
+                    state.fieldErrors?.primaryRecruiterId
+                      ? "application-recruiter-error"
+                      : "application-recruiter-hint"
+                  }
+                >
+                  <option value="">{t("noPrimaryRecruiter")}</option>
+                  {availableRecruiters.map((recruiter) => (
+                    <option key={recruiter.id} value={recruiter.id}>
+                      {recruiter.name}
+                      {recruiter.companyId ? "" : ` · ${t("withoutCompany")}`}
+                    </option>
+                  ))}
+                </select>
+                <Link
+                  href={
+                    selectedCompanyId
+                      ? `/recrutadores/novo?empresa=${selectedCompanyId}`
+                      : "/recrutadores/novo"
+                  }
+                  target="_blank"
+                  aria-label={t("createContactNewTab")}
+                  title={t("createContactNewTab")}
+                  className={buttonClassName({
+                    variant: "secondary",
+                    size: "icon",
+                  })}
+                >
+                  <ExternalLink aria-hidden="true" className="size-4" />
+                </Link>
+              </div>
+            </FormField>
+            <FormField
+              label={t("nextTask")}
+              htmlFor="application-next-action"
+              error={state.fieldErrors?.nextActionSummary}
+            >
+              <input
+                id="application-next-action"
+                name="nextActionSummary"
+                type="text"
+                defaultValue={initialValues.nextActionSummary}
+                placeholder={t("nextTaskPlaceholder")}
+                className={fieldClassName}
+                maxLength={240}
+                aria-invalid={Boolean(state.fieldErrors?.nextActionSummary)}
+                aria-describedby={
+                  state.fieldErrors?.nextActionSummary
+                    ? "application-next-action-error"
+                    : undefined
+                }
+              />
+            </FormField>
+            <FormField
+              label={t("followUpDate")}
+              htmlFor="application-follow-up"
+              error={state.fieldErrors?.followUpDate}
+            >
+              <input
+                id="application-follow-up"
+                name="followUpDate"
+                type="date"
+                defaultValue={initialValues.followUpDate}
+                className={fieldClassName}
+                aria-invalid={Boolean(state.fieldErrors?.followUpDate)}
+                aria-describedby={
+                  state.fieldErrors?.followUpDate
+                    ? "application-follow-up-error"
+                    : undefined
+                }
+              />
+            </FormField>
+            <div className="md:col-span-2">
+              <FormField
+                label={t("notes")}
+                htmlFor="application-notes"
+                error={state.fieldErrors?.summaryNotes}
+              >
+                <textarea
+                  id="application-notes"
+                  name="summaryNotes"
+                  rows={5}
+                  defaultValue={initialValues.summaryNotes}
+                  placeholder={t("notesPlaceholder")}
+                  className={textareaClassName}
+                  maxLength={5000}
+                  aria-invalid={Boolean(state.fieldErrors?.summaryNotes)}
+                  aria-describedby={
+                    state.fieldErrors?.summaryNotes
+                      ? "application-notes-error"
+                      : undefined
+                  }
+                />
+              </FormField>
+            </div>
+          </CardContent>
+        </Card>
 
-      <Card>
-        <CardHeader>
-          <div>
-            <h2 className="font-bold text-slate-950">
-              {t("interviewPreparation")}
-            </h2>
-            <p className="mt-1 text-sm text-slate-500">
-              {t("interviewPreparationDescription")}
-            </p>
-          </div>
-        </CardHeader>
-        <CardContent className="grid gap-5 lg:grid-cols-2">
-          <FormField
-            label={t("personalScript")}
-            htmlFor="application-interview-preparation"
-            hint={t("personalScriptHint")}
-            error={state.fieldErrors?.interviewPreparation}
-          >
-            <textarea
-              id="application-interview-preparation"
-              name="interviewPreparation"
-              rows={9}
-              defaultValue={initialValues.interviewPreparation}
-              placeholder={t("personalScriptPlaceholder")}
-              className={textareaClassName}
-              maxLength={10000}
-              aria-invalid={Boolean(state.fieldErrors?.interviewPreparation)}
-              aria-describedby={
-                state.fieldErrors?.interviewPreparation
-                  ? "application-interview-preparation-error"
-                  : "application-interview-preparation-hint"
-              }
-            />
-          </FormField>
-          <FormField
-            label={t("companyQuestions")}
-            htmlFor="application-company-questions"
-            hint={t("companyQuestionsHint")}
-            error={state.fieldErrors?.questionsForCompany}
-          >
-            <textarea
-              id="application-company-questions"
-              name="questionsForCompany"
-              rows={9}
-              defaultValue={initialValues.questionsForCompany}
-              placeholder={t("companyQuestionsPlaceholder")}
-              className={textareaClassName}
-              maxLength={10000}
-              aria-invalid={Boolean(state.fieldErrors?.questionsForCompany)}
-              aria-describedby={
-                state.fieldErrors?.questionsForCompany
-                  ? "application-company-questions-error"
-                  : "application-company-questions-hint"
-              }
-            />
-          </FormField>
-        </CardContent>
-      </Card>
-
-      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
-        <Link
-          href={cancelHref}
-          className={buttonClassName({ variant: "secondary" })}
-        >
-          {t("cancel")}
-        </Link>
-        <SubmitButton label={submitLabel} />
+        <Card>
+          <CardHeader>
+            <div>
+              <h2 className="font-bold text-slate-950">
+                {t("interviewPreparation")}
+              </h2>
+              <p className="mt-1 text-sm text-slate-500">
+                {t("interviewPreparationDescription")}
+              </p>
+            </div>
+          </CardHeader>
+          <CardContent className="grid gap-5 lg:grid-cols-2">
+            <FormField
+              label={t("personalScript")}
+              htmlFor="application-interview-preparation"
+              hint={t("personalScriptHint")}
+              error={state.fieldErrors?.interviewPreparation}
+            >
+              <textarea
+                id="application-interview-preparation"
+                name="interviewPreparation"
+                rows={9}
+                defaultValue={initialValues.interviewPreparation}
+                placeholder={t("personalScriptPlaceholder")}
+                className={textareaClassName}
+                maxLength={10000}
+                aria-invalid={Boolean(state.fieldErrors?.interviewPreparation)}
+                aria-describedby={
+                  state.fieldErrors?.interviewPreparation
+                    ? "application-interview-preparation-error"
+                    : "application-interview-preparation-hint"
+                }
+              />
+            </FormField>
+            <FormField
+              label={t("companyQuestions")}
+              htmlFor="application-company-questions"
+              hint={t("companyQuestionsHint")}
+              error={state.fieldErrors?.questionsForCompany}
+            >
+              <textarea
+                id="application-company-questions"
+                name="questionsForCompany"
+                rows={9}
+                defaultValue={initialValues.questionsForCompany}
+                placeholder={t("companyQuestionsPlaceholder")}
+                className={textareaClassName}
+                maxLength={10000}
+                aria-invalid={Boolean(state.fieldErrors?.questionsForCompany)}
+                aria-describedby={
+                  state.fieldErrors?.questionsForCompany
+                    ? "application-company-questions-error"
+                    : "application-company-questions-hint"
+                }
+              />
+            </FormField>
+          </CardContent>
+        </Card>
       </div>
+
+      {!progressiveDisclosure || showAdvancedDetails ? (
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <Link
+            href={cancelHref}
+            className={buttonClassName({ variant: "secondary" })}
+          >
+            {t("cancel")}
+          </Link>
+          <SubmitButton label={submitLabel} />
+        </div>
+      ) : null}
     </form>
   );
 }

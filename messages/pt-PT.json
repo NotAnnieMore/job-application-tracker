@@ -41,7 +41,7 @@
     },
     "storage": {
       "title": "Cookies e armazenamento local",
-      "description": "São utilizados cookies essenciais para manter a sessão e a preferência de idioma. O tema claro ou escuro é guardado localmente no browser.",
+      "description": "São utilizados cookies essenciais para manter a sessão e a preferência de idioma. O tema e o tamanho do texto são guardados localmente no browser.",
       "analytics": "A aplicação não utiliza atualmente cookies de publicidade nem ferramentas próprias de acompanhamento comportamental."
     },
     "retention": {
@@ -85,6 +85,56 @@
     "skipToContent": "Saltar para o conteúdo",
     "mainNavigation": "Navegação principal",
     "closeNavigation": "Fechar navegação"
+  },
+  "Onboarding": {
+    "welcomeTitle": "Bem-vindo ao Job Application Tracker",
+    "welcomeDescription": "Faz uma visita rápida para conheceres as principais áreas da aplicação.",
+    "startTour": "Começar visita",
+    "takeTour": "Ajuda e visita guiada",
+    "skip": "Ignorar",
+    "previous": "Anterior",
+    "next": "Seguinte",
+    "finish": "Concluir",
+    "close": "Fechar visita guiada",
+    "progress": "{current} de {total}",
+    "steps": {
+      "dashboard": {
+        "title": "O teu ponto de partida",
+        "description": "O dashboard reúne o progresso da procura de emprego e as prioridades mais próximas."
+      },
+      "addApplication": {
+        "title": "Regista uma candidatura",
+        "description": "Vamos abrir a criação de candidatura para veres as duas formas de registar uma vaga."
+      },
+      "applicationForm": {
+        "title": "Preenche ou importa a vaga",
+        "description": "Preenche os campos principais manualmente ou usa Importar vaga. Ao guardares, regressas à lista de candidaturas."
+      },
+      "applications": {
+        "title": "Organiza as candidaturas",
+        "description": "Pesquisa, filtra e acompanha o estado de todas as oportunidades num só lugar."
+      },
+      "interviews": {
+        "title": "Prepara as entrevistas",
+        "description": "Aqui consultas as entrevistas e podes abrir uma nova através do botão Nova entrevista."
+      },
+      "interviewForm": {
+        "title": "Agenda todos os detalhes",
+        "description": "Seleciona a candidatura, o tipo, a data, o formato e os participantes antes de guardares a entrevista."
+      },
+      "recruiters": {
+        "title": "Guarda os contactos",
+        "description": "Mantém os recrutadores associados às empresas e candidaturas certas."
+      },
+      "tasks": {
+        "title": "Acompanha as próximas tarefas",
+        "description": "Controla follow-ups, prazos e outras tarefas para não deixares processos parados."
+      },
+      "statistics": {
+        "title": "Acompanha a evolução",
+        "description": "Estes indicadores dão-te uma visão rápida dos processos ativos, respostas e resultados."
+      }
+    }
   },
   "Header": {
     "searchLabel": "Pesquisar candidaturas",
@@ -157,7 +207,17 @@
     "profileUpdated": "Perfil atualizado com sucesso.",
     "language": {
       "title": "Idioma",
-      "description": "A preferência fica guardada neste browser."
+      "description": "Na primeira visita usamos o idioma do browser. A tua escolha fica guardada."
+    },
+    "fontSize": {
+      "title": "Tamanho do texto",
+      "description": "Ajusta a leitura neste browser sem alterar a estrutura da aplicação.",
+      "label": "Tamanho do texto: {value}%",
+      "smaller": "Menor",
+      "default": "Padrão",
+      "larger": "Maior",
+      "preview": "Exemplo de texto para confirmares o tamanho escolhido.",
+      "reset": "Repor tamanho"
     },
     "profile": {
       "title": "Perfil da conta",
@@ -364,7 +424,10 @@
     "personalScriptPlaceholder": "Fala-me sobre ti...\nPorque estás interessado nesta vaga?...",
     "companyQuestions": "Perguntas para a empresa",
     "companyQuestionsHint": "Perguntas sobre equipa, função, desafios, cultura ou próximos passos.",
-    "companyQuestionsPlaceholder": "Como é medido o sucesso nesta função?..."
+    "companyQuestionsPlaceholder": "Como é medido o sucesso nesta função?...",
+    "moreDetails": "Adicionar mais detalhes",
+    "hideMoreDetails": "Ocultar detalhes adicionais",
+    "moreDetailsDescription": "Estado, datas, salários, contacto, acompanhamento e preparação."
   },
   "JobImport": {
     "title": "Importar vaga",

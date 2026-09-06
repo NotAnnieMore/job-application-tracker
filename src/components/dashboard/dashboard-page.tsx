@@ -237,27 +237,34 @@ export async function DashboardPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader
-        title={t("title")}
-        description={t("description")}
-        action={
-          <div className="flex flex-wrap gap-2">
-            <Link
-              href="/candidaturas/nova?importar=vaga"
-              className={buttonClassName({ variant: "secondary" })}
-            >
-              <FileSearch aria-hidden="true" className="size-4" />
-              {t("importJob")}
-            </Link>
-            <Link href="/candidaturas/nova" className={buttonClassName()}>
-              <Plus aria-hidden="true" className="size-4" />
-              {t("newApplication")}
-            </Link>
-          </div>
-        }
-      />
+      <div data-tour="dashboard-overview">
+        <PageHeader
+          title={t("title")}
+          description={t("description")}
+          action={
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href="/candidaturas/nova?importar=vaga"
+                className={buttonClassName({ variant: "secondary" })}
+              >
+                <FileSearch aria-hidden="true" className="size-4" />
+                {t("importJob")}
+              </Link>
+              <Link
+                href="/candidaturas/nova"
+                className={buttonClassName()}
+                data-tour="add-application"
+              >
+                <Plus aria-hidden="true" className="size-4" />
+                {t("newApplication")}
+              </Link>
+            </div>
+          }
+        />
+      </div>
 
       <section
+        data-tour="statistics"
         className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4"
         aria-label={t("summary")}
       >
@@ -628,7 +635,7 @@ export async function DashboardPage() {
                       }}
                     />
                   </div>
-                  <span className="mt-2 text-[11px] font-bold tracking-wide text-slate-500">
+                  <span className="mt-2 text-[calc(0.6875rem*var(--app-font-scale))] font-bold tracking-wide text-slate-500">
                     {point.label}
                   </span>
                 </div>
@@ -698,7 +705,7 @@ export async function DashboardPage() {
                         {activity.description}
                       </span>
                     </span>
-                    <span className="shrink-0 text-[11px] font-medium text-slate-400">
+                    <span className="shrink-0 text-[calc(0.6875rem*var(--app-font-scale))] font-medium text-slate-400">
                       {timeLabel}
                     </span>
                   </Link>

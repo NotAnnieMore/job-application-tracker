@@ -15,6 +15,11 @@ pnpm format:check
 pnpm build
 ```
 
+Executar também `pnpm test:onboarding-ui` para validar a ordem do tour, os alvos
+estáveis de cada rota, a migração de perfil e a ativação do formulário progressivo,
+e `pnpm test:preferences` para validar a deteção inicial do idioma, a escala de
+texto e a preferência visual aplicada antes da renderização.
+
 A versão de produção foi também aberta automaticamente no Microsoft Edge em
 larguras de 375 px e 1440 px. Os ecrãs públicos de início de sessão, registo e
 recuperação de palavra-passe apresentaram:
@@ -41,6 +46,7 @@ recuperação de palavra-passe apresentaram:
 ### Idiomas PT-PT / EN-GB (implementação faseada)
 
 - [ ] alternar o idioma no cabeçalho, na autenticação e nas Definições;
+- [ ] sem o cookie de idioma, abrir com o browser em PT-PT, PT-BR e EN e confirmar respetivamente PT, PT e EN; depois escolher manualmente outro idioma e confirmar que essa escolha prevalece;
 - [ ] confirmar a persistência após F5 e a manutenção das rotas e da sessão;
 - [ ] abrir uma candidatura e verificar resumo, contratos conhecidos, datas, salários, contagens e notas nos dois idiomas;
 - [ ] confirmar que nomes, textos importados, guiões e notas não são traduzidos nem modificados;
@@ -87,6 +93,7 @@ não verifica a disponibilidade real do LinkedIn, Indeed ou Supabase. Consultar
 - [ ] alternar entre modo claro e escuro pelo cabeçalho e pelas Definições;
 - [ ] atualizar a página e terminar/iniciar sessão, confirmando que a preferência visual permanece neste browser.
 - [ ] atualizar com `F5` em modo escuro e confirmar que não existe um frame branco antes do conteúdo.
+- [ ] nas Definições, percorrer 90%, 95%, 100%, 105% e 110%, confirmar a persistência após F5 e verificar que não surgem cortes ou overflow a 320/375 px e no desktop.
 
 ### Dados principais
 
@@ -145,6 +152,12 @@ não verifica a disponibilidade real do LinkedIn, Indeed ou Supabase. Consultar
 - [ ] no formulário de candidatura, confirmar que “Importar vaga” é apresentado como um botão quadrado com ícone a 375 px e recupera o texto em ecrãs maiores;
 - [ ] abrir o detalhe de uma entrevista com títulos, guiões, perguntas, participantes e contactos longos a 375 px;
 - [ ] confirmar que todo o conteúdo da entrevista quebra dentro dos cartões, sem scroll horizontal nem elementos cortados à direita.
+- [ ] numa conta com `onboarding_version = 0`, confirmar o welcome e percorrer os nove passos com rato, Tab, setas e Escape;
+- [ ] terminar ou ignorar a visita, iniciar sessão com a mesma conta noutro dispositivo e confirmar que o welcome não reaparece;
+- [ ] reiniciar manualmente a visita pela barra lateral nos temas claro/escuro e em PT/EN;
+- [ ] confirmar que, em cada rota do tour, o item correspondente da barra lateral mantém o mesmo aspeto ativo e permanece iluminado sem uma caixa branca artificial;
+- [ ] criar uma candidatura com os detalhes recolhidos, importar uma vaga e confirmar que os campos avançados preenchidos são guardados;
+- [ ] provocar um erro num campo avançado e confirmar que a secção abre para mostrar a mensagem;
 
 Os testes que eliminam dados devem usar registos temporários criados para esse
 fim, evitando alterar candidaturas reais.

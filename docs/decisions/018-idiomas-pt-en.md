@@ -6,7 +6,8 @@ Data: 4 de setembro de 2026
 
 ## Decisão
 
-- Usar `next-intl` com os idiomas `pt-PT` (predefinido) e `en-GB`.
+- Usar `next-intl` com os idiomas `pt-PT` e `en-GB`.
+- Sem uma preferência guardada, escolher `pt-PT` apenas quando o primeiro idioma indicado pelo browser for `pt-PT` ou `pt-BR`; usar `en-GB` para qualquer outro idioma.
 - Manter as rotas existentes, sem prefixos de idioma, para preservar ligações e redirecionamentos de autenticação.
 - Guardar a preferência no cookie `job-tracker-locale`, válido durante um ano e disponível no servidor para renderizar o idioma correto desde o primeiro pedido.
 - Disponibilizar a seleção no cabeçalho, na autenticação e nas Definições.
@@ -31,7 +32,7 @@ Data: 4 de setembro de 2026
 - Agenda: filtros por tipo/período, contagens, datas, indicadores de hoje/amanhã e textos de fallback, preservando as descrições guardadas e o fuso horário.
 - Validação e mensagens das ações de autenticação, perfil, candidaturas, entrevistas e notas, incluindo erros de estados rápidos, guiões e resultado/notas.
 - Avisos e erros da API de importação no idioma escolhido. Erros conhecidos usam chaves tipadas; erros inesperados devolvem uma mensagem genérica, sem expor detalhes técnicos.
-- Páginas globais de erro e 404. O erro do layout raiz funciona sem o provider de traduções: usa PT como fallback no servidor e lê a preferência do cookie após hidratação.
+- Páginas globais de erro e 404. O erro do layout raiz funciona sem o provider de traduções: usa EN como fallback no servidor e lê a preferência do cookie após hidratação.
 
 ## Validação visual e documentação
 

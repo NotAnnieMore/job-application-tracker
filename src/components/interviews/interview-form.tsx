@@ -7,6 +7,7 @@ import { useActionState, useMemo, useState } from "react";
 import { useFormStatus } from "react-dom";
 
 import { CompanyLogo } from "@/components/companies/company-logo";
+import { PageHeader } from "@/components/shared/page-header";
 import { Button, buttonClassName } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { FormField, fieldClassName } from "@/components/ui/form-field";
@@ -74,6 +75,8 @@ export function InterviewForm({
   initialValues,
   submitLabel,
   cancelHref = "/entrevistas",
+  headerTitle,
+  headerDescription,
 }: {
   action: InterviewFormAction;
   applications: InterviewApplicationOption[];
@@ -81,6 +84,8 @@ export function InterviewForm({
   initialValues: InterviewFormValues;
   submitLabel: string;
   cancelHref?: string;
+  headerTitle?: string;
+  headerDescription?: string;
 }) {
   const t = useTranslations("InterviewForm");
   const tStatus = useTranslations("Enums.interviewStatus");
@@ -107,6 +112,18 @@ export function InterviewForm({
           recruiter.companyId === selectedApplication?.companyId,
       ),
     [recruiters, selectedApplication?.companyId],
+  );
+  const interviewTypes = Array.from(
+    new Set([
+      initialValues.interviewType,
+      t("types.initial"),
+      t("types.hr"),
+      t("types.technical"),
+      t("types.coding"),
+      t("types.manager"),
+      t("types.culture"),
+      t("types.final"),
+    ]),
   );
 
   function chooseApplication(nextApplicationId: string) {
@@ -145,9 +162,27 @@ export function InterviewForm({
         value={initialValues.preparation}
       />
 
-      <div className="flex justify-end">
-        <SubmitButton label={submitLabel} />
-      </div>
+      {headerTitle ? (
+        <PageHeader
+          title={headerTitle}
+          description={headerDescription}
+          action={
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href={cancelHref}
+                className={buttonClassName({ variant: "secondary" })}
+              >
+                {t("cancel")}
+              </Link>
+              <SubmitButton label={submitLabel} />
+            </div>
+          }
+        />
+      ) : (
+        <div className="flex justify-end">
+          <SubmitButton label={submitLabel} />
+        </div>
+      )}
 
       {state.message ? (
         <p
@@ -159,7 +194,7 @@ export function InterviewForm({
         </p>
       ) : null}
 
-      <Card>
+      <Card data-tour="interview-form">
         <CardHeader>
           <div>
             <h2 className="font-bold text-slate-950">{t("scheduling")}</h2>
@@ -202,31 +237,19 @@ export function InterviewForm({
             hint={t("interviewTypeHint")}
             error={state.fieldErrors?.interviewType}
           >
-            <input
+            <select
               id="interview-type"
               name="interviewType"
-              type="text"
-              list="interview-types"
               defaultValue={initialValues.interviewType}
               className={fieldClassName}
-              maxLength={120}
               required
-            />
-            <datalist id="interview-types">
-              {(
-                [
-                  "initial",
-                  "hr",
-                  "technical",
-                  "coding",
-                  "manager",
-                  "culture",
-                  "final",
-                ] as const
-              ).map((type) => (
-                <option key={type} value={t(`types.${type}`)} />
+            >
+              {interviewTypes.map((type) => (
+                <option key={type} value={type}>
+                  {type}
+                </option>
               ))}
-            </datalist>
+            </select>
           </FormField>
 
           <FormField

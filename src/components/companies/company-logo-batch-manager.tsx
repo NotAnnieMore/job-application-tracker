@@ -356,7 +356,7 @@ export function CompanyLogoBatchManager({
                             <span className="mt-2 block w-full truncate text-xs font-semibold text-slate-800">
                               {result.name}
                             </span>
-                            <span className="mt-0.5 block w-full truncate text-[11px] text-slate-500">
+                            <span className="mt-0.5 block w-full truncate text-[calc(0.6875rem*var(--app-font-scale))] text-slate-500">
                               {result.domain}
                             </span>
                           </button>

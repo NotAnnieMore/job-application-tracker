@@ -3,7 +3,12 @@
 import { useEffect, useSyncExternalStore } from "react";
 import ptMessages from "../../messages/pt-PT.json";
 import enMessages from "../../messages/en-GB.json";
-import { defaultLocale, isAppLocale, localeCookieName } from "@/i18n/config";
+import {
+  defaultLocale,
+  isAppLocale,
+  localeCookieName,
+  localeFromAcceptLanguage,
+} from "@/i18n/config";
 
 // The root error boundary replaces the layout, so no translation provider is available.
 function subscribe() {
@@ -15,7 +20,9 @@ function readLocale() {
       .split("; ")
       .find((cookie) => cookie.startsWith(localeCookieName + "="))
       ?.split("=")[1];
-    return isAppLocale(value) ? value : defaultLocale;
+    return isAppLocale(value)
+      ? value
+      : localeFromAcceptLanguage(window.navigator.language);
   } catch {
     return defaultLocale;
   }
@@ -43,10 +50,10 @@ export default function GlobalError({
         <script
           dangerouslySetInnerHTML={{
             __html:
-              'try{var theme=localStorage.getItem("job-tracker-theme")==="dark"?"dark":"light";document.documentElement.dataset.theme=theme}catch(e){}',
+              'try{var root=document.documentElement;var theme=localStorage.getItem("job-tracker-theme")==="dark"?"dark":"light";var storedScale=localStorage.getItem("job-tracker-font-scale");var scale=["90","95","100","105","110"].includes(storedScale)?storedScale:"100";root.dataset.theme=theme;root.dataset.fontScale=scale;root.style.setProperty("--error-font-scale",String(Number(scale)/100))}catch(e){}',
           }}
         />
-        <style>{`:root{--error-background:#f7f9fc;--error-foreground:#172033;--error-surface:#fff;--error-border:#e5eaf1;--error-muted:#64748b}[data-theme="dark"]{color-scheme:dark;--error-background:#080d17;--error-foreground:#e7edf6;--error-surface:#111927;--error-border:#2a3548;--error-muted:#94a3b8}`}</style>
+        <style>{`:root{--error-font-scale:1;--error-background:#f7f9fc;--error-foreground:#172033;--error-surface:#fff;--error-border:#e5eaf1;--error-muted:#64748b}[data-theme="dark"]{color-scheme:dark;--error-background:#080d17;--error-foreground:#e7edf6;--error-surface:#111927;--error-border:#2a3548;--error-muted:#94a3b8}`}</style>
       </head>
       <body
         style={{
@@ -55,6 +62,7 @@ export default function GlobalError({
           color: "var(--error-foreground)",
           display: "flex",
           fontFamily: "Arial, Helvetica, sans-serif",
+          fontSize: "calc(16px * var(--error-font-scale))",
           justifyContent: "center",
           margin: 0,
           minHeight: "100vh",
@@ -74,7 +82,12 @@ export default function GlobalError({
           }}
         >
           <title>{messages.errorTitle}</title>
-          <h1 style={{ fontSize: "24px", margin: 0 }}>
+          <h1
+            style={{
+              fontSize: "calc(24px * var(--error-font-scale))",
+              margin: 0,
+            }}
+          >
             {messages.globalHeading}
           </h1>
           <p
@@ -95,7 +108,7 @@ export default function GlobalError({
               borderRadius: "12px",
               color: "#ffffff",
               cursor: "pointer",
-              fontSize: "14px",
+              fontSize: "calc(14px * var(--error-font-scale))",
               fontWeight: 700,
               marginTop: "20px",
               minHeight: "44px",

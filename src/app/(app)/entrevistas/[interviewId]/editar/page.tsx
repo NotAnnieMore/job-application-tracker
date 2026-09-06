@@ -5,7 +5,6 @@ import { getTranslations } from "next-intl/server";
 
 import { DeleteInterviewForm } from "@/components/interviews/delete-interview-form";
 import { InterviewForm } from "@/components/interviews/interview-form";
-import { PageHeader } from "@/components/shared/page-header";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { updateInterviewAction } from "@/features/interviews/actions";
 import {
@@ -49,10 +48,6 @@ export default async function EditInterviewPage({
         <ArrowLeft aria-hidden="true" className="size-4" />
         {t("backToSummary")}
       </Link>
-      <PageHeader
-        title={t("prepareTitle", { type: interview.interviewType })}
-        description={t("editDescription")}
-      />
       <InterviewForm
         action={action}
         applications={applications}
@@ -60,6 +55,8 @@ export default async function EditInterviewPage({
         initialValues={interview}
         submitLabel={t("saveChanges")}
         cancelHref={returnHref}
+        headerTitle={t("prepareTitle", { type: interview.interviewType })}
+        headerDescription={t("editDescription")}
       />
 
       <Card className="border-red-200">

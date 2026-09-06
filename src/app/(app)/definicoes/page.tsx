@@ -5,6 +5,7 @@ import { LanguageSettings } from "@/components/i18n/language-settings";
 import { PageHeader } from "@/components/shared/page-header";
 import { SuccessToast } from "@/components/shared/success-toast";
 import { ThemeSettings } from "@/components/theme/theme-settings";
+import { FontSizeSettings } from "@/components/accessibility/font-size-settings";
 import { buttonClassName } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { requireCurrentUser } from "@/lib/auth/session";
@@ -28,6 +29,7 @@ export default async function SettingsPage({
       <SuccessToast message={notice} />
       <LanguageSettings />
       <ThemeSettings />
+      <FontSizeSettings />
       <ProfileForm
         key={`${user.fullName}-${user.avatarUrl}`}
         fullName={user.fullName}

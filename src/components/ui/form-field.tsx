@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 
+import { cn } from "@/lib/utils";
+
 export const fieldClassName =
   "h-11 w-full rounded-xl border border-slate-200 bg-white px-3.5 text-sm text-slate-800 outline-none transition placeholder:text-slate-400 focus:border-blue-400 focus:ring-3 focus:ring-blue-100 disabled:cursor-not-allowed disabled:bg-slate-50 disabled:text-slate-500";
 
@@ -9,6 +11,7 @@ export function FormField({
   required,
   hint,
   error,
+  className,
   children,
 }: {
   label: string;
@@ -16,10 +19,11 @@ export function FormField({
   required?: boolean;
   hint?: string;
   error?: string;
+  className?: string;
   children: ReactNode;
 }) {
   return (
-    <div>
+    <div className={cn(className)}>
       <label htmlFor={htmlFor} className="text-sm font-semibold text-slate-700">
         {label}
         {required ? <span className="ml-1 text-red-500">*</span> : null}

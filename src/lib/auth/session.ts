@@ -19,7 +19,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     typeof data.claims.email === "string" ? data.claims.email : "Sem email";
   const { data: profile } = await supabase
     .from("profiles")
-    .select("full_name, avatar_path, updated_at")
+    .select("full_name, avatar_path, onboarding_version, updated_at")
     .eq("id", userId)
     .maybeSingle();
 
@@ -32,6 +32,7 @@ export const getCurrentUser = cache(async (): Promise<CurrentUser | null> => {
     email,
     fullName: profile?.full_name ?? email.split("@")[0] ?? "Utilizador",
     avatarUrl,
+    onboardingVersion: profile?.onboarding_version ?? 0,
   };
 });
 
