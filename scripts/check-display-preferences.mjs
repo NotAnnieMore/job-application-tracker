@@ -47,6 +47,11 @@ assert.match(requestSource, /get\("accept-language"\)/u);
 assert.match(layoutSource, /job-tracker-font-scale/u);
 assert.match(layoutSource, /data-font-scale="100"/u);
 assert.match(settingsSource, /<FontSizeSettings\s*\/>/u);
+assert.match(settingsSource, /lg:grid-cols-3/u);
+assert.match(
+  settingsSource,
+  /xl:grid-cols-\[minmax\(0,2fr\)_minmax\(300px,1fr\)\]/u,
+);
 assert.match(fontSettingsSource, /type="range"/u);
 assert.match(fontSettingsSource, /\[90, 95, 100, 105, 110\]/u);
 assert.match(css, /--app-font-scale: 1/u);
@@ -57,5 +62,5 @@ assert.doesNotMatch(
 );
 
 console.log(
-  "Display preferences OK: browser locale, manual-preference fallback, text scale and tour navigation styling verified.",
+  "Display preferences OK: browser locale, text scale, compact settings layout and tour navigation styling verified.",
 );

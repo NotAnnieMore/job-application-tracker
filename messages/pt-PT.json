@@ -205,6 +205,10 @@
     "title": "Definições",
     "description": "Gere os dados apresentados na tua conta.",
     "profileUpdated": "Perfil atualizado com sucesso.",
+    "preferences": {
+      "title": "Preferências da aplicação",
+      "description": "Personaliza o idioma, a aparência e a leitura."
+    },
     "language": {
       "title": "Idioma",
       "description": "Na primeira visita usamos o idioma do browser. A tua escolha fica guardada."

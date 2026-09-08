@@ -104,33 +104,36 @@ export function ProfileForm({
   const avatarError = clientAvatarError || state.fieldErrors?.avatar;
 
   return (
-    <form action={formAction} className="space-y-6">
+    <form action={formAction}>
       {state.message ? (
         <p
           role="alert"
           aria-live="polite"
-          className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
+          className="mb-4 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm leading-6 text-red-700"
         >
           {state.message}
         </p>
       ) : null}
 
       <Card>
-        <CardHeader>
-          <div>
+        <CardHeader className="flex-wrap px-4 py-3.5 sm:px-5">
+          <div className="min-w-0 flex-1 basis-full sm:basis-auto">
             <h2 className="font-bold text-slate-950">{t("title")}</h2>
-            <p className="mt-1 text-sm text-slate-500">{t("description")}</p>
+            <p className="mt-0.5 text-sm text-slate-500">{t("description")}</p>
+          </div>
+          <div className="ml-auto">
+            <SubmitButton />
           </div>
         </CardHeader>
-        <CardContent className="grid gap-8 lg:grid-cols-[220px_1fr]">
-          <div className="flex flex-col items-center rounded-2xl bg-slate-50 px-5 py-6 text-center">
+        <CardContent className="grid gap-5 p-4 sm:grid-cols-[160px_minmax(0,1fr)] sm:p-5">
+          <div className="flex flex-col items-center rounded-xl bg-slate-50 px-4 py-4 text-center">
             <UserAvatar fullName={name} imageUrl={previewUrl} size="lg" />
             <label
               htmlFor="profile-avatar"
               className={buttonClassName({
                 variant: "secondary",
                 size: "sm",
-                className: "mt-5 cursor-pointer",
+                className: "mt-3 cursor-pointer",
               })}
             >
               <ImagePlus aria-hidden="true" className="size-4" />
@@ -156,7 +159,7 @@ export function ProfileForm({
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="mt-2 text-red-600 hover:bg-red-50 hover:text-red-700"
+                className="mt-1 text-red-600 hover:bg-red-50 hover:text-red-700"
                 onClick={handleRemoveAvatar}
               >
                 <Trash2 aria-hidden="true" className="size-4" />
@@ -165,7 +168,7 @@ export function ProfileForm({
             ) : null}
             <p
               id="profile-avatar-hint"
-              className="mt-3 text-xs leading-5 text-slate-500"
+              className="mt-2 text-xs leading-5 text-slate-500"
             >
               {t("photoHint")}
             </p>
@@ -176,7 +179,7 @@ export function ProfileForm({
             ) : null}
           </div>
 
-          <div className="grid content-start gap-5 md:grid-cols-2">
+          <div className="grid min-w-0 content-start gap-4 lg:grid-cols-2">
             <FormField
               label={t("name")}
               htmlFor="profile-name"
@@ -216,10 +219,6 @@ export function ProfileForm({
           </div>
         </CardContent>
       </Card>
-
-      <div className="flex justify-end">
-        <SubmitButton />
-      </div>
     </form>
   );
 }

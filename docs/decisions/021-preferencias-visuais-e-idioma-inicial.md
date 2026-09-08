@@ -20,3 +20,7 @@ Não é necessária qualquer migração ou alteração aos dados da conta. A pre
 ## Verificação
 
 `pnpm test:preferences` valida a regra PT-PT/PT-BR, o fallback inglês, a ligação entre os ficheiros e a ausência do fundo branco forçado no destaque da navegação. Esta verificação estrutural não substitui a confirmação visual dos cinco tamanhos suportados.
+
+## Ajuste da página de Definições
+
+Em 8 de setembro de 2026, idioma, tema e tamanho de texto foram reunidos num único cartão responsivo. No desktop, os três controlos ocupam colunas lado a lado; em ecrãs pequenos mantêm a ordem vertical. O perfil passou a ter menos espaço vazio, avatar de 80 px e ação de guardar no cabeçalho. A privacidade ocupa um cartão lateral mais curto. Não foram alteradas preferências, validações, ações de servidor ou dados.

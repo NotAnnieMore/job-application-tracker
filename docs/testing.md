@@ -94,6 +94,7 @@ não verifica a disponibilidade real do LinkedIn, Indeed ou Supabase. Consultar
 - [ ] atualizar a página e terminar/iniciar sessão, confirmando que a preferência visual permanece neste browser.
 - [ ] atualizar com `F5` em modo escuro e confirmar que não existe um frame branco antes do conteúdo.
 - [ ] nas Definições, percorrer 90%, 95%, 100%, 105% e 110%, confirmar a persistência após F5 e verificar que não surgem cortes ou overflow a 320/375 px e no desktop.
+- [ ] nas Definições, confirmar que idioma, tema e tamanho do texto aparecem no mesmo cartão, que o perfil e a privacidade formam duas colunas no desktop e que todos os blocos empilham corretamente em mobile.
 
 ### Dados principais
 

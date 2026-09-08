@@ -205,6 +205,10 @@
     "title": "Settings",
     "description": "Manage the details displayed on your account.",
     "profileUpdated": "Profile updated successfully.",
+    "preferences": {
+      "title": "App preferences",
+      "description": "Personalise the language, appearance and readability."
+    },
     "language": {
       "title": "Language",
       "description": "On your first visit, we use your browser language. Your choice is then saved."

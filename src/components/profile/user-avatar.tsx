@@ -6,7 +6,7 @@ import { cn } from "@/lib/utils";
 
 const sizeClasses = {
   sm: "size-9 text-xs",
-  lg: "size-24 text-xl",
+  lg: "size-20 text-lg",
 };
 
 export function getUserInitials(fullName: string) {
